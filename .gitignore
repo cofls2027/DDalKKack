@@ -1,0 +1,13 @@
+# --- Android (frontend) ---
+/frontend/build/
+/frontend/app/build/
+/frontend/.gradle/
+/frontend/local.properties
+
+# --- Backend (Node.js) ---
+/backend/node_modules/
+/backend/.env
+
+# --- OS/Tools ---
+.DS_Store
+.idea/
