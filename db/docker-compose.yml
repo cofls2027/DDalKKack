@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: receipt_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword     # 루트 비밀번호 (개발용)
+      MYSQL_DATABASE: receipt_manager       # 자동으로 생성될 데이터베이스 이름
+      MYSQL_USER: receipt_user              # 생성될 유저 계정
+      MYSQL_PASSWORD: receipt_password      # 유저 비밀번호
+    volumes:
+      - db_data:/var/lib/mysql              # 컨테이너를 껐다 켜도 데이터가 날아가지 않게 보존
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 한글 깨짐 방지
+
+volumes:
+  db_data:
