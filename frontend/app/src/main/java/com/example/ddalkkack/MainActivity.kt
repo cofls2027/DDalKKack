@@ -109,7 +109,8 @@ data class ReceiptSummary(
     val participants: String = "",
     val tripId: Long? = null,
     val imagePath: String? = null,
-    val warnings: List<String> = emptyList()
+    val warnings: List<String> = emptyList(),
+    val rejectionReasons: List<String> = emptyList()
 )
 
 data class AnalyzeReceiptRequest(
@@ -130,7 +131,14 @@ data class AnalyzeReceiptResult(
     val tripId: Long? = null,
     val status: ExpenseStatus,
     val warnings: List<String>,
+    val rejectionReasons: List<String> = emptyList(),
     val imagePath: String?
+)
+
+data class PolicyValidationResult(
+    val status: ExpenseStatus,
+    val warnings: List<String>,
+    val rejectionReasons: List<String>
 )
 
 enum class ExpenseStatus(
@@ -222,91 +230,94 @@ fun DDalKKackApp() {
         colorScheme = colorScheme
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            var isLoggedIn by remember { mutableStateOf(false) }
+    modifier = Modifier.fillMaxSize(),
+    color = MaterialTheme.colorScheme.background
+) {
+    var isLoggedIn by remember { mutableStateOf(false) }
+    var hasRegisteredCard by remember { mutableStateOf(false) }
 
-            val quickReceipts = remember {
-                mutableStateListOf<QuickReceipt>()
-            }
+    val quickReceipts = remember {
+        mutableStateListOf<QuickReceipt>()
+    }
 
-            val receipts = remember {
-                mutableStateListOf(
-                    ReceiptSummary(
-                        id = "sample-1",
-                        merchant = "스타벅스",
-                        amount = 15000,
-                        category = "식비",
-                        status = ExpenseStatus.Reviewing
-                    ),
-                    ReceiptSummary(
-                        id = "sample-2",
-                        merchant = "KTX",
-                        amount = 59800,
-                        category = "교통",
-                        status = ExpenseStatus.Approved
-                    ),
-                    ReceiptSummary(
-                        id = "sample-3",
-                        merchant = "OO식당",
-                        amount = 53200,
-                        category = "회의비",
-                        status = ExpenseStatus.Rejected
-                    )
-                )
-                val registeredCards = remember {
-                    mutableStateListOf<RegisteredCard>()
-                }
-                val trips = remember {
-                    mutableStateListOf(
-                        TripSummary(
-                            id = 1,
-                            tripName = "부산 고객사 방문",
-                            tripPurpose = "계약 협의 및 현장 점검",
-                            tripCompanions = "백다인, 원의재",
-                            startDate = "2026.05.10",
-                            endDate = "2026.05.12"
-                        ),
-                        TripSummary(
-                            id = 2,
-                            tripName = "서울 세미나 참석",
-                            tripPurpose = "AI 비용처리 세미나 참석",
-                            tripCompanions = "오현",
-                            startDate = "2026.05.18",
-                            endDate = "2026.05.18"
-                        )
-                    )
-                }
-            }
+    val receipts = remember {
+        mutableStateListOf(
+            ReceiptSummary(
+                id = "sample-1",
+                merchant = "스타벅스",
+                amount = 15000,
+                category = "식비",
+                status = ExpenseStatus.Reviewing
+            ),
+            ReceiptSummary(
+                id = "sample-2",
+                merchant = "KTX",
+                amount = 59800,
+                category = "교통",
+                status = ExpenseStatus.Approved
+            ),
+            ReceiptSummary(
+                id = "sample-3",
+                merchant = "OO식당",
+                amount = 53200,
+                category = "회의비",
+                status = ExpenseStatus.Rejected
+            )
+        )
+    }
 
-            if (isLoggedIn) {
-                if (!hasRegisteredCard) {
-                    CardOnboardingScreen(
-                        onComplete = { card ->
-                            registeredCards.add(card)
-                            hasRegisteredCard = true
-                        }
-                    )
-                } else {
-                    MainShell(
-                        quickReceipts = quickReceipts,
-                        receipts = receipts,
-                        registeredCards = registeredCards,
-                        trips = trips,
-                        onLogout = {
-                            isLoggedIn = false
-                        }
-                    )
+    val registeredCards = remember {
+        mutableStateListOf<RegisteredCard>()
+    }
+
+    val trips = remember {
+        mutableStateListOf(
+            TripSummary(
+                id = 1,
+                tripName = "부산 고객사 방문",
+                tripPurpose = "계약 협의 및 현장 점검",
+                tripCompanions = "백다인, 원의재",
+                startDate = "2026.05.10",
+                endDate = "2026.05.12"
+            ),
+            TripSummary(
+                id = 2,
+                tripName = "서울 세미나 참석",
+                tripPurpose = "AI 비용처리 세미나 참석",
+                tripCompanions = "오현",
+                startDate = "2026.05.18",
+                endDate = "2026.05.18"
+            )
+        )
+    }
+
+    if (isLoggedIn) {
+        if (!hasRegisteredCard) {
+            CardOnboardingScreen(
+                onComplete = { card ->
+                    registeredCards.add(card)
+                    hasRegisteredCard = true
                 }
-            } else {
-                LoginScreen(
-                    onLoginSuccess = {
-                        isLoggedIn = true
-                    }
-                )
-            }
+            )
+        } else {
+            MainShell(
+                quickReceipts = quickReceipts,
+                receipts = receipts,
+                registeredCards = registeredCards,
+                trips = trips,
+                onLogout = {
+                    isLoggedIn = false
+                }
+            )
         }
+    } else {
+        LoginScreen(
+            onLoginSuccess = {
+                isLoggedIn = true
+            }
+        )
+    }
+}
     }
 }
 
@@ -552,7 +563,7 @@ fun MainShell(
                     receipts = receipts
                 )
 
-                Screen.Menu -> MenuScreen(
+                Screen.Profile -> MenuScreen(
                     onLogout = onLogout,
                     onMoveCardInfo = {
                         currentScreen = Screen.CardInfo
@@ -571,22 +582,12 @@ fun MainShell(
 
                 Screen.RulesInfo -> CompanyRulesScreen(
                     onBack = {
-                        currentScreen = Screen.Menu
+                        currentScreen = Screen.Profile
                     }
-                )
-                
-                Screen.Trips -> TripsScreen(
-                    trips = trips
                 )
 
-                Screen.Profile -> ProfileScreen(
-                    onLogout = onLogout,
-                    onMoveCardInfo = {
-                        currentScreen = Screen.CardInfo
-                    },
-                    onMoveRulesInfo = {
-                        currentScreen = Screen.RulesInfo
-                    }
+                Screen.Trips -> TripsScreen(
+                    trips = trips
                 )
             }
         }
@@ -1702,33 +1703,30 @@ fun AnalysisResultScreen(
     var purpose by remember { mutableStateOf(result.purpose) }
     var participants by remember { mutableStateOf(result.participants) }
 
-    val currentWarnings = buildList {
-        if (category.contains("회의") && purpose.isBlank()) {
-            add("회의비로 처리하려면 사용 목적 입력이 필요합니다.")
-        }
-
-        if (category.contains("회의") && participants.isBlank()) {
-            add("참여자 정보가 누락되어 검토중 상태로 분류되었습니다.")
-        }
-    }
+    val policyResult = validateReceiptPolicyResult(
+    category = category,
+    amount = amountText.toIntOrNull() ?: result.amount,
+    cardType = cardType,
+    purpose = purpose,
+    participants = participants,
+    time = time,
+    tripId = result.tripId
+    )
 
     val editedResult = result.copy(
-        merchant = merchant,
-        amount = amountText.toIntOrNull() ?: result.amount,
-        date = date,
-        time = time,
-        category = category,
-        cardType = cardType,
-        cardCompany = cardCompany,
-        cardNumber = cardNumber,
-        purpose = purpose,
-        participants = participants,
-        warnings = currentWarnings,
-        status = if (currentWarnings.isEmpty()) {
-            ExpenseStatus.Approved
-        } else {
-            ExpenseStatus.Reviewing
-        }
+    merchant = merchant,
+    amount = amountText.toIntOrNull() ?: result.amount,
+    date = date,
+    time = time,
+    category = category,
+    cardType = cardType,
+    cardCompany = cardCompany,
+    cardNumber = cardNumber,
+    purpose = purpose,
+    participants = participants,
+    warnings = policyResult.warnings,
+    rejectionReasons = policyResult.rejectionReasons,
+    status = policyResult.status
     )
 
     Column(
@@ -1887,6 +1885,10 @@ fun AnalysisResultScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         WarningSection(warnings = editedResult.warnings)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        RejectionReasonSection(reasons = editedResult.rejectionReasons)
 
         Spacer(modifier = Modifier.height(22.dp))
 
@@ -2065,6 +2067,10 @@ fun ReceiptDetailScreen(
 
         WarningSection(warnings = receipt.warnings)
 
+        Spacer(modifier = Modifier.height(12.dp))
+
+        RejectionReasonSection(reasons = receipt.rejectionReasons)
+
         Spacer(modifier = Modifier.height(22.dp))
 
         OutlinedButton(
@@ -2122,7 +2128,11 @@ fun WarningSection(
             modifier = Modifier.padding(18.dp)
         ) {
             Text(
-                text = "규정 검증 결과",
+                text = if (warnings.any { it.contains("반려") }) {
+                    "반려 사유"
+                } else {
+                    "규정 검증 결과"
+                },
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -2223,7 +2233,84 @@ fun AnalyzeReceiptResult.toReceiptSummary(): ReceiptSummary {
         participants = participants,
         tripId = tripId,
         imagePath = imagePath,
-        warnings = warnings
+        warnings = warnings,
+        rejectionReasons = rejectionReasons
+    )
+}
+
+fun validateReceiptPolicyResult(
+    category: String,
+    amount: Int,
+    cardType: String,
+    purpose: String,
+    participants: String,
+    time: String,
+    tripId: Long?
+): PolicyValidationResult {
+    val warnings = mutableListOf<String>()
+    val rejectionReasons = mutableListOf<String>()
+
+    if (
+        cardType == "회사카드" &&
+        category.contains("식") &&
+        amount > 15000
+    ) {
+        warnings.add("회사카드 일반 식대는 1인 1식 기준 15,000원을 초과할 수 있습니다.")
+    }
+
+    if (
+        (category.contains("회의") || category.contains("접대")) &&
+        purpose.isBlank()
+    ) {
+        warnings.add("회의비/접대비로 처리하려면 사용 목적 입력이 필요합니다.")
+    }
+
+    if (
+        (category.contains("회의") || category.contains("접대")) &&
+        participants.isBlank()
+    ) {
+        warnings.add("회의비/접대비로 처리하려면 참여자 정보 입력이 필요합니다.")
+    }
+
+    if (
+        cardType == "정부지원카드" &&
+        purpose.isBlank()
+    ) {
+        warnings.add("정부지원카드는 과제 관련 사용 목적을 반드시 입력해야 합니다.")
+    }
+
+    if (
+        cardType == "정부지원카드" &&
+        (category.contains("접대") || category.contains("회식"))
+    ) {
+        rejectionReasons.add("정부지원카드는 접대비 또는 회식비로 사용할 수 없습니다.")
+    }
+
+    if (
+        category.contains("주류") ||
+        category.contains("담배") ||
+        category.contains("유흥")
+    ) {
+        rejectionReasons.add("주류, 담배, 유흥업소 관련 지출은 비용 처리할 수 없습니다.")
+    }
+
+    if (
+        (category.contains("출장") || category.contains("숙박")) &&
+        tripId == null
+    ) {
+        warnings.add("출장/숙박 관련 지출은 출장 정보와 연결하는 것이 권장됩니다.")
+    }
+
+    val status = when {
+        rejectionReasons.isNotEmpty() -> ExpenseStatus.Rejected
+        warnings.isNotEmpty() -> ExpenseStatus.Reviewing
+        else -> ExpenseStatus.Approved
+    }
+
+    return PolicyValidationResult(
+        status = status,
+        warnings = warnings,
+        rejectionReasons = rejectionReasons
     )
 }
 
@@ -2544,61 +2631,6 @@ fun StatBar(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ProfileMenuCard(
-    icon: String,
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = icon,
-                fontSize = 28.sp
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = description,
-                    color = Color(0xFF6B7280),
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp
-                )
-            }
-
-            Text(
-                text = "›",
-                fontSize = 28.sp,
-                color = Color(0xFF9CA3AF)
-            )
         }
     }
 }
@@ -3078,28 +3110,43 @@ fun CompanyRulesScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         RuleInfoItem(
-            title = "식비",
-            description = "업무 관련 식사는 1인 30,000원 이하 권장. 초과 시 목적 및 참여자 입력 필요."
+            title = "회사카드 식대",
+            description = "일반 식대는 1인 1식 기준 최대 15,000원까지 인정됩니다. 야근 식대는 오후 8시 이후 1인 기준 최대 20,000원까지 인정됩니다."
         )
 
         RuleInfoItem(
             title = "교통비",
-            description = "출장 또는 외근 목적의 교통비만 인정. 택시 사용 시 사유 입력 필요."
+            description = "외근, 출장 등 업무 목적 이동 시 지원됩니다. 대중교통은 실비 정산하며, 택시는 야간 업무 또는 대중교통 이용이 어려운 경우 인정됩니다."
+        )
+
+        RuleInfoItem(
+            title = "회식비",
+            description = "팀 회식 및 조직 활성화 목적에 한하여 지원됩니다. 팀장 이상 사전 승인 후 진행 가능하며, 1인 기준 최대 50,000원까지 인정됩니다."
+        )
+
+        RuleInfoItem(
+            title = "접대비",
+            description = "거래처 미팅, 고객 응대, 사업 협의 등 업무 목적에 한하여 사용 가능합니다. 참석자, 사용 목적, 거래처 정보를 기재해야 합니다."
         )
 
         RuleInfoItem(
             title = "정부지원카드",
-            description = "정부지원사업 카드는 별도 규정 적용. 주류, 담배, 사적 사용 항목은 반려 가능."
+            description = "정부지원카드는 승인된 과제 목적에 한하여 사용 가능합니다. 회의 목적과 참석자 작성이 필요하며, 주류·유흥업소·개인 용도 사용은 제한됩니다."
+        )
+
+        RuleInfoItem(
+            title = "정부지원카드 회의비/식대",
+            description = "과제 관련 회의 및 업무 협의 목적에 한해 인정됩니다. 일반 회의 식대는 1인당 30,000원 이하, 외부 전문가 포함 시 50,000원 이하를 권장합니다."
+        )
+
+        RuleInfoItem(
+            title = "출장비",
+            description = "출장 관련 지출은 출장 ID 또는 관련 업무와 연결해야 합니다. 출장 여부가 등록되지 않은 경우 일반 지출 규정을 우선 적용합니다."
         )
 
         RuleInfoItem(
             title = "금지 가능 항목",
-            description = "담배, 주류, 개인 물품, 업무 무관 지출은 경고 또는 반려 대상으로 분류."
-        )
-
-        RuleInfoItem(
-            title = "출장 지출",
-            description = "출장 상태값이 있는 경우 숙박/교통 항목 허용 범위가 일반 지출과 다르게 적용."
+            description = "담배, 주류, 유흥업소, 개인 물품, 사적 여행 경비, 의류 및 사치품 등은 경고 또는 반려 대상으로 분류될 수 있습니다."
         )
 
         Spacer(modifier = Modifier.height(22.dp))
@@ -3266,4 +3313,41 @@ fun currentTimeText(): String {
 
 fun formatWon(amount: Int): String {
     return "%,d원".format(amount)
+}
+
+@Composable
+fun RejectionReasonSection(
+    reasons: List<String>
+) {
+    if (reasons.isEmpty()) return
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = "반려 사유",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFD93025)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            reasons.forEach { reason ->
+                Text(
+                    text = "• $reason",
+                    color = Color(0xFFD93025),
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+            }
+        }
+    }
 }
