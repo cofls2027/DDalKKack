@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../models/user_model.dart';
+import '../../providers/user_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -30,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // users 테이블에서 phone으로 조회 후 로그인
       final response = await Supabase.instance.client
           .from('users')
           .select()
@@ -38,6 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
           .single();
 
       if (response.isEmpty) throw Exception('존재하지 않는 사용자입니다.');
+
+      // 로그인 성공 시 currentUserProvider에 사용자 정보 저장
+      ref.read(currentUserProvider.notifier).state = UserModel.fromJson(response);
 
       if (mounted) context.go('/');
     } on PostgrestException catch (e) {
