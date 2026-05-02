@@ -32,8 +32,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -234,7 +232,6 @@ fun DDalKKackApp() {
     color = MaterialTheme.colorScheme.background
 ) {
     var isLoggedIn by remember { mutableStateOf(false) }
-    var hasRegisteredCard by remember { mutableStateOf(false) }
 
     val quickReceipts = remember {
         mutableStateListOf<QuickReceipt>()
@@ -267,7 +264,22 @@ fun DDalKKackApp() {
     }
 
     val registeredCards = remember {
-        mutableStateListOf<RegisteredCard>()
+        mutableStateListOf(
+            RegisteredCard(
+                id = 1,
+                cardType = "회사카드",
+                cardCompany = "신한",
+                cardNumber = "5234 ****",
+                isActive = true
+            ),
+            RegisteredCard(
+                id = 2,
+                cardType = "정부지원카드",
+                cardCompany = "BC",
+                cardNumber = "9876 ****",
+                isActive = true
+            )
+        )
     }
 
     val trips = remember {
@@ -292,24 +304,15 @@ fun DDalKKackApp() {
     }
 
     if (isLoggedIn) {
-        if (!hasRegisteredCard) {
-            CardOnboardingScreen(
-                onComplete = { card ->
-                    registeredCards.add(card)
-                    hasRegisteredCard = true
-                }
-            )
-        } else {
-            MainShell(
-                quickReceipts = quickReceipts,
-                receipts = receipts,
-                registeredCards = registeredCards,
-                trips = trips,
-                onLogout = {
-                    isLoggedIn = false
-                }
-            )
-        }
+        MainShell(
+            quickReceipts = quickReceipts,
+            receipts = receipts,
+            registeredCards = registeredCards,
+            trips = trips,
+            onLogout = {
+                isLoggedIn = false
+            }
+        )
     } else {
         LoginScreen(
             onLoginSuccess = {
@@ -2686,163 +2689,6 @@ fun ProfileMenuCard(
                 fontSize = 28.sp,
                 color = Color(0xFF9CA3AF)
             )
-        }
-    }
-}
-
-@Composable
-fun CardOnboardingScreen(
-    onComplete: (RegisteredCard) -> Unit
-) {
-    val cardTypes = listOf("회사카드", "정부지원카드", "개인카드")
-    var selectedCardType by remember { mutableStateOf(cardTypes.first()) }
-    var expanded by remember { mutableStateOf(false) }
-    var cardCompany by remember { mutableStateOf("") }
-    var cardNumber by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "카드 등록",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "서비스 이용을 위해 최소 1개의 카드를 등록해야 합니다.",
-            color = Color(0xFF6B7280),
-            fontSize = 14.sp,
-            lineHeight = 20.sp
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Text(
-                    text = "카드 정보 입력",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Box {
-                    OutlinedButton(
-                        onClick = { expanded = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Text(
-                            text = "카드 종류: $selectedCardType",
-                            modifier = Modifier.weight(1f),
-                            textAlign = TextAlign.Start
-                        )
-
-                        Text("▼")
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        cardTypes.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type) },
-                                onClick = {
-                                    selectedCardType = type
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = cardCompany,
-                    onValueChange = {
-                        cardCompany = it
-                        errorMessage = ""
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("카드사") },
-                    placeholder = { Text("예: 신한, 국민, 현대") },
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = cardNumber,
-                    onValueChange = {
-                        cardNumber = it
-                        errorMessage = ""
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("카드 번호 일부") },
-                    placeholder = { Text("예: 5234 ****") },
-                    singleLine = true
-                )
-
-                if (errorMessage.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        text = errorMessage,
-                        color = Color(0xFFD93025),
-                        fontSize = 13.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Button(
-                    onClick = {
-                        if (cardCompany.isBlank() || cardNumber.isBlank()) {
-                            errorMessage = "카드사와 카드 번호 일부를 입력하세요."
-                        } else {
-                            onComplete(
-                                RegisteredCard(
-                                    id = System.currentTimeMillis(),
-                                    cardType = selectedCardType,
-                                    cardCompany = cardCompany,
-                                    cardNumber = cardNumber,
-                                    isActive = true
-                                )
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text(
-                        text = "등록하고 시작하기",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
         }
     }
 }
