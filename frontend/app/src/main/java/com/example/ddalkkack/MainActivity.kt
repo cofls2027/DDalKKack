@@ -32,6 +32,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -158,6 +160,23 @@ enum class ExpenseStatus(
     )
 }
 
+data class RegisteredCard(
+    val id: Long,
+    val cardType: String,
+    val cardCompany: String,
+    val cardNumber: String,
+    val isActive: Boolean = true
+)
+
+data class TripSummary(
+    val id: Long,
+    val tripName: String,
+    val tripPurpose: String,
+    val tripCompanions: String,
+    val startDate: String,
+    val endDate: String
+)
+
 fun ExpenseStatus.toDbValue(): String {
     return when (this) {
         ExpenseStatus.PendingAnalysis -> "pending"
@@ -173,16 +192,17 @@ enum class Screen(
     val showInBottomBar: Boolean = true
 ) {
     Home("홈", "🏠"),
-    QuickRegister("빠른등록", "➕"),
     History("내역", "📄"),
+    Trips("출장", "🧳"),
     Stats("통계", "📊"),
-    Profile("내정보", "👤"),
+    Profile("전체 메뉴", "☰"),
 
     ReceiptRegister("영수증 등록", "🧾", false),
+    QuickRegister("빠른 등록", "⚡", false),
     AnalysisResult("분석 결과", "🤖", false),
     ReceiptDetail("상세보기", "📋", false),
     BatchAnalysis("AI 분석", "🤖", false),
-    CardInfo("카드 정보", "💳", false),
+    CardInfo("카드 관리", "💳", false),
     RulesInfo("회사 규정", "📌", false)
 }
 
@@ -235,17 +255,55 @@ fun DDalKKackApp() {
                         status = ExpenseStatus.Rejected
                     )
                 )
+                val registeredCards = remember {
+                    mutableStateListOf<RegisteredCard>()
+                }
+                val trips = remember {
+                    mutableStateListOf(
+                        TripSummary(
+                            id = 1,
+                            tripName = "부산 고객사 방문",
+                            tripPurpose = "계약 협의 및 현장 점검",
+                            tripCompanions = "백다인, 원의재",
+                            startDate = "2026.05.10",
+                            endDate = "2026.05.12"
+                        ),
+                        TripSummary(
+                            id = 2,
+                            tripName = "서울 세미나 참석",
+                            tripPurpose = "AI 비용처리 세미나 참석",
+                            tripCompanions = "오현",
+                            startDate = "2026.05.18",
+                            endDate = "2026.05.18"
+                        )
+                    )
+                }
             }
 
             if (isLoggedIn) {
-                MainShell(
-                    quickReceipts = quickReceipts,
-                    receipts = receipts,
-                    onLogout = { isLoggedIn = false }
-                )
+                if (!hasRegisteredCard) {
+                    CardOnboardingScreen(
+                        onComplete = { card ->
+                            registeredCards.add(card)
+                            hasRegisteredCard = true
+                        }
+                    )
+                } else {
+                    MainShell(
+                        quickReceipts = quickReceipts,
+                        receipts = receipts,
+                        registeredCards = registeredCards,
+                        trips = trips,
+                        onLogout = {
+                            isLoggedIn = false
+                        }
+                    )
+                }
             } else {
                 LoginScreen(
-                    onLoginSuccess = { isLoggedIn = true }
+                    onLoginSuccess = {
+                        isLoggedIn = true
+                    }
                 )
             }
         }
@@ -375,6 +433,8 @@ fun LoginScreen(
 fun MainShell(
     quickReceipts: SnapshotStateList<QuickReceipt>,
     receipts: SnapshotStateList<ReceiptSummary>,
+    registeredCards: SnapshotStateList<RegisteredCard>,
+    trips: SnapshotStateList<TripSummary>,
     onLogout: () -> Unit
 ) {
     var currentScreen by remember { mutableStateOf(Screen.Home) }
@@ -492,7 +552,7 @@ fun MainShell(
                     receipts = receipts
                 )
 
-                Screen.Profile -> ProfileScreen(
+                Screen.Menu -> MenuScreen(
                     onLogout = onLogout,
                     onMoveCardInfo = {
                         currentScreen = Screen.CardInfo
@@ -503,6 +563,7 @@ fun MainShell(
                 )
 
                 Screen.CardInfo -> CardInfoScreen(
+                    registeredCards = registeredCards,
                     onBack = {
                         currentScreen = Screen.Profile
                     }
@@ -510,7 +571,21 @@ fun MainShell(
 
                 Screen.RulesInfo -> CompanyRulesScreen(
                     onBack = {
-                        currentScreen = Screen.Profile
+                        currentScreen = Screen.Menu
+                    }
+                )
+                
+                Screen.Trips -> TripsScreen(
+                    trips = trips
+                )
+
+                Screen.Profile -> ProfileScreen(
+                    onLogout = onLogout,
+                    onMoveCardInfo = {
+                        currentScreen = Screen.CardInfo
+                    },
+                    onMoveRulesInfo = {
+                        currentScreen = Screen.RulesInfo
                     }
                 )
             }
@@ -1326,7 +1401,7 @@ fun StatsScreen(
 }
 
 @Composable
-fun ProfileScreen(
+fun MenuScreen(
     onLogout: () -> Unit,
     onMoveCardInfo: () -> Unit,
     onMoveRulesInfo: () -> Unit
@@ -1342,7 +1417,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "내정보",
+            text = "전체 메뉴",
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold
         )
@@ -1385,16 +1460,25 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         ProfileMenuCard(
+            icon = "👤",
+            title = "내 정보 관리",
+            description = "이름, 직급, 연락처 등 사용자 정보를 확인합니다.",
+            onClick = {
+                // TODO: 내 정보 관리 화면 연결
+            }
+        )
+
+        ProfileMenuCard(
             icon = "💳",
-            title = "등록된 카드 정보 확인",
-            description = "회사카드 / 정부지원카드 / 개인카드 분류 정보 확인",
+            title = "카드 관리",
+            description = "등록된 카드 정보를 확인합니다.",
             onClick = onMoveCardInfo
         )
 
         ProfileMenuCard(
             icon = "📌",
-            title = "회사 규정 확인",
-            description = "금액 한도, 금지 품목, 카드별 규정 확인",
+            title = "규정 확인",
+            description = "회사 경비 규정과 카드별 규정을 확인합니다.",
             onClick = onMoveRulesInfo
         )
 
@@ -2520,7 +2604,220 @@ fun ProfileMenuCard(
 }
 
 @Composable
+fun ProfileMenuCard(
+    icon: String,
+    title: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = icon,
+                fontSize = 28.sp
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = description,
+                    color = Color(0xFF6B7280),
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp
+                )
+            }
+
+            Text(
+                text = "›",
+                fontSize = 28.sp,
+                color = Color(0xFF9CA3AF)
+            )
+        }
+    }
+}
+
+@Composable
+fun CardOnboardingScreen(
+    onComplete: (RegisteredCard) -> Unit
+) {
+    val cardTypes = listOf("회사카드", "정부지원카드", "개인카드")
+    var selectedCardType by remember { mutableStateOf(cardTypes.first()) }
+    var expanded by remember { mutableStateOf(false) }
+    var cardCompany by remember { mutableStateOf("") }
+    var cardNumber by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "카드 등록",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "서비스 이용을 위해 최소 1개의 카드를 등록해야 합니다.",
+            color = Color(0xFF6B7280),
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "카드 정보 입력",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box {
+                    OutlinedButton(
+                        onClick = { expanded = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(
+                            text = "카드 종류: $selectedCardType",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start
+                        )
+
+                        Text("▼")
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        cardTypes.forEach { type ->
+                            DropdownMenuItem(
+                                text = { Text(type) },
+                                onClick = {
+                                    selectedCardType = type
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = cardCompany,
+                    onValueChange = {
+                        cardCompany = it
+                        errorMessage = ""
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("카드사") },
+                    placeholder = { Text("예: 신한, 국민, 현대") },
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = cardNumber,
+                    onValueChange = {
+                        cardNumber = it
+                        errorMessage = ""
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("카드 번호 일부") },
+                    placeholder = { Text("예: 5234 ****") },
+                    singleLine = true
+                )
+
+                if (errorMessage.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = errorMessage,
+                        color = Color(0xFFD93025),
+                        fontSize = 13.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    onClick = {
+                        if (cardCompany.isBlank() || cardNumber.isBlank()) {
+                            errorMessage = "카드사와 카드 번호 일부를 입력하세요."
+                        } else {
+                            onComplete(
+                                RegisteredCard(
+                                    id = System.currentTimeMillis(),
+                                    cardType = selectedCardType,
+                                    cardCompany = cardCompany,
+                                    cardNumber = cardNumber,
+                                    isActive = true
+                                )
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = "등록하고 시작하기",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun CardInfoScreen(
+    registeredCards: List<RegisteredCard>,
     onBack: () -> Unit
 ) {
     Column(
@@ -2534,7 +2831,7 @@ fun CardInfoScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "등록된 카드 정보",
+            text = "카드 관리",
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold
         )
@@ -2542,7 +2839,7 @@ fun CardInfoScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "관리자 웹에서 등록된 카드 정보를 사용자 앱에서 확인합니다.",
+            text = "등록된 카드 정보를 확인합니다.",
             color = Color(0xFF6B7280),
             fontSize = 14.sp,
             lineHeight = 20.sp
@@ -2550,26 +2847,21 @@ fun CardInfoScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        CardInfoItem(
-            cardName = "법인카드",
-            cardCompany = "신한카드",
-            maskedNumber = "****-****-****-1234",
-            description = "일반 업무 경비 처리용"
-        )
-
-        CardInfoItem(
-            cardName = "정부지원카드",
-            cardCompany = "BC카드",
-            maskedNumber = "****-****-****-9876",
-            description = "정부지원사업 비용 처리용. 별도 규정 적용"
-        )
-
-        CardInfoItem(
-            cardName = "개인카드",
-            cardCompany = "자동 분류",
-            maskedNumber = "등록되지 않은 카드",
-            description = "등록 카드와 일치하지 않으면 개인카드로 분류"
-        )
+        if (registeredCards.isEmpty()) {
+            EmptyCard(
+                icon = "💳",
+                title = "등록된 카드가 없습니다.",
+                description = "카드 등록 후 이용할 수 있습니다."
+            )
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                registeredCards.forEach { card ->
+                    RegisteredCardItem(card = card)
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(22.dp))
 
@@ -2581,6 +2873,45 @@ fun CardInfoScreen(
             shape = RoundedCornerShape(16.dp)
         ) {
             Text("돌아가기")
+        }
+    }
+}
+
+@Composable
+fun RegisteredCardItem(
+    card: RegisteredCard
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = card.cardType,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "${card.cardCompany} · ${card.cardNumber}",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (card.isActive) "사용 가능" else "사용 중지",
+                color = if (card.isActive) Color(0xFF0F9D58) else Color(0xFFD93025),
+                fontSize = 13.sp
+            )
         }
     }
 }
@@ -2626,6 +2957,91 @@ fun CardInfoItem(
                 fontSize = 13.sp,
                 lineHeight = 19.sp
             )
+        }
+    }
+}
+
+@Composable
+fun TripsScreen(
+    trips: List<TripSummary>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(22.dp)
+    ) {
+        AppHeader()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "출장",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "출장 정보와 관련 지출을 연결하기 위한 화면입니다.",
+            color = Color(0xFF6B7280),
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (trips.isEmpty()) {
+            EmptyCard(
+                icon = "🧳",
+                title = "등록된 출장이 없습니다.",
+                description = "출장 등록 기능은 다음 단계에서 연결합니다."
+            )
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                trips.forEach { trip ->
+                    TripCard(trip = trip)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TripCard(
+    trip: TripSummary
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = trip.tripName,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "${trip.startDate} ~ ${trip.endDate}",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            AnalysisField("출장 목적", trip.tripPurpose)
+            AnalysisField("동행인", trip.tripCompanions.ifBlank { "없음" })
         }
     }
 }
