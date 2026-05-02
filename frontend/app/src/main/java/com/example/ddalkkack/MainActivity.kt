@@ -497,12 +497,6 @@ fun MainShell(
                     },
                     onMoveQuickRegister = {
                         currentScreen = Screen.QuickRegister
-                    },
-                    onMoveHistory = {
-                        currentScreen = Screen.History
-                    },
-                    onMoveStats = {
-                        currentScreen = Screen.Stats
                     }
                 )
 
@@ -602,9 +596,7 @@ fun HomeScreen(
     receipts: List<ReceiptSummary>,
     quickReceiptCount: Int,
     onMoveReceiptRegister: () -> Unit,
-    onMoveQuickRegister: () -> Unit,
-    onMoveHistory: () -> Unit,
-    onMoveStats: () -> Unit
+    onMoveQuickRegister: () -> Unit
 ) {
     val totalAmount = receipts.sumOf { it.amount }
     val approvedCount = receipts.count { it.status == ExpenseStatus.Approved }
@@ -707,29 +699,6 @@ fun HomeScreen(
                 icon = "⚡",
                 modifier = Modifier.weight(1f),
                 onClick = onMoveQuickRegister
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            ActionCard(
-                title = "내역 조회",
-                description = "승인 상태별 지출 확인",
-                icon = "📄",
-                modifier = Modifier.weight(1f),
-                onClick = onMoveHistory
-            )
-
-            ActionCard(
-                title = "통계",
-                description = "카테고리별 지출 요약",
-                icon = "📊",
-                modifier = Modifier.weight(1f),
-                onClick = onMoveStats
             )
         }
 
