@@ -8,7 +8,7 @@ async function getRules(req, res) {
   }
 
   const { data, error } = await supabase
-    .from('rules')
+    .from('rules_2')
     .select('id, rule_name, policy_data, created_at')
     .eq('company_id', company_id)
     .order('id', { ascending: true });

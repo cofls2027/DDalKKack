@@ -7,7 +7,7 @@ import 'router/app_router.dart';
 
 // 테스트용 유저 (로그인 구현 전 임시)
 const _testUser = UserModel(
-  id: 1,
+  id: '048def2e-5ff2-480d-a659-c12d18fa7ed8',
   name: '조혜승',
   phone: '01038147994',
   position: '사원',
