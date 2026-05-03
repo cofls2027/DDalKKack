@@ -8,6 +8,8 @@ const BUCKET = 'receipt-images';
  * @returns {string} storagePath  — DB에 저장할 경로
  */
 export async function uploadToStorage(localPath, userId, filename) {
+  console.log('uploadToStorage localPath:', localPath);  // ← 추가
+  console.log('파일 존재 여부:', fs.existsSync(localPath));  // ← 추가
   const storagePath = `receipts/${userId}/${filename}`;
   const fileBuffer  = fs.readFileSync(localPath);
 
@@ -17,8 +19,6 @@ export async function uploadToStorage(localPath, userId, filename) {
 
   if (error) throw error;
 
-  // 업로드 후 임시 파일 삭제
-  fs.unlinkSync(localPath);
 
   return storagePath;
 }
