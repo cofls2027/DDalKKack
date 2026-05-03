@@ -6,13 +6,13 @@ import '../models/stats_model.dart';
 
 class StatsService {
   Future<StatsModel> fetchMyStats({
-    required int userId,
+    required String userId,
     required int companyId,
     required int year,
     required int month,
   }) async {
     final uri = Uri.parse('$kApiBaseUrl/stats/my').replace(queryParameters: {
-      'user_id': userId.toString(),
+      'user_id': userId,
       'company_id': companyId.toString(),
       'year': year.toString(),
       'month': month.toString(),

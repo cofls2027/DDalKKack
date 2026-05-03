@@ -8,7 +8,7 @@ async function getCards(req, res) {
   }
 
   const { data, error } = await supabase
-    .from('cards')
+    .from('cards_2')
     .select('id, card_type, card_company, card_number, is_active, created_at')
     .eq('company_id', company_id)
     .order('created_at', { ascending: false });

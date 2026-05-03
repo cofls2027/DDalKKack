@@ -13,7 +13,7 @@ async function getMyStats(req, res) {
   const endDate = new Date(y, m, 1).toISOString();
 
   const { data, error } = await supabase
-    .from('receipts')
+    .from('receipts_2')
     .select('amount, category, card_type, status')
     .eq('user_id', user_id)
     .eq('company_id', company_id)

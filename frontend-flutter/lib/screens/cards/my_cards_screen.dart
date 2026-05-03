@@ -40,7 +40,7 @@ class _CardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompany = card.cardType == '회사카드';
+    final isCompany = card.cardType == '법인카드';
     final typeColor = isCompany
         ? Theme.of(context).colorScheme.primary
         : const Color(0xFF059669);
