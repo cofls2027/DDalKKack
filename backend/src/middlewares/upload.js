@@ -1,9 +1,12 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import path   from 'path';
+import fs     from 'fs';
+import { fileURLToPath } from 'url';
 
-// 임시 저장 폴더 없으면 생성
-const TMP_DIR = './tmp/receipts';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const TMP_DIR = path.join(__dirname, '../../tmp/receipts');
+
+// 폴더 없으면 생성
 if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
@@ -24,5 +27,5 @@ const fileFilter = (req, file, cb) => {
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 제한
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
