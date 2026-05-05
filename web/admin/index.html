@@ -252,14 +252,28 @@
               <div>
                 <div class="eyebrow">규정 관리</div>
                 <h1>비용 규정</h1>
-                <p class="desc">현재는 화면 프로토타입이며, 추후 Supabase 연동 시 저장 기능을 붙이면 됩니다.</p>
+                <p class="desc">카테고리별·직급별 지출 한도 및 허용 시간을 설정합니다.</p>
               </div>
             </div>
-            <div class="grid">
-              <div class="stat"><strong>30,000원</strong><span>식대 한도</span></div>
-              <div class="stat"><strong>100,000원</strong><span>교통비 한도</span></div>
-              <div class="stat"><strong>07:00~22:00</strong><span>허용 시간</span></div>
-              <div class="stat"><strong>담배, 주류</strong><span>금지 항목</span></div>
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">규정 목록</div>
+                <span class="badge bb" id="rules-badge">0건</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>카테고리</th>
+                      <th>직급</th>
+                      <th>최대 금액</th>
+                      <th>허용 시작</th>
+                      <th>허용 종료</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rules-table"></tbody>
+                </table>
+              </div>
             </div>
           </section>
         </main>
@@ -269,6 +283,10 @@
 
   <script>
     const state = {
+      rules: [
+        { category_code: '식대', position: '전체', max_amount: 30000, allowed_time_from: '07:00', allowed_time_to: '22:00' },
+        { category_code: '교통비', position: '전체', max_amount: 100000, allowed_time_from: null, allowed_time_to: null },
+      ],
       accounts: [
         { phone: '01011112222', name: '김민준', position: '매니저', password: 'DK-7Q4M2A', active: true },
         { phone: '01022223333', name: '이지현', position: '대리', password: 'DK-9R1X8C', active: true },
@@ -309,6 +327,7 @@
       document.getElementById(`panel-${id}`).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.panel === id));
       if(id === 'accounts') renderAccounts();
+      if(id === 'rules') renderRules();
     }
 
     function renderAll(){
@@ -469,6 +488,19 @@
       renderAccounts();
       renderSummary();
       alert(`${name}님 계정이 등록되었습니다.`);
+    }
+
+    function renderRules(){
+      document.getElementById('rules-badge').textContent = `${state.rules.length}건`;
+      document.getElementById('rules-table').innerHTML = state.rules.map(rule => `
+        <tr>
+          <td>${rule.category_code ?? '-'}</td>
+          <td>${rule.position ?? '-'}</td>
+          <td>${rule.max_amount != null ? rule.max_amount.toLocaleString() + '원' : '-'}</td>
+          <td>${rule.allowed_time_from ?? '-'}</td>
+          <td>${rule.allowed_time_to ?? '-'}</td>
+        </tr>
+      `).join('');
     }
 
     function renderAccounts(){
