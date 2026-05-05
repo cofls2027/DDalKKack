@@ -1,43 +1,29 @@
-class PolicyData {
-  final int? mealLimit;
-  final int? transportLimit;
-  final String? allowedHours;
-  final List<String> bannedItems;
-
-  const PolicyData({
-    this.mealLimit,
-    this.transportLimit,
-    this.allowedHours,
-    this.bannedItems = const [],
-  });
-
-  factory PolicyData.fromJson(Map<String, dynamic> json) => PolicyData(
-        mealLimit: json['meal_limit'] as int?,
-        transportLimit: json['transport_limit'] as int?,
-        allowedHours: json['allowed_hours'] as String?,
-        bannedItems: (json['banned_items'] as List<dynamic>?)
-                ?.map((e) => e as String)
-                .toList() ??
-            [],
-      );
-}
-
 class RuleModel {
   final int id;
-  final String ruleName;
-  final PolicyData policyData;
+  final String? categoryCode;
+  final String? categoryName;
+  final String? position;
+  final int? maxAmount;
+  final String? allowedTimeFrom;
+  final String? allowedTimeTo;
 
   const RuleModel({
     required this.id,
-    required this.ruleName,
-    required this.policyData,
+    this.categoryCode,
+    this.categoryName,
+    this.position,
+    this.maxAmount,
+    this.allowedTimeFrom,
+    this.allowedTimeTo,
   });
 
   factory RuleModel.fromJson(Map<String, dynamic> json) => RuleModel(
         id: json['id'] as int,
-        ruleName: json['rule_name'] as String? ?? '',
-        policyData: json['policy_data'] != null
-            ? PolicyData.fromJson(json['policy_data'] as Map<String, dynamic>)
-            : const PolicyData(),
+        categoryCode: json['category_code'] as String?,
+        categoryName: json['category_name'] as String?,
+        position: json['position'] as String?,
+        maxAmount: json['max_amount'] as int?,
+        allowedTimeFrom: json['allowed_time_from'] as String?,
+        allowedTimeTo: json['allowed_time_to'] as String?,
       );
 }
