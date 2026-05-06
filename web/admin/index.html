@@ -280,7 +280,7 @@
           <div class="field">
             <label for="admin-email">관리자 이메일</label>
             <input id="admin-email" type="email" placeholder="admin@example.com">
-            <div class="hint">Supabase Auth에 등록된 관리자 계정만 로그인할 수 있습니다.</div>
+            <div class="hint">발급받은 관리자 이메일과 비밀번호로 로그인하세요.</div>
           </div>
           <div class="field">
             <label for="admin-password">비밀번호</label>
@@ -641,17 +641,13 @@
               <div class="card">
                 <div class="card-head">
                   <div class="card-title">새 계정 등록</div>
-                  <span class="badge bp">Auth 프로필</span>
+                  <span class="badge bp">직원</span>
                 </div>
-                <div class="notice">먼저 Supabase Auth Users에서 이메일 계정을 만든 뒤, 해당 사용자 UUID를 프로필 ID로 등록합니다. 비밀번호는 DB에 저장하지 않습니다.</div>
+                <div class="notice">직원 로그인용 이메일을 입력하면 초기 비밀번호가 자동 생성됩니다. 비밀번호는 직원 정보 <strong>수정</strong> 화면에서 언제든지 확인·수정할 수 있으며, 등록 직후에도 별도 안내 창에서 복사할 수 있습니다.</div>
                 <div class="form-grid">
-                  <div class="field" style="grid-column:1 / -1">
-                    <label for="new-user-id">Supabase Auth UUID</label>
-                    <input id="new-user-id" placeholder="auth.users의 User UID">
-                  </div>
                   <div class="field">
-                    <label for="new-email">이메일</label>
-                    <input id="new-email" type="email" placeholder="user@example.com">
+                    <label for="new-email">이메일 (로그인 ID)</label>
+                    <input id="new-email" type="email" placeholder="user@example.com" autocomplete="off">
                   </div>
                   <div class="field">
                     <label for="new-phone">전화번호</label>
@@ -686,6 +682,7 @@
                       <th>전화번호</th>
                       <th>직급</th>
                       <th>상태</th>
+                      <th>관리</th>
                     </tr>
                   </thead>
                   <tbody id="account-table"></tbody>
@@ -706,6 +703,7 @@
                       <th>전화번호</th>
                       <th>직급</th>
                       <th>상태</th>
+                      <th>관리</th>
                     </tr>
                   </thead>
                   <tbody id="inactive-account-table"></tbody>
@@ -1285,7 +1283,7 @@
             </div>
             <div class="info-list" id="receipt-info"></div>
           </div>
-          <div class="notice">실제 연동 시에는 사용자가 촬영한 이미지 URL과 OCR/AI 분석 결과를 Supabase에서 불러와 이 영역에 표시하면 됩니다.</div>
+          <div class="notice">연동 후에는 사용자가 촬영한 영수증과 분석 결과를 이 영역에 표시합니다.</div>
         </div>
       </div>
     </div>
@@ -1304,13 +1302,89 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="initial-password-modal" onclick="closeInitialPasswordModal(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="initial-password-title" style="width:min(480px,100%)">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="initial-password-title">초기 비밀번호</div>
+          <div class="modal-sub" id="initial-password-sub"></div>
+        </div>
+        <button type="button" class="modal-close" onclick="hideInitialPasswordModal()">닫기</button>
+      </div>
+      <p class="notice" style="margin-bottom:14px">아래 비밀번호를 직원에게 안전하게 전달하세요. 같은 내용은 나중에 사용자 <strong>수정</strong> 창에서도 볼 수 있습니다.</p>
+      <div class="field">
+        <label for="initial-password-display">일회용 비밀번호</label>
+        <input id="initial-password-display" type="text" readonly style="font-family:ui-monospace,monospace;font-weight:700">
+      </div>
+      <div class="form-actions" style="margin-top:18px">
+        <button type="button" class="btn btn-primary" onclick="copyInitialPassword()">클립보드에 복사</button>
+        <button type="button" class="btn btn-subtle" onclick="hideInitialPasswordModal()">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="edit-user-modal" onclick="closeEditUserModal(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-user-title" style="width:min(520px,100%)">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="edit-user-title">사용자 정보 수정</div>
+          <div class="modal-sub">등록된 직원 정보를 수정합니다.</div>
+        </div>
+        <button type="button" class="modal-close" onclick="hideEditUserModal()">닫기</button>
+      </div>
+      <input type="hidden" id="edit-user-id">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1 / -1">
+          <label for="edit-user-email">이메일 (로그인 ID)</label>
+          <input id="edit-user-email" type="email" autocomplete="off">
+          <div class="hint">앱 로그인 주소를 바꾸는 경우 직원에게 새 이메일로 로그인하도록 안내하세요. (환경에 따라 담당자 추가 작업이 필요할 수 있습니다.)</div>
+        </div>
+        <div class="field">
+          <label for="edit-user-phone">전화번호</label>
+          <input id="edit-user-phone" inputmode="numeric" maxlength="11" placeholder="01012345678">
+        </div>
+        <div class="field">
+          <label for="edit-user-name">이름</label>
+          <input id="edit-user-name" placeholder="홍길동">
+        </div>
+        <div class="field" style="grid-column:1 / -1">
+          <label for="edit-user-staff-pw">직원 초기 비밀번호 (관리자 참고용)</label>
+          <input id="edit-user-staff-pw" type="text" autocomplete="off" placeholder="등록 시 자동 저장됩니다. 직접 적어 둘 수도 있습니다.">
+          <div class="hint">로그인 비밀번호를 바꾼 뒤에는 여기도 같이 고쳐 두면 나중에 찾기 쉽습니다. 직원 앱에서는 이 값을 사용하지 않습니다.</div>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:18px">
+        <button type="button" class="btn btn-primary" onclick="saveEditedUser()">저장</button>
+        <button type="button" class="btn btn-subtle" onclick="hideEditUserModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
   <script>window.SUPABASE_PUBLISHABLE_KEY = window.SUPABASE_PUBLISHABLE_KEY || '';</script>
   <script src="config.local.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://hczripxpbmtvqwbouexo.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = String(window.SUPABASE_PUBLISHABLE_KEY || '').trim();
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    (function purgeLegacySupabaseAuthFromLocalStorage(){
+      try {
+        const ref = 'hczripxpbmtvqwbouexo';
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i);
+          if(!k) continue;
+          if(k.startsWith('sb-' + ref) || k === 'sb-' + ref + '-auth-token') localStorage.removeItem(k);
+        }
+      } catch (_) {}
+    })();
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+      },
+    });
     let currentAdminProfile = null;
 
     const state = {
@@ -1353,7 +1427,7 @@
 
     async function login(){
       if(!SUPABASE_PUBLISHABLE_KEY){
-        alert('Supabase 키가 비어 있습니다. web/admin/config.local.js 에 publishable(anon) 키를 넣거나 config.local.example.js 를 참고하세요.');
+        alert('관리자 화면 연결 설정이 필요합니다. 시스템 담당자에게 문의해 주세요.');
         return;
       }
       const email = document.getElementById('admin-email').value.trim();
@@ -1374,7 +1448,8 @@
         return;
       }
       currentAdminProfile = profile;
-      await loadAdminData();
+      const loaded = await loadAdminData();
+      if(!loaded) return;
       document.getElementById('login-screen').classList.remove('active');
       document.getElementById('admin-screen').classList.add('active');
       renderAll();
@@ -1404,7 +1479,7 @@
 
     async function loadAdminData(){
       const [usersResult, receiptsResult, tripsResult, cardsResult] = await Promise.all([
-        supabaseClient.from('users').select('id, company_id, name, phone, position, role, email, is_active').order('created_at', { ascending: false }),
+        supabaseClient.from('users').select('id, company_id, name, phone, position, role, email, is_active, staff_initial_password').order('created_at', { ascending: false }),
         supabaseClient.from('receipts').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('trips').select('*').order('created_at', { ascending: false }),
         supabaseClient.from('cards').select('*').order('created_at', { ascending: false })
@@ -1413,8 +1488,8 @@
       const failed = [usersResult, receiptsResult, tripsResult, cardsResult].find(result => result.error);
       if(failed){
         console.error('Supabase 데이터 조회 실패:', failed.error);
-        alert('데이터를 불러오지 못했습니다. RLS 정책과 계정 권한을 확인해주세요.');
-        return;
+        alert('데이터를 불러오지 못했습니다. 잠시 후 다시 시도하거나 담당자에게 문의해 주세요.');
+        return false;
       }
 
       state.users = usersResult.data || [];
@@ -1424,6 +1499,7 @@
         trip_companions: normalizeTripCompanions(trip.trip_companions)
       }));
       state.cards = cardsResult.data || [];
+      return true;
     }
 
     function normalizeTripCompanions(value){
@@ -2499,7 +2575,7 @@
     function showAddAccount(){
       clearAccountForm();
       document.getElementById('account-form').classList.add('show');
-      document.getElementById('new-user-id').focus();
+      document.getElementById('new-email').focus();
     }
 
     function hideAddAccount(){
@@ -2508,11 +2584,113 @@
     }
 
     function clearAccountForm(){
-      document.getElementById('new-user-id').value = '';
       document.getElementById('new-email').value = '';
       document.getElementById('new-phone').value = '';
       document.getElementById('new-name').value = '';
       document.getElementById('new-position').value = '';
+    }
+
+    function generateEmployeePassword(){
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+      const len = 16;
+      const bytes = new Uint8Array(len);
+      crypto.getRandomValues(bytes);
+      let s = '';
+      for(let i = 0; i < len; i++) s += chars[bytes[i] % chars.length];
+      return s;
+    }
+
+    function showInitialPasswordModal(userName, password){
+      document.getElementById('initial-password-sub').textContent = `${userName}님 계정의 초기 비밀번호입니다.`;
+      document.getElementById('initial-password-display').value = password;
+      document.getElementById('initial-password-modal').classList.add('show');
+    }
+
+    function hideInitialPasswordModal(){
+      document.getElementById('initial-password-modal').classList.remove('show');
+    }
+
+    function closeInitialPasswordModal(event){
+      if(event.target.id === 'initial-password-modal') hideInitialPasswordModal();
+    }
+
+    async function copyInitialPassword(){
+      const el = document.getElementById('initial-password-display');
+      try{
+        await navigator.clipboard.writeText(el.value);
+        alert('복사되었습니다.');
+      } catch (_){
+        el.select();
+        alert('자동 복사에 실패했습니다. 필드를 직접 선택해 복사해 주세요.');
+      }
+    }
+
+    function openEditUserModal(userId){
+      const account = state.users.find(item => item.id === userId);
+      if(!account) return;
+      document.getElementById('edit-user-id').value = account.id;
+      document.getElementById('edit-user-email').value = account.email || '';
+      document.getElementById('edit-user-phone').value = account.phone || '';
+      document.getElementById('edit-user-name').value = account.name || '';
+      document.getElementById('edit-user-position').value = account.position || '';
+      document.getElementById('edit-user-staff-pw').value = account.staff_initial_password || '';
+      document.getElementById('edit-user-modal').classList.add('show');
+    }
+
+    function hideEditUserModal(){
+      document.getElementById('edit-user-modal').classList.remove('show');
+    }
+
+    function closeEditUserModal(event){
+      if(event.target.id === 'edit-user-modal') hideEditUserModal();
+    }
+
+    async function saveEditedUser(){
+      const id = document.getElementById('edit-user-id').value;
+      const email = document.getElementById('edit-user-email').value.trim();
+      const phone = normalizePhone(document.getElementById('edit-user-phone').value);
+      const name = document.getElementById('edit-user-name').value.trim();
+      const position = document.getElementById('edit-user-position').value.trim();
+      const staffPwRaw = document.getElementById('edit-user-staff-pw').value;
+      const staff_initial_password = staffPwRaw.trim() === '' ? null : staffPwRaw.trim();
+      const account = state.users.find(item => item.id === id);
+      if(!account) return;
+      if(!email || !phone || !name || !position){
+        alert('이메일, 전화번호, 이름, 직급을 모두 입력해주세요.');
+        return;
+      }
+      if(!isValidPhone(phone)){
+        alert('전화번호는 하이픈 없이 01012345678 형식의 11자리로 입력해주세요.');
+        return;
+      }
+      if(state.users.some(u => u.id !== id && u.email === email)){
+        alert('다른 사용자가 이미 사용 중인 이메일입니다.');
+        return;
+      }
+      if(state.users.some(u => u.id !== id && u.phone === phone)){
+        alert('다른 사용자가 이미 사용 중인 전화번호입니다.');
+        return;
+      }
+      const { error } = await supabaseClient
+        .from('users')
+        .update({ email, phone, name, position, staff_initial_password })
+        .eq('id', id);
+      if(error){
+        console.error('사용자 정보 수정 실패:', error);
+        alert('저장에 실패했습니다. 담당자에게 문의해 주세요.');
+        return;
+      }
+      account.email = email;
+      account.phone = phone;
+      account.name = name;
+      account.position = position;
+      account.staff_initial_password = staff_initial_password;
+      hideEditUserModal();
+      renderAccounts();
+      renderDashboard();
+      renderStats();
+      renderTrips();
+      alert('저장되었습니다.');
     }
 
     function normalizePhone(phone){
@@ -2523,33 +2701,67 @@
       return /^010\d{8}$/.test(phone);
     }
 
+    async function registerEmployeeAuthUser(email, password){
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if(!res.ok){
+        const msg = body.msg || body.message || body.error_description || `계정을 만들 수 없습니다. (${res.status})`;
+        throw new Error(msg);
+      }
+      const uid = body.user?.id;
+      if(!uid){
+        throw new Error('계정은 생성되었으나 응답을 확인할 수 없습니다. 담당자에게 문의해 주세요.');
+      }
+      return uid;
+    }
+
     async function addAccount(){
-      const id = document.getElementById('new-user-id').value.trim();
+      if(!SUPABASE_PUBLISHABLE_KEY){
+        alert('관리자 화면 연결 설정이 필요합니다. 시스템 담당자에게 문의해 주세요.');
+        return;
+      }
       const email = document.getElementById('new-email').value.trim();
       const phone = normalizePhone(document.getElementById('new-phone').value);
       const name = document.getElementById('new-name').value.trim();
       const position = document.getElementById('new-position').value.trim();
-      if(!id || !email || !phone || !name || !position){
-        alert('Auth UUID, 이메일, 전화번호, 이름, 직급을 모두 입력해주세요.');
+      if(!email || !phone || !name || !position){
+        alert('이메일, 전화번호, 이름, 직급을 모두 입력해주세요.');
         return;
       }
       if(!isValidPhone(phone)){
         alert('전화번호는 하이픈 없이 01012345678 형식의 11자리로 입력해주세요.');
         return;
       }
-      if(state.users.some(account => account.id === id || account.email === email)){
-        alert('이미 등록된 Auth UUID 또는 이메일입니다.');
+      if(state.users.some(account => account.email === email)){
+        alert('이미 등록된 이메일입니다.');
         return;
       }
       if(state.users.some(account => account.phone === phone)){
         alert('이미 등록된 전화번호입니다.');
         return;
       }
-      const newUser = { id, company_id: currentAdminProfile?.company_id || 1, name, email, phone, position, role: 'employee', is_active: true };
+      const password = generateEmployeePassword();
+      let newUserId;
+      try{
+        newUserId = await registerEmployeeAuthUser(email, password);
+      } catch (err){
+        console.error(err);
+        alert(err.message || '로그인 계정 생성에 실패했습니다. 같은 이메일이 이미 존재할 수 있습니다.');
+        return;
+      }
+      const newUser = { id: newUserId, company_id: currentAdminProfile?.company_id || 1, name, email, phone, position, role: 'employee', is_active: true, staff_initial_password: password };
       const { error } = await supabaseClient.from('users').insert([newUser]);
       if(error){
         console.error('사용자 프로필 등록 실패:', error);
-        alert('사용자 프로필 등록에 실패했습니다. Auth UUID와 RLS 권한을 확인해주세요.');
+        alert('직원 정보 저장에 실패했습니다. 담당자에게 문의해 주세요.');
         return;
       }
       state.users.push(newUser);
@@ -2558,7 +2770,7 @@
       renderDashboard();
       renderStats();
       renderTrips();
-      alert(`${name}님 계정이 등록되었습니다.`);
+      showInitialPasswordModal(name, password);
     }
 
     function renderAccounts(){
@@ -2581,10 +2793,11 @@
           </td>
           <td>${account.email || '-'}</td>
           <td>${account.phone || '-'}</td>
-          <td>${account.position}</td>
+          <td>${account.position || '-'}</td>
           <td><button class="account-status-btn ${account.is_active === false ? 'inactive' : 'active'}" onclick="toggleAccountStatus('${account.id}')">${account.is_active === false ? '비활성' : '활성'}</button></td>
+          <td><button type="button" class="modal-tool-btn" onclick="openEditUserModal('${account.id}')">수정</button></td>
         </tr>
-      `).join('') || `<tr><td class="empty" colspan="5">${emptyMessage}</td></tr>`;
+      `).join('') || `<tr><td class="empty" colspan="6">${emptyMessage}</td></tr>`;
     }
 
     async function toggleAccountStatus(id){
@@ -2618,7 +2831,9 @@
         await supabaseClient.auth.signOut();
         return;
       }
-      await loadAdminData();
+      currentAdminProfile = profile;
+      const loaded = await loadAdminData();
+      if(!loaded) return;
       document.getElementById('login-screen').classList.remove('active');
       document.getElementById('admin-screen').classList.add('active');
       renderAll();
