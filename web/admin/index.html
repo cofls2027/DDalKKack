@@ -1304,10 +1304,12 @@
     </div>
   </div>
 
+  <script>window.SUPABASE_PUBLISHABLE_KEY = window.SUPABASE_PUBLISHABLE_KEY || '';</script>
+  <script src="config.local.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://hczripxpbmtvqwbouexo.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+    const SUPABASE_PUBLISHABLE_KEY = String(window.SUPABASE_PUBLISHABLE_KEY || '').trim();
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     let currentAdminProfile = null;
 
@@ -1350,6 +1352,10 @@
     };
 
     async function login(){
+      if(!SUPABASE_PUBLISHABLE_KEY){
+        alert('Supabase 키가 비어 있습니다. web/admin/config.local.js 에 publishable(anon) 키를 넣거나 config.local.example.js 를 참고하세요.');
+        return;
+      }
       const email = document.getElementById('admin-email').value.trim();
       const password = document.getElementById('admin-password').value;
       if(!email || !password){
