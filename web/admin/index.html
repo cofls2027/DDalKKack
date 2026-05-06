@@ -1304,31 +1304,31 @@
 
   <script>
     const state = {
-      accounts: [
-        { phone: '01011112222', name: '김민준', position: '매니저', password: 'DK-7Q4M2A', active: true },
-        { phone: '01022223333', name: '이지현', position: '대리', password: 'DK-9R1X8C', active: true },
-        { phone: '01033334444', name: '박지훈', position: '팀장', password: 'DK-3P6T9K', active: true },
-        { phone: '01044445555', name: '최준호', position: '사원', password: 'DK-5N8B1Y', active: true }
+      users: [
+        { id: 'u001', company_id: 1, name: '김민준', phone: '01011112222', position: '매니저', role: 'employee', password: 'DK-7Q4M2A', is_active: true },
+        { id: 'u002', company_id: 1, name: '이지현', phone: '01022223333', position: '대리', role: 'employee', password: 'DK-9R1X8C', is_active: true },
+        { id: 'u003', company_id: 1, name: '박지훈', phone: '01033334444', position: '팀장', role: 'manager', password: 'DK-3P6T9K', is_active: true },
+        { id: 'u004', company_id: 1, name: '최준호', phone: '01044445555', position: '사원', role: 'employee', password: 'DK-5N8B1Y', is_active: true }
       ],
       receipts: [
-        { employeePhone: '01011112222', employee: '김민준', merchant: '교보문고 광화문', category: '복리후생', amount: 32000, date: '2026.05.01', status: 'pending', card: '회사카드', purpose: '업무 도서 구매', items: ['클린 아키텍처 1권', '문구류 2개'] },
-        { employeePhone: '01022223333', employee: '이지현', merchant: '편의점 점심', category: '식대', amount: 29000, date: '2026.05.01', status: 'pending', card: '회사카드', purpose: '외근 중 식사', items: ['도시락 2개', '음료 2개'] },
-        { employeePhone: '01033334444', employee: '박지훈', merchant: '식당 A', category: '식대', amount: 30000, date: '2026.04.30', status: 'approved', card: '회사카드', purpose: '고객 미팅 식사', items: ['점심 정식 2인'] },
-        { employeePhone: '01044445555', employee: '최준호', merchant: 'GS25 역삼점', category: '기타', amount: 4200, date: '2026.04.29', status: 'rejected', card: '개인카드', purpose: '간식 구매', items: ['음료', '스낵'] },
-        { employeePhone: '01011112222', employee: '김민준', merchant: 'KTX 승차권', category: '교통비', amount: 59800, date: '2026.04.28', status: 'approved', card: '개인카드', purpose: '부산 출장 이동', items: ['KTX 일반실 1매'] },
-        { employeePhone: '01022223333', employee: '이지현', merchant: '스타벅스 강남점', category: '식대', amount: 28500, date: '2026.04.27', status: 'approved', card: '회사카드', purpose: '외부 미팅', items: ['아메리카노 3잔'] },
-        { employeePhone: '01033334444', employee: '박지훈', merchant: '한식당 점심', category: '회식비', amount: 87000, date: '2026.04.26', status: 'approved', card: '회사카드', purpose: '팀 회식', items: ['점심 세트 6인'] },
-        { employeePhone: '01011112222', employee: '김민준', merchant: '스타벅스 강남점', category: '식대', amount: 9400, date: '2026.04.25', status: 'approved', card: '회사카드', purpose: '팀 미팅', items: ['아메리카노 2잔'] },
-        { employeePhone: '01022223333', employee: '이지현', merchant: '스타벅스 강남점', category: '식대', amount: 17600, date: '2026.04.24', status: 'approved', card: '회사카드', purpose: '고객 미팅', items: ['라떼 2잔'] }
+        { id: 1, user_id: 'u001', company_id: 1, trip_id: null, merchant_name: '교보문고 광화문', category: '복리후생', amount: 32000, payment_date: '2026.05.01', status: 'pending', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '업무 도서 구매', image_url: '', items: ['클린 아키텍처 1권', '문구류 2개'], reject_reason: null, storage_path: '' },
+        { id: 2, user_id: 'u002', company_id: 1, trip_id: null, merchant_name: '편의점 점심', category: '식대', amount: 29000, payment_date: '2026.05.01', status: 'pending', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '외근 중 식사', image_url: '', items: ['도시락 2개', '음료 2개'], reject_reason: null, storage_path: '' },
+        { id: 3, user_id: 'u003', company_id: 1, trip_id: null, merchant_name: '식당 A', category: '식대', amount: 30000, payment_date: '2026.04.30', status: 'approved', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '고객 미팅 식사', image_url: '', items: ['점심 정식 2인'], reject_reason: null, storage_path: '' },
+        { id: 4, user_id: 'u004', company_id: 1, trip_id: null, merchant_name: 'GS25 역삼점', category: '기타', amount: 4200, payment_date: '2026.04.29', status: 'rejected', card_type: '개인카드', card_company: '', card_number: '', purpose: '간식 구매', image_url: '', items: ['음료', '스낵'], reject_reason: '개인 간식 구매', storage_path: '' },
+        { id: 5, user_id: 'u001', company_id: 1, trip_id: 1, merchant_name: 'KTX 승차권', category: '교통비', amount: 59800, payment_date: '2026.04.28', status: 'approved', card_type: '개인카드', card_company: '', card_number: '', purpose: '부산 출장 이동', image_url: '', items: ['KTX 일반실 1매'], reject_reason: null, storage_path: '' },
+        { id: 6, user_id: 'u002', company_id: 1, trip_id: null, merchant_name: '스타벅스 강남점', category: '식대', amount: 28500, payment_date: '2026.04.27', status: 'approved', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '외부 미팅', image_url: '', items: ['아메리카노 3잔'], reject_reason: null, storage_path: '' },
+        { id: 7, user_id: 'u003', company_id: 1, trip_id: null, merchant_name: '한식당 점심', category: '회식비', amount: 87000, payment_date: '2026.04.26', status: 'approved', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '팀 회식', image_url: '', items: ['점심 세트 6인'], reject_reason: null, storage_path: '' },
+        { id: 8, user_id: 'u001', company_id: 1, trip_id: null, merchant_name: '스타벅스 강남점', category: '식대', amount: 9400, payment_date: '2026.04.25', status: 'approved', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '팀 미팅', image_url: '', items: ['아메리카노 2잔'], reject_reason: null, storage_path: '' },
+        { id: 9, user_id: 'u002', company_id: 1, trip_id: null, merchant_name: '스타벅스 강남점', category: '식대', amount: 17600, payment_date: '2026.04.24', status: 'approved', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '고객 미팅', image_url: '', items: ['라떼 2잔'], reject_reason: null, storage_path: '' }
       ],
       trips: [
-        { id: 'T001', employeePhone: '01011112222', title: '부산 고객사 방문', purpose: '신규 계약 협의 및 현장 미팅', companions: ['01022223333'], startDate: '2026-05-04', endDate: '2026-05-04' },
-        { id: 'T002', employeePhone: '01022223333', title: '제주 워크숍', purpose: '상반기 프로젝트 회고 및 기획 워크숍', companions: ['01033334444', '01044445555'], startDate: '2026-05-20', endDate: '2026-05-22' },
-        { id: 'T003', employeePhone: '01033334444', title: '대전 현장 점검', purpose: '장비 설치 상태 점검', companions: [], startDate: '2026-04-29', endDate: '2026-04-30' }
+        { id: 1, user_id: 'u001', company_id: 1, trip_name: '부산 고객사 방문', trip_purpose: '신규 계약 협의 및 현장 미팅', trip_companions: ['u002'], start_date: '2026-05-04', end_date: '2026-05-04' },
+        { id: 2, user_id: 'u002', company_id: 1, trip_name: '제주 워크숍', trip_purpose: '상반기 프로젝트 회고 및 기획 워크숍', trip_companions: ['u003', 'u004'], start_date: '2026-05-20', end_date: '2026-05-22' },
+        { id: 3, user_id: 'u003', company_id: 1, trip_name: '대전 현장 점검', trip_purpose: '장비 설치 상태 점검', trip_companions: [], start_date: '2026-04-29', end_date: '2026-04-30' }
       ],
       cards: [
-        { id: 'C001', name: '본사 법인카드', type: 'corporate', issuer: '국민카드', last4: '4821', memo: '일반 경비 결제', active: true },
-        { id: 'C002', name: '정부지원 R&D 카드', type: 'government', issuer: '신한카드', last4: '7304', memo: '정부지원 과제 전용', active: true }
+        { id: 1, company_id: 1, card_type: 'corporate', card_company: '국민카드', card_number: '4821', is_active: true, user_id: null, card_description: '본사 법인카드' },
+        { id: 2, company_id: 1, card_type: 'government', card_company: '신한카드', card_number: '7304', is_active: true, user_id: null, card_description: '정부지원 R&D 카드' }
       ],
       currentReceiptIndex: null,
       currentTripIndex: null,
@@ -1390,8 +1390,17 @@
       renderRecentSubmissions();
     }
 
+    function toDateOnly(value){
+      if(!value) return '';
+      return String(value).split('T')[0].replace(/\./g, '-');
+    }
+
+    function formatPaymentDate(value){
+      return toDateOnly(value).replace(/-/g, '.');
+    }
+
     function getTodayReceipts(){
-      return getVisibleReceipts().filter(item => item.date === '2026.05.01');
+      return getVisibleReceipts().filter(item => formatPaymentDate(item.payment_date) === '2026.05.01');
     }
 
     function renderTodayStatus(){
@@ -1417,7 +1426,7 @@
       const today = getTodayReceipts();
       const receipts = getVisibleReceipts();
       const nearLimit = receipts.filter(item => item.category === '식대' && item.amount >= 28000 && item.amount <= 30000);
-      const repeated = receipts.filter(item => item.merchant === '스타벅스 강남점');
+      const repeated = receipts.filter(item => item.merchant_name === '스타벅스 강남점');
       const rejected = today.filter(item => item.status === 'rejected');
       return [
         nearLimit.length ? { level: 'high', title: '식대 한도 근접', desc: `식대 28,000원 이상 결제가 ${nearLimit.length}건 있습니다.` } : null,
@@ -1450,8 +1459,8 @@
       document.getElementById('recent-submissions').innerHTML = recent.map(item => `
         <div class="recent-item">
           <div>
-            <div class="recent-title">${item.merchant}</div>
-            <div class="recent-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}</div>
+            <div class="recent-title">${item.merchant_name}</div>
+            <div class="recent-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${formatPaymentDate(item.payment_date)}</div>
           </div>
           <div>
             <div class="recent-amount">${item.amount.toLocaleString()}원</div>
@@ -1490,12 +1499,12 @@
     }
 
     function getEmployeeKey(item){
-      return item.employeePhone || item.employee;
+      return item.user_id;
     }
 
     function isEmployeeActive(key){
-      const account = state.accounts.find(item => item.phone === key);
-      return !account || account.active !== false;
+      const account = state.users.find(item => item.id === key);
+      return !account || account.is_active !== false;
     }
 
     function getVisibleReceipts(){
@@ -1515,11 +1524,11 @@
     function getVisibleTripEntries(){
       return state.trips
         .map((item, index) => ({ item, index }))
-        .filter(entry => isEmployeeActive(entry.item.employeePhone));
+        .filter(entry => isEmployeeActive(entry.item.user_id));
     }
 
     function getEmployeeProfile(key){
-      return state.accounts.find(account => account.phone === key) || { name: key, position: '직급 미등록', phone: '' };
+      return state.users.find(account => account.id === key || account.phone === key) || { name: key, position: '직급 미등록', phone: '' };
     }
 
     function getEmployeeDisplay(key){
@@ -1554,11 +1563,11 @@
     }
 
     function parseDate(value){
-      return new Date(`${value.replace(/\./g, '-')}T00:00:00`);
+      return new Date(`${toDateOnly(value)}T00:00:00`);
     }
 
     function getLatestStatsReceiptDate(){
-      return getApprovedReceipts().map(item => parseDate(item.date)).sort((a, b) => b - a)[0];
+      return getApprovedReceipts().map(item => parseDate(item.payment_date)).sort((a, b) => b - a)[0];
     }
 
     function getStatsItems(){
@@ -1577,7 +1586,7 @@
         start = new Date(latest.getFullYear(), latest.getMonth() - 5, 1);
       }
       return getApprovedReceipts().filter(item => {
-        const date = parseDate(item.date);
+        const date = parseDate(item.payment_date);
         return (!start || date >= start) && (!end || date <= end);
       });
     }
@@ -1650,8 +1659,8 @@
       const prevStart = new Date(latest.getFullYear(), latest.getMonth() - 1, 1);
       const prevEnd = new Date(latest.getFullYear(), latest.getMonth(), 0);
       const receipts = getApprovedReceipts();
-      const current = receipts.filter(item => parseDate(item.date) >= currentStart && parseDate(item.date) <= latest);
-      const previous = receipts.filter(item => parseDate(item.date) >= prevStart && parseDate(item.date) <= prevEnd);
+      const current = receipts.filter(item => parseDate(item.payment_date) >= currentStart && parseDate(item.payment_date) <= latest);
+      const previous = receipts.filter(item => parseDate(item.payment_date) >= prevStart && parseDate(item.payment_date) <= prevEnd);
       const currentTotal = current.reduce((sum, item) => sum + item.amount, 0);
       const previousTotal = previous.reduce((sum, item) => sum + item.amount, 0);
       const diff = currentTotal - previousTotal;
@@ -1715,7 +1724,7 @@
     }
 
     function renderCardRatio(){
-      const totals = sumBy(getStatsItems(), 'card');
+      const totals = sumBy(getStatsItems(), 'card_type');
       const entries = Object.entries(totals);
       const colors = ['var(--p)', 'var(--g)', 'var(--b)', 'var(--am)'];
       const total = entries.reduce((sum, [, value]) => sum + value, 0) || 1;
@@ -1743,9 +1752,9 @@
 
     function renderStatsTopMerchants(){
       const merchants = getStatsItems().reduce((acc, item) => {
-        if(!acc[item.merchant]) acc[item.merchant] = { amount: 0, count: 0 };
-        acc[item.merchant].amount += item.amount;
-        acc[item.merchant].count += 1;
+        if(!acc[item.merchant_name]) acc[item.merchant_name] = { amount: 0, count: 0 };
+        acc[item.merchant_name].amount += item.amount;
+        acc[item.merchant_name].count += 1;
         return acc;
       }, {});
       const entries = Object.entries(merchants).sort((a, b) => b[1].amount - a[1].amount).slice(0, 5);
@@ -1901,9 +1910,9 @@
 
     function renderTopMerchants(){
       const merchants = getVisibleReceipts().reduce((acc, item) => {
-        if(!acc[item.merchant]) acc[item.merchant] = { amount: 0, count: 0 };
-        acc[item.merchant].amount += item.amount;
-        acc[item.merchant].count += 1;
+        if(!acc[item.merchant_name]) acc[item.merchant_name] = { amount: 0, count: 0 };
+        acc[item.merchant_name].amount += item.amount;
+        acc[item.merchant_name].count += 1;
         return acc;
       }, {});
       const entries = Object.entries(merchants)
@@ -1934,7 +1943,7 @@
         const month = monthDate.getMonth();
         const value = approved
           .filter(item => {
-            const date = parseDate(item.date);
+            const date = parseDate(item.payment_date);
             return date.getFullYear() === year && date.getMonth() === month;
           })
           .reduce((sum, item) => sum + item.amount, 0);
@@ -1971,8 +1980,8 @@
         <div class="receipt-card">
           <div class="receipt-main">
             <div>
-            <div class="receipt-name">${item.merchant}</div>
-            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}<br>${item.purpose || '-'}</div>
+            <div class="receipt-name">${item.merchant_name}</div>
+            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${formatPaymentDate(item.payment_date)}<br>${item.purpose || '-'}</div>
             </div>
             <button class="review-btn detail-btn" onclick="showReceiptDetail(${index})">영수증 확인</button>
           </div>
@@ -1995,13 +2004,13 @@
     }
 
     function getTripDuration(item){
-      return `${formatTripDate(item.startDate)} ~ ${formatTripDate(item.endDate)}`;
+      return `${formatTripDate(item.start_date)} ~ ${formatTripDate(item.end_date)}`;
     }
 
     function getTripCompanionKeys(item){
-      return (item.companions || []).map(value => {
-        const account = state.accounts.find(account => account.phone === value || account.name === value);
-        return account ? account.phone : value;
+      return (item.trip_companions || []).map(value => {
+        const account = state.users.find(account => account.id === value || account.phone === value || account.name === value);
+        return account ? account.id : value;
       });
     }
 
@@ -2015,19 +2024,19 @@
     }
 
     function getAvailableTripCompanions(trip){
-      return state.accounts.filter(account => account.active !== false && account.phone !== trip.employeePhone);
+      return state.users.filter(account => account.is_active !== false && account.id !== trip.user_id);
     }
 
     function renderTripCompanionPicker(keyword = ''){
       const trip = state.trips[state.currentTripIndex];
       if(!trip) return;
       const selected = new Set(state.tripCompanionDraft);
-      document.getElementById('edit-trip-companions').innerHTML = state.tripCompanionDraft.map(phone => {
-        const profile = getEmployeeProfile(phone);
+      document.getElementById('edit-trip-companions').innerHTML = state.tripCompanionDraft.map(user_id => {
+        const profile = getEmployeeProfile(user_id);
         return `
           <span class="selected-chip">
             ${profile.name}
-            <button type="button" onclick="removeTripCompanion('${phone}')" aria-label="${profile.name} 동행인 제외">x</button>
+            <button type="button" onclick="removeTripCompanion('${user_id}')" aria-label="${profile.name} 동행인 제외">x</button>
           </span>
         `;
       }).join('') || '<span class="muted">선택된 동행인이 없습니다.</span>';
@@ -2038,7 +2047,7 @@
         return;
       }
       const results = getAvailableTripCompanions(trip)
-        .filter(account => !selected.has(account.phone))
+        .filter(account => !selected.has(account.id))
         .filter(account => [account.name, account.position, account.phone, account.phone.slice(-4)].join(' ').toLowerCase().includes(query));
       document.getElementById('trip-companion-results').innerHTML = results.map(account => `
         <button type="button" class="search-result" onclick="selectTripCompanion('${account.phone}')">
@@ -2053,8 +2062,10 @@
     }
 
     function selectTripCompanion(phone){
-      if(!state.tripCompanionDraft.includes(phone)){
-        state.tripCompanionDraft.push(phone);
+      const user = state.users.find(account => account.phone === phone || account.id === phone);
+      const user_id = user ? user.id : phone;
+      if(!state.tripCompanionDraft.includes(user_id)){
+        state.tripCompanionDraft.push(user_id);
       }
       document.getElementById('edit-trip-companion-search').value = '';
       renderTripCompanionPicker();
@@ -2075,7 +2086,7 @@
 
     function isOngoingTrip(item){
       const today = getTodayIsoDate();
-      return item.startDate <= today && today <= item.endDate;
+      return item.start_date <= today && today <= item.end_date;
     }
 
     function renderTrips(){
@@ -2091,14 +2102,14 @@
       return entries.map(({ item, index }) => `
         <tr>
           <td>
-            <strong>${item.title}</strong>
-            <div class="muted">${item.id} · ${item.purpose || '-'}</div>
+            <strong>${item.trip_name}</strong>
+            <div class="muted">${item.id} · ${item.trip_purpose || '-'}</div>
           </td>
           <td>
             <div class="person">
-              <div class="avatar">${getEmployeeProfile(item.employeePhone).name.slice(0, 1)}</div>
+              <div class="avatar">${getEmployeeProfile(item.user_id).name.slice(0, 1)}</div>
               <div>
-                <strong>${getEmployeeDisplay(item.employeePhone)}</strong>
+                <strong>${getEmployeeDisplay(item.user_id)}</strong>
               </div>
             </div>
           </td>
@@ -2116,10 +2127,10 @@
       if(!trip) return;
       state.currentTripIndex = index;
       document.getElementById('trip-edit-id').textContent = trip.id;
-      document.getElementById('edit-trip-title').value = trip.title;
-      document.getElementById('edit-trip-purpose').value = trip.purpose || '';
-      document.getElementById('edit-trip-start').value = trip.startDate;
-      document.getElementById('edit-trip-end').value = trip.endDate;
+      document.getElementById('edit-trip-title').value = trip.trip_name;
+      document.getElementById('edit-trip-purpose').value = trip.trip_purpose || '';
+      document.getElementById('edit-trip-start').value = trip.start_date;
+      document.getElementById('edit-trip-end').value = trip.end_date;
       state.tripCompanionDraft = getTripCompanionKeys(trip);
       document.getElementById('edit-trip-companion-search').value = '';
       renderTripCompanionPicker();
@@ -2149,18 +2160,18 @@
         alert('출장 종료일은 시작일보다 빠를 수 없습니다.');
         return;
       }
-      trip.title = title;
-      trip.purpose = purpose;
-      trip.startDate = startDate;
-      trip.endDate = endDate;
-      trip.companions = companions;
+      trip.trip_name = title;
+      trip.trip_purpose = purpose;
+      trip.start_date = startDate;
+      trip.end_date = endDate;
+      trip.trip_companions = companions;
       hideTripEdit();
       renderTrips();
     }
 
     function renderPatterns(){
       const receipts = getVisibleReceipts();
-      const repeatedMerchant = receipts.filter(item => item.merchant === '스타벅스 강남점');
+      const repeatedMerchant = receipts.filter(item => item.merchant_name === '스타벅스 강남점');
       const nearLimit = receipts.filter(item => item.category === '식대' && item.amount >= 28000 && item.amount <= 30000);
       const rejected = receipts.filter(item => item.status === 'rejected');
       const employeeTotals = sumByEmployee(receipts.filter(item => item.status === 'approved'));
@@ -2205,8 +2216,8 @@
         <div class="receipt-card">
           <div class="receipt-main">
             <div>
-            <div class="receipt-name">${item.merchant}</div>
-            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}<br>${item.purpose || '-'}</div>
+            <div class="receipt-name">${item.merchant_name}</div>
+            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${formatPaymentDate(item.payment_date)}<br>${item.purpose || '-'}</div>
             </div>
             <button class="review-btn detail-btn" onclick="showReceiptDetail(${index})">영수증 확인</button>
           </div>
@@ -2220,9 +2231,9 @@
     function renderReceiptImage(item){
       const lines = (item.items || []).map(name => `<div class="receipt-line"><span>${name}</span><span></span></div>`).join('');
       return `
-        <div class="receipt-image-title">${item.merchant}</div>
-        <div class="receipt-line"><span>일자</span><span>${item.date}</span></div>
-        <div class="receipt-line"><span>카드</span><span>${item.card || '-'}</span></div>
+        <div class="receipt-image-title">${item.merchant_name}</div>
+        <div class="receipt-line"><span>일자</span><span>${formatPaymentDate(item.payment_date)}</span></div>
+        <div class="receipt-line"><span>카드</span><span>${item.card_type || '-'}</span></div>
         ${lines}
         <div class="receipt-total"><span>합계</span><span>${item.amount.toLocaleString()}원</span></div>
       `;
@@ -2241,19 +2252,19 @@
     function renderReceiptInfo(item, editMode){
       document.getElementById('receipt-info').innerHTML = editMode ? `
         <div class="info-row"><div class="info-key">제출자</div><div class="info-val">${getReceiptEmployeeDisplay(item)}</div></div>
-        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val"><input class="edit-field" id="edit-merchant" value="${item.merchant}"></div></div>
+        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val"><input class="edit-field" id="edit-merchant" value="${item.merchant_name}"></div></div>
         <div class="info-row"><div class="info-key">금액</div><div class="info-val"><input class="edit-field" id="edit-amount" type="number" value="${item.amount}"></div></div>
         <div class="info-row"><div class="info-key">카테고리</div><div class="info-val"><input class="edit-field" id="edit-category" value="${item.category}"></div></div>
-        <div class="info-row"><div class="info-key">결제일</div><div class="info-val"><input class="edit-field" id="edit-date" value="${item.date}"></div></div>
-        <div class="info-row"><div class="info-key">카드</div><div class="info-val"><input class="edit-field" id="edit-card" value="${item.card || ''}"></div></div>
+        <div class="info-row"><div class="info-key">결제일</div><div class="info-val"><input class="edit-field" id="edit-date" value="${formatPaymentDate(item.payment_date)}"></div></div>
+        <div class="info-row"><div class="info-key">카드</div><div class="info-val"><input class="edit-field" id="edit-card" value="${item.card_type || ''}"></div></div>
         <div class="info-row"><div class="info-key">목적</div><div class="info-val"><input class="edit-field" id="edit-purpose" value="${item.purpose || ''}"></div></div>
       ` : `
         <div class="info-row"><div class="info-key">제출자</div><div class="info-val">${getReceiptEmployeeDisplay(item)}</div></div>
-        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val">${item.merchant}</div></div>
+        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val">${item.merchant_name}</div></div>
         <div class="info-row"><div class="info-key">금액</div><div class="info-val">${item.amount.toLocaleString()}원</div></div>
         <div class="info-row"><div class="info-key">카테고리</div><div class="info-val">${item.category}</div></div>
-        <div class="info-row"><div class="info-key">결제일</div><div class="info-val">${item.date}</div></div>
-        <div class="info-row"><div class="info-key">카드</div><div class="info-val">${item.card || '-'}</div></div>
+        <div class="info-row"><div class="info-key">결제일</div><div class="info-val">${formatPaymentDate(item.payment_date)}</div></div>
+        <div class="info-row"><div class="info-key">카드</div><div class="info-val">${item.card_type || '-'}</div></div>
         <div class="info-row"><div class="info-key">목적</div><div class="info-val">${item.purpose || '-'}</div></div>
       `;
     }
@@ -2289,11 +2300,11 @@
         alert('가맹점, 금액, 카테고리, 결제일은 필수입니다.');
         return;
       }
-      item.merchant = merchant;
+      item.merchant_name = merchant;
       item.amount = amount;
       item.category = category;
-      item.date = date;
-      item.card = document.getElementById('edit-card').value.trim();
+      item.payment_date = date;
+      item.card_type = document.getElementById('edit-card').value.trim();
       item.purpose = document.getElementById('edit-purpose').value.trim();
       document.getElementById('receipt-image').innerHTML = renderReceiptImage(item);
       setReceiptEditMode(false);
@@ -2353,8 +2364,7 @@
     }
 
     function generateCardId(){
-      const nextNumber = state.cards.length + 1;
-      return `C${String(nextNumber).padStart(3, '0')}`;
+      return Math.max(0, ...state.cards.map(card => Number(card.id) || 0)) + 1;
     }
 
     function addCard(){
@@ -2371,19 +2381,19 @@
         alert('카드번호 끝 4자리는 숫자 4자리로 입력해주세요.');
         return;
       }
-      if(state.cards.some(card => card.name === name || (card.issuer === issuer && card.last4 === last4))){
+      if(state.cards.some(card => card.card_description === name || (card.card_company === issuer && card.card_number === last4))){
         alert('이미 등록된 카드와 이름 또는 발급처/끝 4자리가 겹칩니다.');
         return;
       }
-      state.cards.push({ id: generateCardId(), name, type, issuer, last4, memo, active: true });
+      state.cards.push({ id: generateCardId(), company_id: 1, card_type: type, card_company: issuer, card_number: last4, is_active: true, user_id: null, card_description: memo ? `${name} - ${memo}` : name });
       hideAddCard();
       renderCards();
       alert(`${name} 카드가 등록되었습니다.`);
     }
 
     function renderCards(){
-      const activeCards = state.cards.filter(card => card.active !== false);
-      const inactiveCards = state.cards.filter(card => card.active === false);
+      const activeCards = state.cards.filter(card => card.is_active !== false);
+      const inactiveCards = state.cards.filter(card => card.is_active === false);
       document.getElementById('active-card-count').textContent = `(${activeCards.length}장)`;
       document.getElementById('inactive-card-count').textContent = `(${inactiveCards.length}장)`;
       document.getElementById('active-card-table').innerHTML = renderCardRows(activeCards, '활성 카드가 없습니다.');
@@ -2394,22 +2404,22 @@
       return cards.map(card => `
         <tr>
           <td>
-            <strong>${card.name}</strong>
+            <strong>${card.card_description}</strong>
             <div class="muted">${card.id}</div>
           </td>
-          <td><span class="badge ${card.type === 'government' ? 'bb' : 'bp'}">${getCardTypeLabel(card.type)}</span></td>
-          <td>${card.issuer}</td>
-          <td><code>**** ${card.last4}</code></td>
-          <td>${card.memo || '-'}</td>
-          <td><button class="account-status-btn ${card.active === false ? 'inactive' : 'active'}" onclick="toggleCardStatus('${card.id}')">${card.active === false ? '비활성' : '활성'}</button></td>
+          <td><span class="badge ${card.card_type === 'government' ? 'bb' : 'bp'}">${getCardTypeLabel(card.card_type)}</span></td>
+          <td>${card.card_company}</td>
+          <td><code>**** ${card.card_number}</code></td>
+          <td>${card.card_description || '-'}</td>
+          <td><button class="account-status-btn ${card.is_active === false ? 'inactive' : 'active'}" onclick="toggleCardStatus('${card.id}')">${card.is_active === false ? '비활성' : '활성'}</button></td>
         </tr>
       `).join('') || `<tr><td class="empty" colspan="6">${emptyMessage}</td></tr>`;
     }
 
     function toggleCardStatus(id){
-      const card = state.cards.find(item => item.id === id);
+      const card = state.cards.find(item => String(item.id) === String(id));
       if(!card) return;
-      card.active = card.active === false;
+      card.is_active = card.is_active === false;
       renderCards();
     }
 
@@ -2442,7 +2452,7 @@
     }
 
     function generateUniquePassword(){
-      const used = new Set(state.accounts.map(account => account.password));
+      const used = new Set(state.users.map(account => account.password));
       let password = generatePassword();
       while(used.has(password)){
         password = generatePassword();
@@ -2475,16 +2485,16 @@
         alert('전화번호는 하이픈 없이 01012345678 형식의 11자리로 입력해주세요.');
         return;
       }
-      if(state.accounts.some(account => account.phone === phone)){
+      if(state.users.some(account => account.phone === phone)){
         alert('이미 등록된 전화번호입니다.');
         return;
       }
-      if(state.accounts.some(account => account.password === password)){
+      if(state.users.some(account => account.password === password)){
         document.getElementById('new-password').value = generateUniquePassword();
         alert('비밀번호가 중복되어 새로 생성했습니다. 다시 등록해주세요.');
         return;
       }
-      state.accounts.push({ phone, name, position, password, active: true });
+      state.users.push({ id: phone, company_id: 1, name, phone, position, role: 'employee', password, is_active: true });
       hideAddAccount();
       renderAccounts();
       renderDashboard();
@@ -2494,8 +2504,8 @@
     }
 
     function renderAccounts(){
-      const activeAccounts = state.accounts.filter(account => account.active !== false);
-      const inactiveAccounts = state.accounts.filter(account => account.active === false);
+      const activeAccounts = state.users.filter(account => account.is_active !== false);
+      const inactiveAccounts = state.users.filter(account => account.is_active === false);
       document.getElementById('account-count').textContent = `(${activeAccounts.length}명)`;
       document.getElementById('inactive-account-count').textContent = `(${inactiveAccounts.length}명)`;
       document.getElementById('account-table').innerHTML = renderAccountRows(activeAccounts, '등록된 활성 사용자가 없습니다.');
@@ -2514,15 +2524,15 @@
           <td>${account.phone}</td>
           <td>${account.position}</td>
           <td><code>${account.password}</code></td>
-          <td><button class="account-status-btn ${account.active === false ? 'inactive' : 'active'}" onclick="toggleAccountStatus('${account.phone}')">${account.active === false ? '비활성' : '활성'}</button></td>
+          <td><button class="account-status-btn ${account.is_active === false ? 'inactive' : 'active'}" onclick="toggleAccountStatus('${account.id}')">${account.is_active === false ? '비활성' : '활성'}</button></td>
         </tr>
       `).join('') || `<tr><td class="empty" colspan="5">${emptyMessage}</td></tr>`;
     }
 
-    function toggleAccountStatus(phone){
-      const account = state.accounts.find(item => item.phone === phone);
+    function toggleAccountStatus(id){
+      const account = state.users.find(item => item.id === id);
       if(!account) return;
-      account.active = account.active === false;
+      account.is_active = account.is_active === false;
       renderAccounts();
       renderDashboard();
       renderStats();
