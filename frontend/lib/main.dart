@@ -7,13 +7,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 const supabaseUrl = 'https://hczripxpbmtvqwbouexo.supabase.co';
-const supabasePublishableKey = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+
+/// 빌드/실행 시 `--dart-define=SUPABASE_ANON_KEY=...` 또는
+/// `flutter run --dart-define-from-file=dart_defines.json` (gitignore) 로 전달하세요.
+const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (supabaseAnonKey.isEmpty) {
+    throw StateError(
+      'SUPABASE_ANON_KEY 가 비어 있습니다. '
+      'frontend/dart_defines.example.json 을 dart_defines.json 으로 복사해 키를 넣거나, '
+      'flutter run --dart-define=SUPABASE_ANON_KEY=<키> 로 실행하세요.',
+    );
+  }
   await Supabase.initialize(
     url: supabaseUrl,
-    anonKey: supabasePublishableKey,
+    anonKey: supabaseAnonKey,
   );
   runApp(const DDalKKackApp());
 }

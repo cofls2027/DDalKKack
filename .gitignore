@@ -11,3 +11,6 @@
 # --- OS/Tools ---
 .DS_Store
 .idea/
+
+# --- Local secrets (copy from *.example.*) ---
+/frontend/dart_defines.json
