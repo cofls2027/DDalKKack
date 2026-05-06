@@ -278,13 +278,13 @@
             </div>
           </div>
           <div class="field">
-            <label for="admin-phone">관리자 전화번호</label>
-            <input id="admin-phone" inputmode="numeric" maxlength="11" value="01000000000" placeholder="01012345678">
-            <div class="hint">웹에서는 관리자 계정만 로그인합니다. 테스트: 01000000000 / 1234</div>
+            <label for="admin-email">관리자 이메일</label>
+            <input id="admin-email" type="email" placeholder="admin@example.com">
+            <div class="hint">Supabase Auth에 등록된 관리자 계정만 로그인할 수 있습니다.</div>
           </div>
           <div class="field">
             <label for="admin-password">비밀번호</label>
-            <input id="admin-password" type="password" value="1234" placeholder="비밀번호">
+            <input id="admin-password" type="password" placeholder="비밀번호">
           </div>
           <button class="btn btn-primary" onclick="login()">로그인</button>
         </div>
@@ -641,10 +641,18 @@
               <div class="card">
                 <div class="card-head">
                   <div class="card-title">새 계정 등록</div>
-                  <span class="badge bp">전화번호 ID</span>
+                  <span class="badge bp">Auth 프로필</span>
                 </div>
-                <div class="notice">비밀번호는 다른 사용자와 겹치지 않도록 자동 생성됩니다. 필요하면 다시 생성할 수 있습니다.</div>
+                <div class="notice">먼저 Supabase Auth Users에서 이메일 계정을 만든 뒤, 해당 사용자 UUID를 프로필 ID로 등록합니다. 비밀번호는 DB에 저장하지 않습니다.</div>
                 <div class="form-grid">
+                  <div class="field" style="grid-column:1 / -1">
+                    <label for="new-user-id">Supabase Auth UUID</label>
+                    <input id="new-user-id" placeholder="auth.users의 User UID">
+                  </div>
+                  <div class="field">
+                    <label for="new-email">이메일</label>
+                    <input id="new-email" type="email" placeholder="user@example.com">
+                  </div>
                   <div class="field">
                     <label for="new-phone">전화번호</label>
                     <input id="new-phone" inputmode="numeric" maxlength="11" placeholder="01012345678">
@@ -654,17 +662,11 @@
                     <input id="new-name" placeholder="홍길동">
                   </div>
                   <div class="field">
-                    <label for="new-password">비밀번호</label>
-                    <input id="new-password" readonly>
-                    <div class="hint">자동 생성되며 현재 등록된 사용자 비밀번호와 중복되지 않습니다.</div>
-                  </div>
-                  <div class="field">
                     <label for="new-position">직급</label>
                     <input id="new-position" placeholder="예: 매니저, 대리, 팀장">
                   </div>
                 </div>
                 <div class="form-actions">
-                  <button class="btn btn-outline" onclick="regeneratePassword()">비밀번호 재생성</button>
                   <button class="btn btn-primary" onclick="addAccount()">등록하기</button>
                   <button class="btn btn-subtle" onclick="hideAddAccount()">취소</button>
                 </div>
@@ -680,9 +682,9 @@
                   <thead>
                     <tr>
                       <th>사용자</th>
-                      <th>전화번호(ID)</th>
+                      <th>이메일</th>
+                      <th>전화번호</th>
                       <th>직급</th>
-                      <th>비밀번호</th>
                       <th>상태</th>
                     </tr>
                   </thead>
@@ -700,9 +702,9 @@
                   <thead>
                     <tr>
                       <th>사용자</th>
-                      <th>전화번호(ID)</th>
+                      <th>이메일</th>
+                      <th>전화번호</th>
                       <th>직급</th>
-                      <th>비밀번호</th>
                       <th>상태</th>
                     </tr>
                   </thead>
@@ -1302,13 +1304,19 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = 'https://hczripxpbmtvqwbouexo.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    let currentAdminProfile = null;
+
     const state = {
       users: [
-        { id: 'u001', company_id: 1, name: '김민준', phone: '01011112222', position: '매니저', role: 'employee', password: 'DK-7Q4M2A', is_active: true },
-        { id: 'u002', company_id: 1, name: '이지현', phone: '01022223333', position: '대리', role: 'employee', password: 'DK-9R1X8C', is_active: true },
-        { id: 'u003', company_id: 1, name: '박지훈', phone: '01033334444', position: '팀장', role: 'manager', password: 'DK-3P6T9K', is_active: true },
-        { id: 'u004', company_id: 1, name: '최준호', phone: '01044445555', position: '사원', role: 'employee', password: 'DK-5N8B1Y', is_active: true }
+        { id: 'u001', company_id: 1, name: '김민준', email: 'minjun@example.com', phone: '01011112222', position: '매니저', role: 'employee', is_active: true },
+        { id: 'u002', company_id: 1, name: '이지현', email: 'jihyun@example.com', phone: '01022223333', position: '대리', role: 'employee', is_active: true },
+        { id: 'u003', company_id: 1, name: '박지훈', email: 'jihoon@example.com', phone: '01033334444', position: '팀장', role: 'manager', is_active: true },
+        { id: 'u004', company_id: 1, name: '최준호', email: 'junho@example.com', phone: '01044445555', position: '사원', role: 'employee', is_active: true }
       ],
       receipts: [
         { id: 1, user_id: 'u001', company_id: 1, trip_id: null, merchant_name: '교보문고 광화문', category: '복리후생', amount: 32000, payment_date: '2026.05.01', status: 'pending', card_type: '회사카드', card_company: '국민카드', card_number: '4821', purpose: '업무 도서 구매', image_url: '', items: ['클린 아키텍처 1권', '문구류 2개'], reject_reason: null, storage_path: '' },
@@ -1341,25 +1349,84 @@
       statsSearchComposing: false
     };
 
-    function login(){
-      const phone = normalizePhone(document.getElementById('admin-phone').value);
+    async function login(){
+      const email = document.getElementById('admin-email').value.trim();
       const password = document.getElementById('admin-password').value;
-      if(!phone || !password){
-        alert('전화번호와 비밀번호를 입력해주세요.');
+      if(!email || !password){
+        alert('이메일과 비밀번호를 입력해주세요.');
         return;
       }
-      if(phone !== '01000000000' || password !== '1234'){
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if(authError || !authData.user){
         alert('관리자 계정 정보가 올바르지 않습니다.');
         return;
       }
+      const profile = await loadCurrentAdminProfile(authData.user.id);
+      if(!profile){
+        await supabaseClient.auth.signOut();
+        alert('관리자 권한이 없거나 비활성화된 계정입니다.');
+        return;
+      }
+      currentAdminProfile = profile;
+      await loadAdminData();
       document.getElementById('login-screen').classList.remove('active');
       document.getElementById('admin-screen').classList.add('active');
       renderAll();
     }
 
-    function logout(){
+    async function logout(){
+      await supabaseClient.auth.signOut();
       document.getElementById('admin-screen').classList.remove('active');
       document.getElementById('login-screen').classList.add('active');
+    }
+
+    async function loadCurrentAdminProfile(userId){
+      const { data, error } = await supabaseClient
+        .from('users')
+        .select('id, company_id, name, phone, position, role, email, is_active')
+        .eq('id', userId)
+        .eq('role', 'admin')
+        .eq('is_active', true)
+        .maybeSingle();
+      if(error){
+        console.error('관리자 프로필 조회 실패:', error);
+        return null;
+      }
+      currentAdminProfile = data;
+      return data;
+    }
+
+    async function loadAdminData(){
+      const [usersResult, receiptsResult, tripsResult, cardsResult] = await Promise.all([
+        supabaseClient.from('users').select('id, company_id, name, phone, position, role, email, is_active').order('created_at', { ascending: false }),
+        supabaseClient.from('receipts').select('*').order('created_at', { ascending: false }),
+        supabaseClient.from('trips').select('*').order('created_at', { ascending: false }),
+        supabaseClient.from('cards').select('*').order('created_at', { ascending: false })
+      ]);
+
+      const failed = [usersResult, receiptsResult, tripsResult, cardsResult].find(result => result.error);
+      if(failed){
+        console.error('Supabase 데이터 조회 실패:', failed.error);
+        alert('데이터를 불러오지 못했습니다. RLS 정책과 계정 권한을 확인해주세요.');
+        return;
+      }
+
+      state.users = usersResult.data || [];
+      state.receipts = receiptsResult.data || [];
+      state.trips = (tripsResult.data || []).map(trip => ({
+        ...trip,
+        trip_companions: normalizeTripCompanions(trip.trip_companions)
+      }));
+      state.cards = cardsResult.data || [];
+    }
+
+    function normalizeTripCompanions(value){
+      if(Array.isArray(value)) return value;
+      if(!value) return [];
+      return String(value)
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
     }
 
     function showPanel(id){
@@ -2425,9 +2492,8 @@
 
     function showAddAccount(){
       clearAccountForm();
-      regeneratePassword();
       document.getElementById('account-form').classList.add('show');
-      document.getElementById('new-phone').focus();
+      document.getElementById('new-user-id').focus();
     }
 
     function hideAddAccount(){
@@ -2436,32 +2502,11 @@
     }
 
     function clearAccountForm(){
+      document.getElementById('new-user-id').value = '';
+      document.getElementById('new-email').value = '';
       document.getElementById('new-phone').value = '';
       document.getElementById('new-name').value = '';
       document.getElementById('new-position').value = '';
-      document.getElementById('new-password').value = '';
-    }
-
-    function generatePassword(){
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let value = 'DK-';
-      for(let i = 0; i < 6; i += 1){
-        value += chars[Math.floor(Math.random() * chars.length)];
-      }
-      return value;
-    }
-
-    function generateUniquePassword(){
-      const used = new Set(state.users.map(account => account.password));
-      let password = generatePassword();
-      while(used.has(password)){
-        password = generatePassword();
-      }
-      return password;
-    }
-
-    function regeneratePassword(){
-      document.getElementById('new-password').value = generateUniquePassword();
     }
 
     function normalizePhone(phone){
@@ -2472,29 +2517,36 @@
       return /^010\d{8}$/.test(phone);
     }
 
-    function addAccount(){
+    async function addAccount(){
+      const id = document.getElementById('new-user-id').value.trim();
+      const email = document.getElementById('new-email').value.trim();
       const phone = normalizePhone(document.getElementById('new-phone').value);
       const name = document.getElementById('new-name').value.trim();
-      const password = document.getElementById('new-password').value.trim() || generateUniquePassword();
       const position = document.getElementById('new-position').value.trim();
-      if(!phone || !name || !position){
-        alert('전화번호, 이름, 직급을 모두 입력해주세요.');
+      if(!id || !email || !phone || !name || !position){
+        alert('Auth UUID, 이메일, 전화번호, 이름, 직급을 모두 입력해주세요.');
         return;
       }
       if(!isValidPhone(phone)){
         alert('전화번호는 하이픈 없이 01012345678 형식의 11자리로 입력해주세요.');
         return;
       }
+      if(state.users.some(account => account.id === id || account.email === email)){
+        alert('이미 등록된 Auth UUID 또는 이메일입니다.');
+        return;
+      }
       if(state.users.some(account => account.phone === phone)){
         alert('이미 등록된 전화번호입니다.');
         return;
       }
-      if(state.users.some(account => account.password === password)){
-        document.getElementById('new-password').value = generateUniquePassword();
-        alert('비밀번호가 중복되어 새로 생성했습니다. 다시 등록해주세요.');
+      const newUser = { id, company_id: currentAdminProfile?.company_id || 1, name, email, phone, position, role: 'employee', is_active: true };
+      const { error } = await supabaseClient.from('users').insert([newUser]);
+      if(error){
+        console.error('사용자 프로필 등록 실패:', error);
+        alert('사용자 프로필 등록에 실패했습니다. Auth UUID와 RLS 권한을 확인해주세요.');
         return;
       }
-      state.users.push({ id: phone, company_id: 1, name, phone, position, role: 'employee', password, is_active: true });
+      state.users.push(newUser);
       hideAddAccount();
       renderAccounts();
       renderDashboard();
@@ -2521,18 +2573,28 @@
               <div>${account.name}</div>
             </div>
           </td>
-          <td>${account.phone}</td>
+          <td>${account.email || '-'}</td>
+          <td>${account.phone || '-'}</td>
           <td>${account.position}</td>
-          <td><code>${account.password}</code></td>
           <td><button class="account-status-btn ${account.is_active === false ? 'inactive' : 'active'}" onclick="toggleAccountStatus('${account.id}')">${account.is_active === false ? '비활성' : '활성'}</button></td>
         </tr>
       `).join('') || `<tr><td class="empty" colspan="5">${emptyMessage}</td></tr>`;
     }
 
-    function toggleAccountStatus(id){
+    async function toggleAccountStatus(id){
       const account = state.users.find(item => item.id === id);
       if(!account) return;
-      account.is_active = account.is_active === false;
+      const nextActive = account.is_active === false;
+      const { error } = await supabaseClient
+        .from('users')
+        .update({ is_active: nextActive })
+        .eq('id', id);
+      if(error){
+        console.error('사용자 상태 변경 실패:', error);
+        alert('사용자 상태를 변경하지 못했습니다.');
+        return;
+      }
+      account.is_active = nextActive;
       renderAccounts();
       renderDashboard();
       renderStats();
@@ -2541,7 +2603,22 @@
       renderPatterns();
     }
 
-    renderAll();
+    async function initAdminSession(){
+      const { data } = await supabaseClient.auth.getSession();
+      const user = data.session?.user;
+      if(!user) return;
+      const profile = await loadCurrentAdminProfile(user.id);
+      if(!profile){
+        await supabaseClient.auth.signOut();
+        return;
+      }
+      await loadAdminData();
+      document.getElementById('login-screen').classList.remove('active');
+      document.getElementById('admin-screen').classList.add('active');
+      renderAll();
+    }
+
+    initAdminSession();
   </script>
 </body>
 </html>
