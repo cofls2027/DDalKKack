@@ -1,4 +1,4 @@
-﻿# Flutter / Dart
+# Flutter / Dart
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -10,8 +10,8 @@ build/
 # Android / Gradle
 *.iml
 .gradle/
-/local.properties
 local.properties
+/local.properties
 .externalNativeBuild
 .cxx
 /captures
