@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/expense/history_screen.dart';
+import 'screens/trip/trip_screen.dart';
 
 const supabaseUrl = 'https://hczripxpbmtvqwbouexo.supabase.co';
 
@@ -626,8 +627,8 @@ class _MainShellState extends State<MainShell> {
           );
         },
       ),
-      HistoryScreen(receipts: widget.receipts),
-      TripsScreen(trips: widget.trips),
+      const HistoryScreen(),
+      const TripScreen(),
       StatsScreen(receipts: widget.receipts),
       MenuScreen(
         cards: widget.cards,
@@ -734,13 +735,14 @@ class HomeScreen extends StatelessWidget {
                   (receipt) => ReceiptTile(
                 receipt: receipt,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReceiptDetailScreen(receipt: receipt),
-                    ),
-                  );
-                },
+              // 🚀 당분간 홈 화면에서 상세 화면 넘어가는 건 막아둡니다!
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (_) => ReceiptDetailScreen(receipt: receipt),
+              //   ),
+              // );
+            },
               ),
             ),
         ],
@@ -1166,132 +1168,7 @@ class BatchAnalysisScreen extends StatelessWidget {
   }
 }
 
-class HistoryScreen extends StatelessWidget {
-  final List<ReceiptSummary> receipts;
 
-  const HistoryScreen({
-    super.key,
-    required this.receipts,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppPage(
-      title: '정산 내역',
-      subtitle: '분석 및 제출된 지출 내역을 확인합니다.',
-      child: receipts.isEmpty
-          ? const EmptyCard(
-        icon: Icons.receipt_long,
-        title: '내역이 없습니다.',
-        description: '영수증을 등록하면 이곳에 표시됩니다.',
-      )
-          : Column(
-        children: receipts
-            .map(
-              (receipt) => ReceiptTile(
-            receipt: receipt,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ReceiptDetailScreen(receipt: receipt),
-                ),
-              );
-            },
-          ),
-        )
-            .toList(),
-      ),
-    );
-  }
-}
-
-class ReceiptDetailScreen extends StatelessWidget {
-  final ReceiptSummary receipt;
-
-  const ReceiptDetailScreen({
-    super.key,
-    required this.receipt,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppPage(
-      title: '지출 상세보기',
-      subtitle: '영수증 이미지, 분석 결과, 규정 검증 결과를 확인합니다.',
-      showBack: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ReceiptTile(receipt: receipt),
-          const SizedBox(height: 12),
-          DetailCard(
-            title: '분석 결과',
-            items: {
-              '가맹점': receipt.merchant,
-              '금액': formatWon(receipt.amount),
-              '날짜': receipt.date,
-              '시간': receipt.time,
-              '카테고리': receipt.category,
-              '카드 종류': receipt.cardType,
-              '사용 목적': receipt.purpose.isEmpty ? '미입력' : receipt.purpose,
-              '참여자': receipt.participants.isEmpty ? '미입력' : receipt.participants,
-            },
-          ),
-          const SizedBox(height: 12),
-          WarningBox(warnings: receipt.warnings),
-          const SizedBox(height: 12),
-          RejectionBox(reasons: receipt.rejectionReasons),
-          const SizedBox(height: 12),
-          InfoCard(
-            icon: Icons.image,
-            title: '영수증 이미지 경로',
-            description: receipt.imagePath ?? '이미지 없음',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TripsScreen extends StatelessWidget {
-  final List<TripSummary> trips;
-
-  const TripsScreen({
-    super.key,
-    required this.trips,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppPage(
-      title: '출장',
-      subtitle: '출장 정보와 관련 지출을 연결하기 위한 화면입니다.',
-      child: trips.isEmpty
-          ? const EmptyCard(
-        icon: Icons.luggage,
-        title: '등록된 출장이 없습니다.',
-        description: '출장 등록 기능은 다음 단계에서 연결합니다.',
-      )
-          : Column(
-        children: trips
-            .map(
-              (trip) => Card(
-            child: ListTile(
-              leading: const Icon(Icons.luggage),
-              title: Text(trip.tripName),
-              subtitle: Text(
-                '${trip.startDate} ~ ${trip.endDate}\n${trip.tripPurpose}\n동행인: ${trip.tripCompanions}',
-              ),
-              isThreeLine: true,
-            ),
-          ),
-        )
-            .toList(),
-      ),
-    );
-  }
-}
 
 class StatsScreen extends StatelessWidget {
   final List<ReceiptSummary> receipts;
