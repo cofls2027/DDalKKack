@@ -1,10 +1,20 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+const supabaseUrl = 'https://hczripxpbmtvqwbouexo.supabase.co';
+const supabasePublishableKey = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabasePublishableKey,
+  );
   runApp(const DDalKKackApp());
 }
 
@@ -219,6 +229,10 @@ class AppRoot extends StatefulWidget {
 
 class _AppRootState extends State<AppRoot> {
   bool isLoggedIn = false;
+  bool isCheckingSession = true;
+  StreamSubscription<AuthState>? authSubscription;
+
+  SupabaseClient get supabase => Supabase.instance.client;
 
   final List<QuickReceipt> quickReceipts = [];
   final List<ReceiptSummary> receipts = [
@@ -271,6 +285,80 @@ class _AppRootState extends State<AppRoot> {
     ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    restoreSession();
+    authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+      if (!mounted) return;
+      setState(() {
+        isLoggedIn = data.session != null;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    authSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> restoreSession() async {
+    final session = supabase.auth.currentSession;
+    if (session == null) {
+      setState(() {
+        isLoggedIn = false;
+        isCheckingSession = false;
+      });
+      return;
+    }
+    final isActive = await isCurrentUserActive();
+    if (!isActive) {
+      await supabase.auth.signOut();
+    }
+    if (!mounted) return;
+    setState(() {
+      isLoggedIn = isActive;
+      isCheckingSession = false;
+    });
+  }
+
+  Future<bool> isCurrentUserActive() async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return false;
+    final profile = await supabase
+        .from('users')
+        .select('id, is_active')
+        .eq('id', userId)
+        .maybeSingle();
+    return profile != null && profile['is_active'] == true;
+  }
+
+  Future<String?> signIn(String email, String password) async {
+    try {
+      final response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      if (response.user == null) {
+        return '로그인에 실패했습니다.';
+      }
+      final isActive = await isCurrentUserActive();
+      if (!isActive) {
+        await supabase.auth.signOut();
+        return '비활성화된 계정입니다. 관리자에게 문의하세요.';
+      }
+      setState(() {
+        isLoggedIn = true;
+      });
+      return null;
+    } on AuthException catch (error) {
+      return error.message;
+    } catch (_) {
+      return '로그인 중 오류가 발생했습니다.';
+    }
+  }
+
   void addReceipt(ReceiptSummary receipt) {
     setState(() {
       receipts.insert(0, receipt);
@@ -297,13 +385,15 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   Widget build(BuildContext context) {
+    if (isCheckingSession) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     if (!isLoggedIn) {
       return LoginScreen(
-        onLogin: () {
-          setState(() {
-            isLoggedIn = true;
-          });
-        },
+        onLogin: signIn,
       );
     }
 
@@ -317,6 +407,7 @@ class _AppRootState extends State<AppRoot> {
       onAddQuickReceipts: addQuickReceipts,
       onRemoveSelectedQuickReceipts: removeSelectedQuickReceipts,
       onLogout: () {
+        supabase.auth.signOut();
         setState(() {
           isLoggedIn = false;
         });
@@ -327,7 +418,7 @@ class _AppRootState extends State<AppRoot> {
 }
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLogin;
+  final Future<String?> Function(String email, String password) onLogin;
 
   const LoginScreen({
     super.key,
@@ -342,6 +433,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final idController = TextEditingController();
   final passwordController = TextEditingController();
   String error = '';
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -383,8 +475,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
                     TextField(
                       controller: idController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
-                        labelText: '이메일 또는 전화번호',
+                        labelText: '이메일',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -409,17 +502,32 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       height: 52,
                       child: FilledButton(
-                        onPressed: () {
-                          if (idController.text.isEmpty ||
-                              passwordController.text.isEmpty) {
-                            setState(() {
-                              error = '아이디와 비밀번호를 입력하세요.';
-                            });
-                            return;
-                          }
-                          widget.onLogin();
-                        },
-                        child: const Text('로그인'),
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                final email = idController.text.trim();
+                                final password = passwordController.text;
+                                if (email.isEmpty || password.isEmpty) {
+                                  setState(() {
+                                    error = '이메일과 비밀번호를 입력하세요.';
+                                  });
+                                  return;
+                                }
+                                setState(() {
+                                  error = '';
+                                  isLoading = true;
+                                });
+                                final message = await widget.onLogin(
+                                  email,
+                                  password,
+                                );
+                                if (!mounted) return;
+                                setState(() {
+                                  isLoading = false;
+                                  error = message ?? '';
+                                });
+                              },
+                        child: Text(isLoading ? '로그인 중...' : '로그인'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1456,7 +1564,7 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Center(
