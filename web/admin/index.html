@@ -29,8 +29,8 @@
     .brand-sub{font-size:13px;color:var(--tx2);margin-top:3px}
     .field{margin-bottom:16px}
     .field label{display:block;font-size:13px;color:var(--tx2);font-weight:600;margin-bottom:7px}
-    .field input{width:100%;border:1px solid var(--bd);border-radius:13px;padding:13px 14px;background:var(--wh);outline:none;color:var(--tx)}
-    .field input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(83,74,183,.08)}
+    .field input,.field select{width:100%;border:1px solid var(--bd);border-radius:13px;padding:13px 14px;background:var(--wh);outline:none;color:var(--tx)}
+    .field input:focus,.field select:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(83,74,183,.08)}
     .field input[readonly]{background:#fafafa;color:var(--tx2)}
     .hint{font-size:12px;color:var(--tx3);margin-top:6px;line-height:1.5}
     .btn{width:100%;border:0;border-radius:14px;padding:14px;text-align:center;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .12s,transform .12s}
@@ -61,11 +61,90 @@
     .stat span{font-size:13px;color:var(--tx2)}
     .card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
     .card-title{font-size:16px;font-weight:800}
+    .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+    #panel-dashboard .dashboard-grid{gap:12px}
+    #panel-dashboard .card{padding:14px}
+    #panel-dashboard .card:nth-child(2),#panel-dashboard .card:nth-child(3){min-height:248px}
+    #panel-dashboard .card-head{margin-bottom:10px}
+    #panel-dashboard .chart-list{gap:8px}
+    #panel-dashboard .merchant-item{padding:8px 0}
+    .chart-list{display:flex;flex-direction:column;gap:12px}
+    .bar-row{display:grid;grid-template-columns:88px 1fr 82px;gap:10px;align-items:center}
+    .bar-label{font-size:13px;font-weight:800;color:var(--tx2)}
+    .bar-track{height:10px;background:#f1f1f4;border-radius:999px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:999px;background:var(--p)}
+    .bar-value{font-size:13px;font-weight:800;text-align:right}
+    .period-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 14px}
+    .period-row{display:flex;background:#f0f0f2;border-radius:13px;padding:4px;gap:3px}
+    .period-btn{border:0;background:transparent;border-radius:10px;padding:9px 15px;color:var(--tx2);font-size:13px;font-weight:900;cursor:pointer}
+    .period-btn.active{background:var(--wh);color:var(--p);box-shadow:0 2px 8px rgba(20,20,40,.06)}
+    .date-range{display:flex;align-items:center;gap:7px;background:var(--wh);border:1px solid var(--bd);border-radius:13px;padding:6px 8px}
+    .date-range input{border:0;outline:none;font-size:13px;color:var(--tx);font-weight:800}
+    .change-list{display:flex;flex-direction:column;gap:10px}
+    .change-item{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#fafafa;border:1px solid #f1f1f4}
+    .change-title{font-size:14px;font-weight:900;margin-bottom:3px}
+    .change-desc{font-size:12px;color:var(--tx2)}
+    .change-value{font-size:16px;font-weight:900}
+    .change-up{color:var(--r)}
+    .change-down{color:var(--g)}
+    .status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .status-card{border-radius:15px;padding:14px;text-align:center}
+    .status-number{font-size:24px;font-weight:900;margin-bottom:4px}
+    .status-label{font-size:12px;font-weight:800}
+    .today-panel{display:grid;grid-template-columns:minmax(180px,.8fr) 1.2fr;gap:18px;align-items:end}
+    .today-total{font-size:34px;font-weight:900;margin-bottom:8px}
+    .today-meta{display:grid;grid-template-columns:repeat(4,minmax(112px,1fr));gap:10px}
+    .today-metric{border-radius:16px;padding:14px 16px;text-align:center}
+    .today-metric strong{display:block;font-size:27px;font-weight:900;line-height:1;margin-bottom:7px}
+    .today-metric span{font-size:13px;font-weight:900}
+    .today-metric.submit{background:var(--pl);color:var(--pd)}
+    .today-metric.pending{background:var(--aml);color:var(--am)}
+    .today-metric.approved{background:var(--gl);color:var(--g)}
+    .today-metric.rejected{background:var(--rl);color:var(--r)}
+    .alert-list{display:flex;flex-direction:column;gap:10px}
+    .alert-item{border-left:4px solid var(--am);border-radius:14px;padding:12px 13px;background:#fffaf2;border-top:1px solid #f5ead8;border-right:1px solid #f5ead8;border-bottom:1px solid #f5ead8}
+    .alert-item.high{border-left-color:var(--r);background:#fff7f7;border-color:#f7dddd}
+    .alert-title{font-size:14px;font-weight:900;margin-bottom:4px}
+    .alert-desc{font-size:12px;color:var(--tx2);line-height:1.45}
+    .recent-list{display:flex;flex-direction:column;gap:9px}
+    .recent-item{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f2f2f4}
+    .recent-item:last-child{border-bottom:0}
+    .recent-title{font-size:14px;font-weight:900;margin-bottom:3px}
+    .recent-meta{font-size:12px;color:var(--tx2)}
+    .recent-amount{font-size:14px;font-weight:900;text-align:right;margin-bottom:5px}
+    .more-btn{border:0;border-radius:999px;background:var(--bl);color:var(--b);padding:6px 11px;font-size:12px;font-weight:900;cursor:pointer}
+    .more-btn:active{opacity:.86}
+    .trend-bars{height:180px;display:flex;align-items:flex-end;gap:12px;padding-top:12px}
+    .trend-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:42px}
+    .trend-bar{width:100%;max-width:34px;border-radius:9px 9px 0 0;background:linear-gradient(180deg,#7167d8,var(--p))}
+    .trend-label{font-size:12px;color:var(--tx2);font-weight:800}
+    .trend-value{font-size:11px;color:var(--tx3)}
+    .donut-wrap{display:flex;align-items:center;gap:18px;min-height:178px}
+    .donut{width:128px;height:128px;border-radius:50%;background:conic-gradient(var(--p) 0 40%, #3B6D11 40% 72%, #A32D2D 72% 100%);position:relative;flex-shrink:0}
+    .donut::after{content:"";position:absolute;inset:32px;background:var(--wh);border-radius:50%}
+    .legend{display:flex;flex-direction:column;gap:10px;flex:1}
+    .legend-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .merchant-list{display:flex;flex-direction:column;gap:12px}
+    .merchant-item{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #f2f2f4}
+    .merchant-item:last-child{border-bottom:0}
+    .merchant-rank{width:28px;height:28px;border-radius:50%;background:var(--pl);color:var(--pd);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900}
+    .merchant-name{font-size:14px;font-weight:900;margin-bottom:3px}
+    .merchant-count{font-size:12px;color:var(--tx2);font-weight:700}
+    .merchant-amount{font-size:14px;font-weight:900;text-align:right}
+    .pattern-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .pattern-card{background:var(--wh);border:1px solid var(--bd);border-left:4px solid var(--am);border-radius:17px;padding:18px;box-shadow:0 6px 20px rgba(20,20,40,.03)}
+    .pattern-card.high{border-left-color:var(--r)}
+    .pattern-card.low{border-left-color:var(--b)}
+    .pattern-title{font-size:16px;font-weight:900;margin-bottom:6px}
+    .pattern-desc{font-size:13px;color:var(--tx2);line-height:1.55;margin-bottom:12px}
+    .pattern-meta{display:flex;gap:8px;flex-wrap:wrap}
     .badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700}
     .bg{background:var(--gl);color:var(--g)}
     .ba{background:var(--aml);color:var(--am)}
     .bp{background:var(--pl);color:var(--pd)}
     .bb{background:var(--bl);color:var(--b)}
+    .br{background:var(--rl);color:var(--r)}
     .empty{padding:26px;text-align:center;color:var(--tx3);font-size:14px}
     .table-wrap{overflow:auto}
     table{width:100%;border-collapse:collapse;font-size:14px}
@@ -75,28 +154,107 @@
     .person{display:flex;align-items:center;gap:10px}
     .avatar{width:38px;height:38px;border-radius:50%;background:var(--pl);color:var(--p);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
     .muted{color:var(--tx2);font-size:12px;margin-top:3px}
+    .inactive-account-card{margin-top:16px}
+    .account-status-btn{border:0;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer}
+    .account-status-btn.active{background:var(--gl);color:var(--g)}
+    .account-status-btn.inactive{background:var(--rl);color:var(--r)}
     .form-wrap{display:none;margin-bottom:16px}
     .form-wrap.show{display:block}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .form-actions{display:flex;gap:10px;margin-top:2px}
     .form-actions .btn{width:auto;min-width:130px}
-    .receipt-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #f2f2f4}
-    .receipt-card:last-child{border-bottom:0}
-    .receipt-name{font-weight:800;margin-bottom:4px}
-    .receipt-meta{font-size:13px;color:var(--tx2)}
-    .amount{font-weight:800;text-align:right}
+    .selected-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:9px}
+    .selected-chip{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:var(--pl);color:var(--pd);padding:7px 10px;font-size:12px;font-weight:900}
+    .selected-chip button{border:0;background:transparent;color:inherit;cursor:pointer;font-weight:900}
+    .search-results{border:1px solid var(--bd);border-radius:13px;background:#fff;overflow:hidden;margin-top:8px}
+    .search-result{width:100%;border:0;background:#fff;text-align:left;padding:11px 12px;cursor:pointer;font-weight:900;border-bottom:1px solid #f2f2f4}
+    .search-result:last-child{border-bottom:0}
+    .search-result:active{background:var(--pl)}
+    .choice-meta{display:block;color:var(--tx2);font-size:11px;font-weight:700;margin-top:2px}
+    .receipt-card{display:grid;grid-template-columns:minmax(0,1fr) 130px 150px 170px;gap:18px;align-items:center;padding:20px;border:1px solid #f0f0f4;border-radius:16px;background:#fff;margin-bottom:12px}
+    .receipt-card:last-child{margin-bottom:0}
+    .receipt-main{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+    .receipt-name{font-size:16px;font-weight:800;margin-bottom:7px}
+    .receipt-meta{font-size:13px;color:var(--tx2);line-height:1.5}
+    .receipt-status{display:flex;justify-content:center}
+    .receipt-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+    .amount{font-size:17px;font-weight:900;text-align:right}
+    .status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:98px;border-radius:999px;padding:9px 14px;font-size:13px;font-weight:800}
+    .status-approved{background:var(--gl);color:var(--g)}
+    .status-pending{background:var(--aml);color:var(--am)}
+    .status-rejected{background:var(--rl);color:var(--r)}
+    .review-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+    .review-btn{border:0;border-radius:12px;padding:11px 12px;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .12s,transform .12s}
+    .review-btn:active{opacity:.86;transform:translateY(1px)}
+    .detail-btn{background:var(--bl);color:var(--b)}
+    .receipt-main .detail-btn{width:auto;min-width:128px}
+    .approve-btn{background:var(--gl);color:var(--g)}
+    .reject-btn{background:var(--rl);color:var(--r)}
     .notice{border-radius:14px;padding:13px 15px;font-size:13px;line-height:1.6;margin-bottom:14px;background:var(--bl);color:var(--b)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(20,20,30,.48);display:none;align-items:center;justify-content:center;padding:24px;z-index:10}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(860px,100%);max-height:90vh;overflow:auto;background:var(--wh);border-radius:22px;box-shadow:var(--shadow);padding:22px}
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+    .modal-title{font-size:22px;font-weight:900;margin-bottom:4px}
+    .modal-sub{font-size:13px;color:var(--tx2)}
+    .modal-close{border:0;background:var(--bg);border-radius:12px;padding:10px 13px;cursor:pointer;font-weight:800;color:var(--tx2)}
+    .modal-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .modal-tool-btn{border:0;border-radius:11px;padding:9px 12px;font-size:13px;font-weight:800;cursor:pointer}
+    .modal-search{margin-bottom:14px}
+    .modal-search input{width:100%;border:1px solid var(--bd);border-radius:13px;padding:12px 14px;background:var(--wh);outline:none;font:inherit;font-weight:800}
+    .modal-search input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(83,74,183,.08)}
+    .edit-btn{background:var(--pl);color:var(--pd)}
+    .save-btn{background:var(--p);color:#fff}
+    .cancel-btn{background:var(--bg);color:var(--tx2)}
+    .detail-grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+    .receipt-image{min-height:390px;border-radius:16px;background:linear-gradient(180deg,#fff,#fafafa);border:1px solid var(--bd);padding:24px 20px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.8);font-family:"Courier New",monospace;color:#333}
+    .receipt-image-title{text-align:center;font-weight:800;font-size:15px;margin-bottom:18px}
+    .receipt-line{display:flex;justify-content:space-between;border-bottom:1px dashed #ddd;padding:8px 0;font-size:12px}
+    .receipt-total{margin-top:18px;padding-top:14px;border-top:2px solid #333;display:flex;justify-content:space-between;font-weight:900}
+    .info-list{border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+    .info-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid #f2f2f4}
+    .info-row:last-child{border-bottom:0}
+    .info-key{background:#fafafa;color:var(--tx2);font-size:13px;font-weight:800;padding:13px}
+    .info-val{font-size:14px;font-weight:700;padding:13px}
+    .edit-field{width:100%;border:1px solid var(--bd);border-radius:10px;padding:10px 11px;background:var(--wh);outline:none;font:inherit;font-weight:700}
+    .edit-field:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(83,74,183,.08)}
     .hidden{display:none!important}
+    .rule-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .rule-summary .badge{padding:8px 12px}
+    .rule-list{display:flex;flex-direction:column;gap:14px}
+    .rule-section{background:var(--wh);border:1px solid var(--bd);border-radius:18px;padding:18px;box-shadow:0 6px 20px rgba(20,20,40,.03)}
+    .rule-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:12px;border-bottom:1px solid #f2f2f4;margin-bottom:14px}
+    .rule-kicker{font-size:12px;color:var(--p);font-weight:900;margin-bottom:4px}
+    .rule-section h2{font-size:19px;line-height:1.35}
+    .rule-section-desc{font-size:13px;color:var(--tx2);line-height:1.55;margin-top:5px}
+    .rule-group{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid #f2f2f4}
+    .rule-group:last-child{border-bottom:0;padding-bottom:0}
+    .rule-group-title{font-size:15px;font-weight:900;line-height:1.45}
+    .rule-group-body{display:flex;flex-direction:column;gap:9px}
+    .rule-items{padding-left:18px;color:var(--tx2);font-size:14px;line-height:1.65}
+    .rule-items strong{color:var(--tx)}
+    .rule-items li+li{margin-top:3px}
+    .rule-table{width:100%;border:1px solid var(--bd);border-radius:14px;overflow:auto;margin-top:2px}
+    .rule-table table{font-size:13px}
+    .rule-table th{background:#fafafa}
+    .rule-note{border-radius:13px;background:#fafafa;border:1px solid #f2f2f4;color:var(--tx2);font-size:13px;line-height:1.55;padding:12px}
     @media (max-width:860px){
       .layout{grid-template-columns:1fr}
       .sidebar{position:sticky;top:0;z-index:2;border-right:0;border-bottom:1px solid var(--bd);padding:14px}
       .side-head{border-bottom:0;padding-bottom:0}
-      .nav-list{display:grid;grid-template-columns:repeat(4,1fr)}
+      .nav-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
       .nav-btn{text-align:center;padding:10px 6px;font-size:13px}
       .logout{margin-top:0}
       .main{padding:18px}
       .grid{grid-template-columns:repeat(2,1fr)}
+      .dashboard-grid,.pattern-list,.today-panel{grid-template-columns:1fr}
       .form-grid{grid-template-columns:1fr}
+      .receipt-card{grid-template-columns:1fr}
+      .receipt-status{justify-content:flex-start}
+      .receipt-side{align-items:stretch}
+      .amount{text-align:left}
+      .detail-grid{grid-template-columns:1fr}
+      .rule-group{grid-template-columns:1fr;gap:8px}
     }
     @media (max-width:520px){
       .grid{grid-template-columns:1fr}
@@ -142,8 +300,12 @@
           </div>
           <nav class="nav-list" aria-label="관리자 메뉴">
             <button class="nav-btn active" data-panel="dashboard" onclick="showPanel('dashboard')">대시보드</button>
+            <button class="nav-btn" data-panel="stats" onclick="showPanel('stats')">통계</button>
             <button class="nav-btn" data-panel="reviews" onclick="showPanel('reviews')">영수증 검토</button>
-            <button class="nav-btn" data-panel="accounts" onclick="showPanel('accounts')">계정 관리</button>
+            <button class="nav-btn" data-panel="trips" onclick="showPanel('trips')">출장</button>
+            <button class="nav-btn" data-panel="patterns" onclick="showPanel('patterns')">이상 패턴 탐지</button>
+            <button class="nav-btn" data-panel="cards" onclick="showPanel('cards')">카드 관리</button>
+            <button class="nav-btn" data-panel="accounts" onclick="showPanel('accounts')">사용자 계정 관리</button>
             <button class="nav-btn" data-panel="rules" onclick="showPanel('rules')">규정 관리</button>
           </nav>
           <button class="btn btn-subtle logout" onclick="logout()">로그아웃</button>
@@ -154,17 +316,109 @@
             <div class="topbar">
               <div>
                 <div class="eyebrow">관리자 홈</div>
-                <h1>전체 비용 현황</h1>
-                <p class="desc">검토가 필요한 영수증과 직원 계정을 한 곳에서 관리합니다.</p>
+                <h1>오늘 운영 현황</h1>
+                <p class="desc">오늘 들어온 지출, 처리할 검토 건, 이상 징후를 빠르게 확인합니다.</p>
               </div>
             </div>
-            <div class="grid" id="summary-grid"></div>
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">검토 대기 영수증</div>
-                <span class="badge ba" id="pending-badge">0건</span>
+            <div class="dashboard-grid">
+              <div class="card" style="grid-column:1 / -1">
+                <div class="card-head">
+                  <div class="card-title">오늘 지출 현황</div>
+                </div>
+                <div class="today-panel" id="today-status"></div>
               </div>
-              <div id="pending-list"></div>
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">최근 제출</div>
+                  <button class="more-btn" onclick="showPanel('reviews')">더보기</button>
+                </div>
+                <div class="recent-list" id="recent-submissions"></div>
+              </div>
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">이상 징후 알림</div>
+                  <span class="badge ba" id="alert-count-badge">0개</span>
+                </div>
+                <div class="alert-list" id="dashboard-alerts"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="panel-stats">
+            <div class="topbar">
+              <div>
+                <div class="eyebrow">통계</div>
+                <h1>상세 지출 분석</h1>
+                <p class="desc">기간별 지출 흐름과 원인을 자세히 확인합니다.</p>
+              </div>
+            </div>
+            <div class="period-tools">
+              <div class="period-row">
+                <button class="period-btn" data-period="month" onclick="setStatsPeriod('month')">이번 달</button>
+                <button class="period-btn" data-period="3m" onclick="setStatsPeriod('3m')">3개월</button>
+                <button class="period-btn" data-period="6m" onclick="setStatsPeriod('6m')">6개월</button>
+                <button class="period-btn active" data-period="all" onclick="setStatsPeriod('all')">전체</button>
+              </div>
+              <div class="date-range">
+                <input type="date" id="stats-start" onchange="setCustomStatsRange()">
+                <span style="color:var(--tx3);font-weight:900;">~</span>
+                <input type="date" id="stats-end" onchange="setCustomStatsRange()">
+              </div>
+            </div>
+            <div class="grid" id="stats-summary"></div>
+            <div class="dashboard-grid">
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">카테고리별 지출</div>
+                  <span class="badge bp" id="stats-period-label">이번 달</span>
+                </div>
+                <div class="chart-list" id="stats-category-bars"></div>
+              </div>
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">전월 대비 변화</div>
+                </div>
+                <div class="change-list" id="stats-change-list"></div>
+              </div>
+              <div class="card" style="grid-column:1 / -1">
+                <div class="card-head">
+                  <div class="card-title">월별 트렌드</div>
+                  <span class="badge bg">최근 6개월</span>
+                </div>
+                <div class="trend-bars" id="trend-bars"></div>
+              </div>
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">직원별 지출</div>
+                  <button class="more-btn" onclick="showStatsModal('employeeSpend')">전체보기</button>
+                </div>
+                <div class="chart-list" id="employee-bars"></div>
+              </div>
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">카드 종류별 비율</div>
+                </div>
+                <div class="donut-wrap">
+                  <div class="donut" id="card-donut"></div>
+                  <div class="legend" id="card-legend"></div>
+                </div>
+              </div>
+              <div class="card" style="grid-column:1 / -1">
+                <div class="card-head">
+                  <div class="card-title">TOP 가맹점</div>
+                  <span class="badge bp">금액 기준</span>
+                </div>
+                <div class="merchant-list" id="stats-top-merchants"></div>
+              </div>
+              <div class="card" style="grid-column:1 / -1">
+                <div class="card-head">
+                  <div class="card-title">직원별 카테고리</div>
+                  <button class="more-btn" onclick="showStatsModal('employeeCategory')">전체보기</button>
+                </div>
+                <div class="table-wrap">
+                  <table id="employee-category-matrix"></table>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -181,11 +435,203 @@
             </div>
           </section>
 
+          <section class="panel" id="panel-trips">
+            <div class="topbar">
+              <div>
+                <div class="eyebrow">출장</div>
+                <h1>출장 관리</h1>
+                <p class="desc">현재 진행 중인 출장과 전체 등록된 출장 내용을 확인하고 수정합니다.</p>
+              </div>
+            </div>
+
+            <div class="form-wrap" id="trip-form">
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">출장 내용 수정</div>
+                  <span class="badge bp" id="trip-edit-id"></span>
+                </div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="edit-trip-title">출장명</label>
+                    <input id="edit-trip-title" placeholder="예: 부산 고객사 방문">
+                  </div>
+                  <div class="field">
+                    <label for="edit-trip-companion-search">동행인</label>
+                    <div class="selected-list" id="edit-trip-companions"></div>
+                    <input id="edit-trip-companion-search" placeholder="사용자 이름 검색" oninput="renderTripCompanionSearch(this.value)">
+                    <div class="search-results" id="trip-companion-results"></div>
+                  </div>
+                  <div class="field">
+                    <label for="edit-trip-start">출장 시작일</label>
+                    <input id="edit-trip-start" type="date">
+                  </div>
+                  <div class="field">
+                    <label for="edit-trip-end">출장 종료일</label>
+                    <input id="edit-trip-end" type="date">
+                  </div>
+                  <div class="field" style="grid-column:1 / -1">
+                    <label for="edit-trip-purpose">목적</label>
+                    <input id="edit-trip-purpose" placeholder="출장 목적을 입력하세요">
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="saveTripEdit()">저장하기</button>
+                  <button class="btn btn-subtle" onclick="hideTripEdit()">취소</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">현재 진행 중인 출장 <span id="current-trip-count"></span></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>출장</th>
+                      <th>신청자</th>
+                      <th>기간</th>
+                      <th>동행인</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="current-trip-table"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+              <div class="card-head">
+                <div class="card-title">전체 등록된 출장 <span id="trip-count"></span></div>
+                <span class="badge bp">최신순</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>출장</th>
+                      <th>신청자</th>
+                      <th>기간</th>
+                      <th>동행인</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="trip-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="panel-patterns">
+            <div class="topbar">
+              <div>
+                <div class="eyebrow">이상 패턴 탐지</div>
+                <h1>참고용 이상 징후</h1>
+                <p class="desc">규정 위반 확정이 아니라 관리자가 추가 확인할 수 있는 참고 신호입니다.</p>
+              </div>
+            </div>
+            <div class="notice">동일 가맹점 반복, 한도 근접, 반려 이력, 특정 카테고리 쏠림 같은 패턴을 모아 보여줍니다.</div>
+            <div class="pattern-list" id="pattern-list"></div>
+          </section>
+
+          <section class="panel" id="panel-cards">
+            <div class="topbar">
+              <div>
+                <div class="eyebrow">카드 관리</div>
+                <h1>등록 카드</h1>
+                <p class="desc">사용자에게 노출할 법인카드와 정부지원카드를 등록하고 사용 가능 여부를 관리합니다.</p>
+              </div>
+              <button class="btn btn-primary" style="width:auto;min-width:110px" onclick="showAddCard()">+ 추가</button>
+            </div>
+
+            <div class="form-wrap" id="card-form">
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">새 카드 등록</div>
+                  <span class="badge bp">사용자 노출 카드</span>
+                </div>
+                <div class="notice">카드번호 전체는 저장하지 않고, 사용자가 구분할 수 있도록 끝 4자리만 등록합니다.</div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="new-card-name">카드명</label>
+                    <input id="new-card-name" placeholder="예: 본사 법인카드">
+                  </div>
+                  <div class="field">
+                    <label for="new-card-type">카드 종류</label>
+                    <select id="new-card-type">
+                      <option value="corporate">법인카드</option>
+                      <option value="government">정부지원카드</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="new-card-issuer">발급처</label>
+                    <input id="new-card-issuer" placeholder="예: 국민카드, 신한카드">
+                  </div>
+                  <div class="field">
+                    <label for="new-card-last4">카드번호 끝 4자리</label>
+                    <input id="new-card-last4" inputmode="numeric" maxlength="4" placeholder="1234">
+                  </div>
+                  <div class="field" style="grid-column:1 / -1">
+                    <label for="new-card-memo">메모</label>
+                    <input id="new-card-memo" placeholder="예: 출장비 결제 전용">
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" onclick="addCard()">등록하기</button>
+                  <button class="btn btn-subtle" onclick="hideAddCard()">취소</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">활성 카드 <span id="active-card-count"></span></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>카드</th>
+                      <th>종류</th>
+                      <th>발급처</th>
+                      <th>끝 4자리</th>
+                      <th>메모</th>
+                      <th>상태</th>
+                    </tr>
+                  </thead>
+                  <tbody id="active-card-table"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card inactive-account-card">
+              <div class="card-head">
+                <div class="card-title">비활성 카드 <span id="inactive-card-count"></span></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>카드</th>
+                      <th>종류</th>
+                      <th>발급처</th>
+                      <th>끝 4자리</th>
+                      <th>메모</th>
+                      <th>상태</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inactive-card-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
           <section class="panel" id="panel-accounts">
             <div class="topbar">
               <div>
-                <div class="eyebrow">계정 관리</div>
-                <h1>직원 계정</h1>
+                <div class="eyebrow">사용자 계정 관리</div>
+                <h1>사용자 계정</h1>
                 <p class="desc">사번 대신 전화번호를 로그인 ID로 사용합니다.</p>
               </div>
               <button class="btn btn-primary" style="width:auto;min-width:110px" onclick="showAddAccount()">+ 추가</button>
@@ -197,7 +643,7 @@
                   <div class="card-title">새 계정 등록</div>
                   <span class="badge bp">전화번호 ID</span>
                 </div>
-                <div class="notice">초기 비밀번호는 다른 사용자와 겹치지 않도록 자동 생성됩니다. 필요하면 다시 생성할 수 있습니다.</div>
+                <div class="notice">비밀번호는 다른 사용자와 겹치지 않도록 자동 생성됩니다. 필요하면 다시 생성할 수 있습니다.</div>
                 <div class="form-grid">
                   <div class="field">
                     <label for="new-phone">전화번호</label>
@@ -208,7 +654,7 @@
                     <input id="new-name" placeholder="홍길동">
                   </div>
                   <div class="field">
-                    <label for="new-password">초기 비밀번호</label>
+                    <label for="new-password">비밀번호</label>
                     <input id="new-password" readonly>
                     <div class="hint">자동 생성되며 현재 등록된 사용자 비밀번호와 중복되지 않습니다.</div>
                   </div>
@@ -228,7 +674,6 @@
             <div class="card">
               <div class="card-head">
                 <div class="card-title">등록된 사용자 <span id="account-count"></span></div>
-                <span class="badge bg">활성</span>
               </div>
               <div class="table-wrap">
                 <table>
@@ -237,11 +682,31 @@
                       <th>사용자</th>
                       <th>전화번호(ID)</th>
                       <th>직급</th>
-                      <th>초기 비밀번호</th>
+                      <th>비밀번호</th>
                       <th>상태</th>
                     </tr>
                   </thead>
                   <tbody id="account-table"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card inactive-account-card">
+              <div class="card-head">
+                <div class="card-title">비활성 사용자 <span id="inactive-account-count"></span></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>사용자</th>
+                      <th>전화번호(ID)</th>
+                      <th>직급</th>
+                      <th>비밀번호</th>
+                      <th>상태</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inactive-account-table"></tbody>
                 </table>
               </div>
             </div>
@@ -251,20 +716,590 @@
             <div class="topbar">
               <div>
                 <div class="eyebrow">규정 관리</div>
-                <h1>비용 규정</h1>
-                <p class="desc">현재는 화면 프로토타입이며, 추후 Supabase 연동 시 저장 기능을 붙이면 됩니다.</p>
+                <h1>통합 비용 처리 및 카드 사용 규정집</h1>
+                <p class="desc">비용 처리 기준과 카드 사용 규정을 표로 간단히 확인합니다.</p>
               </div>
             </div>
-            <div class="grid">
-              <div class="stat"><strong>30,000원</strong><span>식대 한도</span></div>
-              <div class="stat"><strong>100,000원</strong><span>교통비 한도</span></div>
-              <div class="stat"><strong>07:00~22:00</strong><span>허용 시간</span></div>
-              <div class="stat"><strong>담배, 주류</strong><span>금지 항목</span></div>
+            <div class="rule-summary" aria-label="규정 요약">
+              <span class="badge bp">영수증 14일 이내 제출</span>
+              <span class="badge bb">회사카드 우선 사용</span>
+              <span class="badge bg">정부지원카드 과제 목적 한정</span>
+              <span class="badge ba">출장 등록 시 완화 규정 적용</span>
+              <span class="badge br">허위·중복 신청 환수 가능</span>
+            </div>
+            <div class="rule-list">
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">공통</div>
+                    <h2>공통 처리 기준</h2>
+                  </div>
+                  <span class="badge bb">전체 비용</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>구분</th><th>기준</th><th>비고</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>영수증 제출</td><td>사용일 기준 14일 이내</td><td>상세 품목 포함 권장</td></tr>
+                      <tr><td>카드 사용</td><td>회사카드 우선</td><td>개인카드도 동일 규정 적용 가능</td></tr>
+                      <tr><td>정부지원카드</td><td>승인된 과제 목적만 가능</td><td>사용 목적, 참여 인원 기록</td></tr>
+                      <tr><td>검증 결과</td><td>승인 / 경고 / 반려</td><td>AI 분석 및 관리자 검토</td></tr>
+                      <tr><td>위반 처리</td><td>제한, 반려, 비용 환수 가능</td><td>허위·중복 신청 포함</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">회사카드</div>
+                    <h2>회사카드 경비 기준</h2>
+                  </div>
+                  <span class="badge bg">법인카드</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>항목</th><th>한도 / 기준</th><th>필수 확인</th><th>제한</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>일반 식대</td><td>1인 1식 최대 15,000원</td><td>업무 중 식사</td><td>개인 음주 비용</td></tr>
+                      <tr><td>야근 식대</td><td>1인 최대 20,000원</td><td>오후 8시 이후, 근무 확인</td><td>업무 무관 식사</td></tr>
+                      <tr><td>교통비</td><td>대중교통 실비</td><td>외근·출장 등 업무 이동</td><td>개인 목적 이동</td></tr>
+                      <tr><td>택시</td><td>업무상 필요 시 인정</td><td>야간 업무 또는 대중교통 이용 곤란</td><td>불필요한 이용</td></tr>
+                      <tr><td>회식비</td><td>1인 최대 50,000원</td><td>팀장 이상 사전 승인</td><td>유흥 목적 업종</td></tr>
+                      <tr><td>복리후생비</td><td>회사 기준표 / 사전 승인</td><td>경조사, 교육, 세미나, 자격증</td><td>증빙 없는 신청</td></tr>
+                      <tr><td>비품비</td><td>업무용 구매 인정</td><td>고가 장비 사전 승인</td><td>개인 사용 목적</td></tr>
+                      <tr><td>행사비</td><td>예산 사전 승인</td><td>행사 목적, 결과, 사용 내역</td><td>목적 불명확 지출</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">회사카드</div>
+                    <h2>접대비 한도</h2>
+                  </div>
+                  <span class="badge bg">직급별</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>직급</th><th>1회 사용 한도</th><th>월 한도</th><th>초과 시</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>사원 / 주임</td><td>50,000원</td><td>200,000원</td><td>사전 승인</td></tr>
+                      <tr><td>대리</td><td>100,000원</td><td>400,000원</td><td>사전 승인</td></tr>
+                      <tr><td>과장</td><td>200,000원</td><td>800,000원</td><td>사전 승인</td></tr>
+                      <tr><td>차장</td><td>300,000원</td><td>1,500,000원</td><td>사전 승인</td></tr>
+                      <tr><td>부장 이상</td><td>500,000원</td><td>3,000,000원</td><td>사전 승인</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">회사카드</div>
+                    <h2>대외 경조사비 한도</h2>
+                  </div>
+                  <span class="badge bg">거래처</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>구분</th><th>1회 한도</th><th>필수 정보</th><th>제한</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>일반 거래처</td><td>100,000원</td><td>거래처명, 사용 목적</td><td>개인 친분 목적</td></tr>
+                      <tr><td>주요 거래처</td><td>300,000원</td><td>부서장 승인</td><td>과도한 고가 선물</td></tr>
+                      <tr><td>VIP 고객사</td><td>별도 승인</td><td>승인 내역, 증빙 자료</td><td>증빙 없는 현금 지급</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">정부지원카드</div>
+                    <h2>사용 가능 / 제한 항목</h2>
+                  </div>
+                  <span class="badge ba">과제 전용</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>구분</th><th>가능 항목</th><th>기준</th><th>제한</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>재료비</td><td>센서, 모터, PCB, 케이블, 테스트 부품</td><td>과제 수행 목적</td><td>개인 용도</td></tr>
+                      <tr><td>장비 / 비품</td><td>모니터, 키보드, 웹캠, OCR, AI API, 클라우드</td><td>고가 장비 사전 승인</td><td>개인 PC, 휴대폰</td></tr>
+                      <tr><td>회의비 / 식대</td><td>프로젝트 회의, 발표 준비, 외부 전문가 미팅</td><td>일반 30,000원 / 전문가 50,000원 이하</td><td>주류, 개인 식사</td></tr>
+                      <tr><td>출장 / 교통</td><td>KTX, 버스, 항공, 숙박, 현지 교통</td><td>출장 목적, 일정, 장소 제출</td><td>사적 여행</td></tr>
+                      <tr><td>교육 / 세미나</td><td>AI 교육, 컨퍼런스, 기술 세미나</td><td>영수증, 수료증 또는 참가 확인서</td><td>과제 무관 교육</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">정부지원카드</div>
+                    <h2>사전 승인 기준</h2>
+                  </div>
+                  <span class="badge ba">승인 필요</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>항목</th><th>승인 기준</th><th>검토 대상</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>100만원 이상 장비 구매</td><td>사전 승인 필수</td><td>구매 목적, 과제 관련성</td></tr>
+                      <tr><td>해외 결제</td><td>사전 승인 필수</td><td>결제 필요성</td></tr>
+                      <tr><td>정기 구독형 서비스</td><td>사용 목적 제출</td><td>반복 비용</td></tr>
+                      <tr><td>숙박비</td><td>출장 승인 필요</td><td>출장 일정, 장소</td></tr>
+                      <tr><td>이상 패턴</td><td>관리자 검토</td><td>심야 결제, 반복 카페, 주류 업종, 명절 회식성 지출</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">출장비</div>
+                    <h2>출장 경비 기준</h2>
+                  </div>
+                  <span class="badge br">출장 등록</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>항목</th><th>허용 기준</th><th>제한</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>출장 등록</td><td>시스템 내 출장 등록, 출장 ID 연결</td><td>미등록 시 일반 지출 규정 적용</td></tr>
+                      <tr><td>교통비</td><td>KTX, SRT, 버스, 지하철, 택시, 항공권, 공항 이동</td><td>개인 이동, 불필요한 옵션</td></tr>
+                      <tr><td>기타 비용</td><td>주차비, 회의실, 소모품, 비자 발급, 업무 수수료</td><td>개인 쇼핑, 사적 사용</td></tr>
+                      <tr><td>완화 가능</td><td>근무시간 외, 근무지 외, 숙박·교통, 야간 식대, 공항·해외 사용</td><td>출장 등록 지출에 한함</td></tr>
+                      <tr><td>금지 항목</td><td>담배, 사적 오락, 개인 선물, 업무 무관 고가 소비</td><td>출장 중에도 제한</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">출장비</div>
+                    <h2>출장 숙박비 / 식비 한도</h2>
+                  </div>
+                  <span class="badge br">한도</span>
+                </div>
+                <div class="rule-table">
+                  <table>
+                    <thead>
+                      <tr><th>구분</th><th>대상</th><th>한도</th><th>비고</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>국내 숙박</td><td>사원 / 대리</td><td>1박 최대 120,000원</td><td>성수기 승인 시 초과 가능</td></tr>
+                      <tr><td>국내 숙박</td><td>과장 이상</td><td>1박 최대 180,000원</td><td>서울·제주 별도 상한 가능</td></tr>
+                      <tr><td>국내 숙박</td><td>임원</td><td>별도 승인</td><td>-</td></tr>
+                      <tr><td>해외 아시아권 숙박</td><td>일반 직원</td><td>1박 최대 180,000원</td><td>환율 조정 가능</td></tr>
+                      <tr><td>해외 아시아권 숙박</td><td>관리자급</td><td>1박 최대 250,000원</td><td>환율 조정 가능</td></tr>
+                      <tr><td>해외 북미 / 유럽권 숙박</td><td>일반 직원</td><td>1박 최대 300,000원</td><td>사치성 숙박 제한</td></tr>
+                      <tr><td>해외 북미 / 유럽권 숙박</td><td>관리자급</td><td>1박 최대 400,000원</td><td>사치성 숙박 제한</td></tr>
+                      <tr><td>국내 출장 식비</td><td>전체</td><td>1식 최대 15,000원</td><td>주류 제외 가능</td></tr>
+                      <tr><td>해외 출장 식비</td><td>전체</td><td>1식 최대 30,000원</td><td>현지 물가 고려</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </div>
+            <div class="rule-list hidden" aria-hidden="true">
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">제1조</div>
+                    <h2>목적</h2>
+                    <p class="rule-section-desc">업무 수행 과정에서 발생하는 비용의 집행 기준과 처리 절차를 정하고, 카드 및 출장비 사용 기준을 통합 관리합니다.</p>
+                  </div>
+                  <span class="badge bp">기본 원칙</span>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">적용 목적</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>비용 사용의 투명성과 효율성을 확보합니다.</li>
+                      <li>회사카드, 정부지원카드, 출장비 사용 기준을 통합 관리해 예산 집행의 적정성을 높입니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">제2조</div>
+                    <h2>공통 규정</h2>
+                    <p class="rule-section-desc">모든 비용 신청에 공통으로 적용되는 제출, 카드 사용, 시스템 검증 기준입니다.</p>
+                  </div>
+                  <span class="badge bb">전체 비용 공통</span>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">영수증 제출 원칙</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>모든 비용은 영수증 제출을 원칙으로 하며, 사용일 기준 <strong>14일 이내</strong> 제출해야 합니다.</li>
+                      <li>허위 또는 중복 신청이 적발되면 비용 환수 및 인사 조치가 가능합니다.</li>
+                      <li>회사 정책에 따라 일부 비용은 제한 또는 반려될 수 있습니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">영수증 제출 기준</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>구매 품목과 상세 내역이 포함된 영수증 제출을 원칙으로 합니다.</li>
+                      <li>총금액만 표시된 카드전표는 보조 자료로만 활용될 수 있습니다.</li>
+                      <li>AI 분석 및 규정 검증을 위해 품목 정보 확인이 가능한 영수증 제출을 권장합니다.</li>
+                      <li>품목 확인이 어려운 경우 관리자 검토 대상이 될 수 있습니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">카드 사용 원칙</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>회사카드 사용을 우선 권장합니다.</li>
+                      <li>회사카드 사용이 어려운 경우 개인카드 사용이 가능합니다.</li>
+                      <li>개인카드 사용 시에도 동일 규정을 적용할 수 있습니다.</li>
+                      <li>정부지원카드는 승인된 과제 목적에 한하여 사용 가능합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">시스템 검증</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>시스템은 AI 기반 영수증 분석으로 금액, 가맹점, 날짜, 시간, 품목 등을 자동 분석합니다.</li>
+                      <li>등록된 규정과 카드 유형에 따라 자동 검증을 수행합니다.</li>
+                      <li>검증 결과는 승인, 경고, 반려 상태로 구분될 수 있습니다.</li>
+                      <li>이상 패턴 탐지 결과는 관리자 검토 참고 자료로 활용합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">제3조</div>
+                    <h2>회사카드 경비 규정</h2>
+                    <p class="rule-section-desc">회사 업무 수행 중 발생한 식대, 교통비, 회식비, 접대비, 복리후생비, 비품비 등의 처리 기준입니다.</p>
+                  </div>
+                  <span class="badge bg">회사카드</span>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">식대</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>일반 식대는 업무 중 발생한 식사 비용에 대해 <strong>1인 1식 최대 15,000원</strong>까지 인정합니다.</li>
+                      <li>야근 식대는 오후 8시 이후 야근 시 <strong>1인 최대 20,000원</strong>까지 인정하며, 출퇴근 기록 또는 업무 확인이 필요합니다.</li>
+                      <li>동일 인원의 반복적 고액 사용은 제한될 수 있고, 개인 음주 비용은 제외합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">교통비 및 회식비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>교통비는 외근, 출장 등 업무 목적 이동 시 지원하며 대중교통은 실비 정산합니다.</li>
+                      <li>택시는 야간 업무 또는 대중교통 이용이 어려운 경우 인정합니다.</li>
+                      <li>회식비는 팀 회식 및 조직 활성화 목적에 한하며, 팀장 이상 사전 승인 후 <strong>1인 최대 50,000원</strong>까지 인정합니다.</li>
+                      <li>유흥 목적 업종 및 개인 목적 이동 비용은 처리할 수 없습니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">접대비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>거래처 미팅, 고객 응대, 사업 협의 등 업무 목적에 한하여 사용 가능합니다.</li>
+                      <li>법인카드 사용을 원칙으로 하며 참석자, 사용 목적, 거래처 정보를 기재해야 합니다.</li>
+                      <li>직급별 1회 사용 한도를 초과하면 사전 승인이 필수이며, 승인 없는 초과 사용은 반려될 수 있습니다.</li>
+                      <li>유흥업소 및 사행성 업종 사용은 불가하고, 과도한 반복 사용은 감사 대상이 될 수 있습니다.</li>
+                    </ul>
+                    <div class="rule-table">
+                      <table>
+                        <thead>
+                          <tr><th>직급</th><th>1회 사용 한도</th><th>월 한도</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>사원 / 주임</td><td>50,000원</td><td>200,000원</td></tr>
+                          <tr><td>대리</td><td>100,000원</td><td>400,000원</td></tr>
+                          <tr><td>과장</td><td>200,000원</td><td>800,000원</td></tr>
+                          <tr><td>차장</td><td>300,000원</td><td>1,500,000원</td></tr>
+                          <tr><td>부장 이상</td><td>500,000원</td><td>3,000,000원</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">복리후생비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>경조사비는 직원 본인 및 직계가족 대상이며 회사 경조사 기준표에 따라 지급합니다.</li>
+                      <li>교육지원비는 직무 관련 교육, 세미나, 자격증 비용에 대해 사전 승인 후 처리 가능합니다.</li>
+                      <li>교육지원비 처리 시 수료증 및 영수증 제출이 필수입니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">대외 경조사비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>거래처 및 고객사와의 관계 유지를 위한 명절 선물, 화환, 조의금, 축의금 등을 지원합니다.</li>
+                      <li>부서장 승인 후 사용 가능하며, 거래처명 및 사용 목적 기재가 필수입니다.</li>
+                      <li>개인 친분 목적 사용은 불가하고 현금 지급 시 증빙 자료가 필요합니다.</li>
+                    </ul>
+                    <div class="rule-table">
+                      <table>
+                        <thead>
+                          <tr><th>구분</th><th>1회 한도</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>일반 거래처</td><td>100,000원</td></tr>
+                          <tr><td>주요 거래처</td><td>300,000원</td></tr>
+                          <tr><td>VIP 고객사</td><td>별도 승인</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">비품비 및 행사비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>업무용 비품 및 소프트웨어 구매 비용을 지원합니다. 예: 키보드, 마우스, 모니터, AI 서비스 구독료 등</li>
+                      <li>고가 장비 구매 시 사전 승인이 필수이며, 개인 사용 목적 구매는 불가합니다.</li>
+                      <li>워크숍, 세미나, 사내 행사 운영 비용은 목적 및 예산 사전 승인 후 지원합니다.</li>
+                      <li>행사 종료 후 결과 및 사용 내역을 제출해야 합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">제4조</div>
+                    <h2>정부지원카드 사용 규정</h2>
+                    <p class="rule-section-desc">정부지원카드는 승인된 과제 수행 목적과 예산 항목 안에서만 사용합니다.</p>
+                  </div>
+                  <span class="badge ba">과제 전용</span>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">기본 원칙</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>과제 수행 목적에 한하여 사용 가능하며, 승인된 예산 항목 내에서만 집행합니다.</li>
+                      <li>모든 사용 내역은 증빙 자료 제출을 원칙으로 하고, 개인 용도 사용은 금지합니다.</li>
+                      <li>사용 목적 및 참여 인원 등을 반드시 기록해야 합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">사용 가능 항목</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li><strong>재료비:</strong> 시제품 제작 및 연구개발에 필요한 센서, 모터, PCB, 케이블, 아두이노, 라즈베리파이, 테스트용 전자부품 등</li>
+                      <li><strong>장비 및 비품비:</strong> 모니터, 키보드, 웹캠, OCR 프로그램, GPT API, Gemini API, 클라우드 서버 이용료 등</li>
+                      <li><strong>회의비 및 식대:</strong> 과제 관련 회의와 업무 협의 목적에 한하며 회의 목적 및 참석자 작성이 필수입니다.</li>
+                      <li><strong>출장비 및 교통비:</strong> 과제 수행 관련 KTX, 버스, 항공, 숙박비, 출장지 이동 교통비 사용이 가능합니다.</li>
+                      <li><strong>교육 및 세미나비:</strong> AI 교육 수강료, 개발 컨퍼런스 참가비, 기술 세미나 등록비 등을 지원할 수 있습니다.</li>
+                    </ul>
+                    <div class="rule-note">회의 식대 권장 기준: 일반 회의는 1인당 30,000원 이하, 외부 전문가 포함 시 1인당 50,000원 이하입니다. 주류 비용은 제외합니다.</div>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">사용 제한 항목</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>개인 식사, 유흥업소, 주류 구매, 명절 선물, 접대비는 사용할 수 없습니다.</li>
+                      <li>상품권 및 현금성 물품, 개인 PC 및 휴대폰 구매, 사적 여행 경비, 의류 및 사치품은 제한됩니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">사전 승인 및 검토</div>
+                  <div class="rule-group-body">
+                    <div class="rule-table">
+                      <table>
+                        <thead>
+                          <tr><th>항목</th><th>승인 기준</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>100만원 이상 장비 구매</td><td>사전 승인 필수</td></tr>
+                          <tr><td>해외 결제</td><td>사전 승인 필수</td></tr>
+                          <tr><td>정기 구독형 서비스</td><td>사용 목적 제출</td></tr>
+                          <tr><td>숙박비</td><td>출장 승인 필요</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ul class="rule-items">
+                      <li>정부과제 감사에서는 누구와 사용했는지, 어떤 목적이었는지, 과제와 관련된 사용인지가 중요합니다.</li>
+                      <li>심야 시간대 결제, 반복적인 카페 결제, 주류 업종 사용, 명절 기간 회식성 지출은 관리자 검토 대상이 될 수 있습니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rule-section">
+                <div class="rule-section-head">
+                  <div>
+                    <div class="rule-kicker">제5조</div>
+                    <h2>출장비 규정</h2>
+                    <p class="rule-section-desc">출장 관련 지출은 출장 등록과 업무 연결 여부를 기준으로 검토하며, 최종 승인·경고·반려 상태로 처리합니다.</p>
+                  </div>
+                  <span class="badge br">출장 경비</span>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">출장 등록 기준</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>출장 관련 지출은 시스템 내 “출장 등록” 기능을 통해 등록해야 합니다.</li>
+                      <li>출장 ID 또는 관련 업무와 연결하여 관리합니다.</li>
+                      <li>출장 여부가 등록되지 않은 경우 일반 지출 규정을 우선 적용합니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">교통비</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>KTX, SRT, 고속버스, 시내버스, 지하철, 업무상 필요한 택시, 승인 차량의 주유비 및 통행료를 허용합니다.</li>
+                      <li>국내선·국제선 항공권, 공항철도 및 공항 이동 교통비를 허용합니다.</li>
+                      <li>개인 용도 이동 비용, 제한된 좌석 등급, 불필요한 추가 옵션 및 사적 이동 비용은 제한됩니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">숙박비</div>
+                  <div class="rule-group-body">
+                    <div class="rule-table">
+                      <table>
+                        <thead>
+                          <tr><th>출장 구분</th><th>대상</th><th>1박 기준</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>국내</td><td>사원 / 대리</td><td>최대 120,000원</td></tr>
+                          <tr><td>국내</td><td>과장 이상</td><td>최대 180,000원</td></tr>
+                          <tr><td>국내</td><td>임원</td><td>별도 승인</td></tr>
+                          <tr><td>해외 아시아권</td><td>일반 직원</td><td>최대 180,000원</td></tr>
+                          <tr><td>해외 아시아권</td><td>관리자급</td><td>최대 250,000원</td></tr>
+                          <tr><td>해외 북미 / 유럽권</td><td>일반 직원</td><td>최대 300,000원</td></tr>
+                          <tr><td>해외 북미 / 유럽권</td><td>관리자급</td><td>최대 400,000원</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ul class="rule-items">
+                      <li>성수기 및 행사 지역은 관리자 승인 시 초과 가능하며, 서울·제주 지역은 별도 상한이 적용될 수 있습니다.</li>
+                      <li>현지 물가 및 환율에 따라 조정 가능하고, 국제 행사 기간은 예외 승인할 수 있습니다.</li>
+                      <li>리조트 및 사치성 숙박시설은 제한됩니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">식비 및 기타 비용</div>
+                  <div class="rule-group-body">
+                    <div class="rule-table">
+                      <table>
+                        <thead>
+                          <tr><th>구분</th><th>1식 기준</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>국내 출장</td><td>최대 15,000원</td></tr>
+                          <tr><td>해외 출장</td><td>최대 30,000원</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <ul class="rule-items">
+                      <li>해외 출장은 현지 물가 및 환율을 고려하여 일반 출장보다 높은 식대 기준을 적용할 수 있습니다.</li>
+                      <li>업무 관련 주차비, 회의실 이용료, 출장 수행에 필요한 소모성 비용, 비자 발급 비용 및 업무 관련 수수료를 허용합니다.</li>
+                      <li>주류 비용, 업무와 무관한 과도한 식사 비용, 동일 시간대 중복 결제, 개인 쇼핑 및 사적 사용 비용은 제한됩니다.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="rule-group">
+                  <div class="rule-group-title">출장 시 완화·금지 항목</div>
+                  <div class="rule-group-body">
+                    <ul class="rule-items">
+                      <li>출장 등록 지출은 근무시간 외 사용, 근무지 외 지역 사용, 숙박·교통 카테고리, 야간 식대, 공항 및 해외 지역 사용을 완화 적용할 수 있습니다.</li>
+                      <li>담배 구매, 사적 오락 비용, 개인 선물 구매, 업무 무관 고가 소비, 동행자 확인 불가능한 과도한 식대는 출장 중에도 제한합니다.</li>
+                      <li>출장비는 시스템 검증 결과와 관리자 검토를 거쳐 최종 승인, 경고, 반려 상태로 처리됩니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
             </div>
           </section>
         </main>
       </div>
     </section>
+  </div>
+
+  <div class="modal-backdrop" id="receipt-modal" onclick="closeReceiptDetail(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="receipt-modal-title">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="receipt-modal-title">영수증 상세 확인</div>
+          <div class="modal-sub">사용자가 촬영한 영수증 이미지와 AI가 추출한 정보를 함께 확인합니다.</div>
+        </div>
+        <button class="modal-close" onclick="hideReceiptDetail()">닫기</button>
+      </div>
+      <div class="detail-grid">
+        <div class="receipt-image" id="receipt-image"></div>
+        <div>
+          <div class="card" style="box-shadow:none;margin-bottom:14px">
+            <div class="card-head">
+              <div class="card-title">추출 정보</div>
+              <div class="modal-tools">
+                <span id="detail-status"></span>
+                <button class="modal-tool-btn edit-btn" id="receipt-edit-btn" onclick="editReceiptDetail()">수정</button>
+                <button class="modal-tool-btn save-btn hidden" id="receipt-save-btn" onclick="saveReceiptDetail()">저장</button>
+                <button class="modal-tool-btn cancel-btn hidden" id="receipt-cancel-btn" onclick="cancelReceiptEdit()">취소</button>
+              </div>
+            </div>
+            <div class="info-list" id="receipt-info"></div>
+          </div>
+          <div class="notice">실제 연동 시에는 사용자가 촬영한 이미지 URL과 OCR/AI 분석 결과를 Supabase에서 불러와 이 영역에 표시하면 됩니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="stats-modal" onclick="closeStatsModal(event)">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="stats-modal-title">전체보기</div>
+          <div class="modal-sub" id="stats-modal-sub">선택한 기간 기준 전체 데이터를 확인합니다.</div>
+        </div>
+        <button class="modal-close" onclick="hideStatsModal()">닫기</button>
+      </div>
+      <div id="stats-modal-body"></div>
+    </div>
   </div>
 
   <script>
@@ -276,11 +1311,34 @@
         { phone: '01044445555', name: '최준호', position: '사원', password: 'DK-5N8B1Y', active: true }
       ],
       receipts: [
-        { employee: '김민준', merchant: '교보문고 광화문', category: '복리후생', amount: 32000, date: '2026.05.01', status: 'pending' },
-        { employee: '이지현', merchant: '편의점 점심', category: '식대', amount: 29000, date: '2026.05.01', status: 'pending' },
-        { employee: '박지훈', merchant: '식당 A', category: '식대', amount: 30000, date: '2026.04.30', status: 'approved' },
-        { employee: '최준호', merchant: 'GS25 역삼점', category: '기타', amount: 4200, date: '2026.04.29', status: 'rejected' }
-      ]
+        { employeePhone: '01011112222', employee: '김민준', merchant: '교보문고 광화문', category: '복리후생', amount: 32000, date: '2026.05.01', status: 'pending', card: '회사카드', purpose: '업무 도서 구매', items: ['클린 아키텍처 1권', '문구류 2개'] },
+        { employeePhone: '01022223333', employee: '이지현', merchant: '편의점 점심', category: '식대', amount: 29000, date: '2026.05.01', status: 'pending', card: '회사카드', purpose: '외근 중 식사', items: ['도시락 2개', '음료 2개'] },
+        { employeePhone: '01033334444', employee: '박지훈', merchant: '식당 A', category: '식대', amount: 30000, date: '2026.04.30', status: 'approved', card: '회사카드', purpose: '고객 미팅 식사', items: ['점심 정식 2인'] },
+        { employeePhone: '01044445555', employee: '최준호', merchant: 'GS25 역삼점', category: '기타', amount: 4200, date: '2026.04.29', status: 'rejected', card: '개인카드', purpose: '간식 구매', items: ['음료', '스낵'] },
+        { employeePhone: '01011112222', employee: '김민준', merchant: 'KTX 승차권', category: '교통비', amount: 59800, date: '2026.04.28', status: 'approved', card: '개인카드', purpose: '부산 출장 이동', items: ['KTX 일반실 1매'] },
+        { employeePhone: '01022223333', employee: '이지현', merchant: '스타벅스 강남점', category: '식대', amount: 28500, date: '2026.04.27', status: 'approved', card: '회사카드', purpose: '외부 미팅', items: ['아메리카노 3잔'] },
+        { employeePhone: '01033334444', employee: '박지훈', merchant: '한식당 점심', category: '회식비', amount: 87000, date: '2026.04.26', status: 'approved', card: '회사카드', purpose: '팀 회식', items: ['점심 세트 6인'] },
+        { employeePhone: '01011112222', employee: '김민준', merchant: '스타벅스 강남점', category: '식대', amount: 9400, date: '2026.04.25', status: 'approved', card: '회사카드', purpose: '팀 미팅', items: ['아메리카노 2잔'] },
+        { employeePhone: '01022223333', employee: '이지현', merchant: '스타벅스 강남점', category: '식대', amount: 17600, date: '2026.04.24', status: 'approved', card: '회사카드', purpose: '고객 미팅', items: ['라떼 2잔'] }
+      ],
+      trips: [
+        { id: 'T001', employeePhone: '01011112222', title: '부산 고객사 방문', purpose: '신규 계약 협의 및 현장 미팅', companions: ['01022223333'], startDate: '2026-05-04', endDate: '2026-05-04' },
+        { id: 'T002', employeePhone: '01022223333', title: '제주 워크숍', purpose: '상반기 프로젝트 회고 및 기획 워크숍', companions: ['01033334444', '01044445555'], startDate: '2026-05-20', endDate: '2026-05-22' },
+        { id: 'T003', employeePhone: '01033334444', title: '대전 현장 점검', purpose: '장비 설치 상태 점검', companions: [], startDate: '2026-04-29', endDate: '2026-04-30' }
+      ],
+      cards: [
+        { id: 'C001', name: '본사 법인카드', type: 'corporate', issuer: '국민카드', last4: '4821', memo: '일반 경비 결제', active: true },
+        { id: 'C002', name: '정부지원 R&D 카드', type: 'government', issuer: '신한카드', last4: '7304', memo: '정부지원 과제 전용', active: true }
+      ],
+      currentReceiptIndex: null,
+      currentTripIndex: null,
+      tripCompanionDraft: [],
+      statsPeriod: 'all',
+      statsStart: '',
+      statsEnd: '',
+      statsModalType: '',
+      statsModalSearch: '',
+      statsSearchComposing: false
     };
 
     function login(){
@@ -308,53 +1366,623 @@
       document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
       document.getElementById(`panel-${id}`).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.panel === id));
+      if(id === 'dashboard') renderDashboard();
+      if(id === 'stats') renderStats();
+      if(id === 'trips') renderTrips();
+      if(id === 'patterns') renderPatterns();
+      if(id === 'cards') renderCards();
       if(id === 'accounts') renderAccounts();
     }
 
     function renderAll(){
-      renderSummary();
-      renderPending();
+      renderDashboard();
+      renderStats();
       renderReviews();
+      renderTrips();
+      renderPatterns();
+      renderCards();
       renderAccounts();
     }
 
-    function renderSummary(){
-      const approved = state.receipts.filter(item => item.status === 'approved');
-      const pending = state.receipts.filter(item => item.status === 'pending');
-      const total = approved.reduce((sum, item) => sum + item.amount, 0);
-      document.getElementById('summary-grid').innerHTML = `
-        <div class="stat"><strong>${total.toLocaleString()}원</strong><span>승인 합계</span></div>
-        <div class="stat"><strong>${pending.length}건</strong><span>검토 대기</span></div>
-        <div class="stat"><strong>${state.accounts.length}명</strong><span>등록 사용자</span></div>
-        <div class="stat"><strong>${state.receipts.length}건</strong><span>전체 제출</span></div>
+    function renderDashboard(){
+      renderTodayStatus();
+      renderDashboardAlerts();
+      renderRecentSubmissions();
+    }
+
+    function getTodayReceipts(){
+      return getVisibleReceipts().filter(item => item.date === '2026.05.01');
+    }
+
+    function renderTodayStatus(){
+      const today = getTodayReceipts();
+      const total = today.reduce((sum, item) => sum + item.amount, 0);
+      const approved = today.filter(item => item.status === 'approved').length;
+      const pending = today.filter(item => item.status === 'pending').length;
+      const rejected = today.filter(item => item.status === 'rejected').length;
+      document.getElementById('today-status').innerHTML = `
+        <div>
+          <div class="today-total">${total.toLocaleString()}원</div>
+        </div>
+        <div class="today-meta">
+          <div class="today-metric submit"><strong>${today.length}</strong><span>제출</span></div>
+          <div class="today-metric pending"><strong>${pending}</strong><span>검토 대기</span></div>
+          <div class="today-metric approved"><strong>${approved}</strong><span>승인</span></div>
+          <div class="today-metric rejected"><strong>${rejected}</strong><span>반려</span></div>
+        </div>
       `;
-      document.getElementById('pending-badge').textContent = `${pending.length}건`;
+    }
+
+    function getDashboardAlerts(){
+      const today = getTodayReceipts();
+      const receipts = getVisibleReceipts();
+      const nearLimit = receipts.filter(item => item.category === '식대' && item.amount >= 28000 && item.amount <= 30000);
+      const repeated = receipts.filter(item => item.merchant === '스타벅스 강남점');
+      const rejected = today.filter(item => item.status === 'rejected');
+      return [
+        nearLimit.length ? { level: 'high', title: '식대 한도 근접', desc: `식대 28,000원 이상 결제가 ${nearLimit.length}건 있습니다.` } : null,
+        repeated.length >= 3 ? { level: '', title: '동일 가맹점 반복', desc: `스타벅스 강남점 결제가 ${repeated.length}건 감지되었습니다.` } : null,
+        rejected.length ? { level: 'high', title: '오늘 반려 발생', desc: `오늘 반려된 영수증이 ${rejected.length}건 있습니다.` } : null
+      ].filter(Boolean);
+    }
+
+    function renderDashboardAlerts(){
+      const alerts = getDashboardAlerts();
+      document.getElementById('alert-count-badge').textContent = `${alerts.length}개`;
+      if(!alerts.length){
+        document.getElementById('dashboard-alerts').innerHTML = '<div class="empty">현재 표시할 이상 징후가 없습니다.</div>';
+        return;
+      }
+      document.getElementById('dashboard-alerts').innerHTML = alerts.map(alert => `
+        <div class="alert-item ${alert.level}">
+          <div class="alert-title">${alert.title}</div>
+          <div class="alert-desc">${alert.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRecentSubmissions(){
+      const recent = getVisibleReceipts().slice(0, 3);
+      if(!recent.length){
+        document.getElementById('recent-submissions').innerHTML = '<div class="empty">표시할 최근 제출이 없습니다.</div>';
+        return;
+      }
+      document.getElementById('recent-submissions').innerHTML = recent.map(item => `
+        <div class="recent-item">
+          <div>
+            <div class="recent-title">${item.merchant}</div>
+            <div class="recent-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}</div>
+          </div>
+          <div>
+            <div class="recent-amount">${item.amount.toLocaleString()}원</div>
+            ${statusBadge(item.status)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderStats(){
+      renderStatsPeriodControls();
+      renderStatsSummary();
+      renderStatsCategoryBars();
+      renderStatsChangeList();
+      renderEmployeeBars();
+      renderCardRatio();
+      renderTrendBars();
+      renderStatsTopMerchants();
+      renderEmployeeCategoryMatrix();
+    }
+
+    function sumBy(items, key){
+      return items.reduce((acc, item) => {
+        acc[item[key]] = (acc[item[key]] || 0) + item.amount;
+        return acc;
+      }, {});
+    }
+
+    function escapeHtml(value){
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getEmployeeKey(item){
+      return item.employeePhone || item.employee;
+    }
+
+    function isEmployeeActive(key){
+      const account = state.accounts.find(item => item.phone === key);
+      return !account || account.active !== false;
+    }
+
+    function getVisibleReceipts(){
+      return state.receipts.filter(item => isEmployeeActive(getEmployeeKey(item)));
+    }
+
+    function getApprovedReceipts(){
+      return getVisibleReceipts().filter(item => item.status === 'approved');
+    }
+
+    function getVisibleReceiptEntries(){
+      return state.receipts
+        .map((item, index) => ({ item, index }))
+        .filter(entry => isEmployeeActive(getEmployeeKey(entry.item)));
+    }
+
+    function getVisibleTripEntries(){
+      return state.trips
+        .map((item, index) => ({ item, index }))
+        .filter(entry => isEmployeeActive(entry.item.employeePhone));
+    }
+
+    function getEmployeeProfile(key){
+      return state.accounts.find(account => account.phone === key) || { name: key, position: '직급 미등록', phone: '' };
+    }
+
+    function getEmployeeDisplay(key){
+      const profile = getEmployeeProfile(key);
+      const phoneLast4 = profile.phone ? profile.phone.slice(-4) : '----';
+      return `${profile.name} · ${profile.position} · ${phoneLast4}`;
+    }
+
+    function getReceiptEmployeeDisplay(item){
+      return getEmployeeDisplay(getEmployeeKey(item));
+    }
+
+    function matchesEmployeeKeySearch(key){
+      const profile = getEmployeeProfile(key);
+      const keyword = state.statsModalSearch.trim().toLowerCase();
+      const searchable = [
+        profile.name,
+        profile.position,
+        profile.phone,
+        profile.phone ? profile.phone.slice(-4) : '',
+        getEmployeeDisplay(key)
+      ].join(' ').toLowerCase();
+      return searchable.includes(keyword);
+    }
+
+    function sumByEmployee(items){
+      return items.reduce((acc, item) => {
+        const key = getEmployeeKey(item);
+        acc[key] = (acc[key] || 0) + item.amount;
+        return acc;
+      }, {});
+    }
+
+    function parseDate(value){
+      return new Date(`${value.replace(/\./g, '-')}T00:00:00`);
+    }
+
+    function getLatestStatsReceiptDate(){
+      return getApprovedReceipts().map(item => parseDate(item.date)).sort((a, b) => b - a)[0];
+    }
+
+    function getStatsItems(){
+      const latest = getLatestStatsReceiptDate();
+      if(!latest) return [];
+      let start = null;
+      let end = latest;
+      if(state.statsPeriod === 'custom' && state.statsStart && state.statsEnd){
+        start = parseDate(state.statsStart);
+        end = parseDate(state.statsEnd);
+      }else if(state.statsPeriod === 'month'){
+        start = new Date(latest.getFullYear(), latest.getMonth(), 1);
+      }else if(state.statsPeriod === '3m'){
+        start = new Date(latest.getFullYear(), latest.getMonth() - 2, 1);
+      }else if(state.statsPeriod === '6m'){
+        start = new Date(latest.getFullYear(), latest.getMonth() - 5, 1);
+      }
+      return getApprovedReceipts().filter(item => {
+        const date = parseDate(item.date);
+        return (!start || date >= start) && (!end || date <= end);
+      });
+    }
+
+    function getStatsPeriodLabel(){
+      const labels = { month: '이번 달', '3m': '3개월', '6m': '6개월', all: '전체', custom: '직접 선택' };
+      return labels[state.statsPeriod] || '이번 달';
+    }
+
+    function renderStatsPeriodControls(){
+      document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.period === state.statsPeriod);
+      });
+      document.getElementById('stats-period-label').textContent = getStatsPeriodLabel();
+    }
+
+    function setStatsPeriod(period){
+      state.statsPeriod = period;
+      if(period !== 'custom'){
+        state.statsStart = '';
+        state.statsEnd = '';
+        document.getElementById('stats-start').value = '';
+        document.getElementById('stats-end').value = '';
+      }
+      renderStats();
+    }
+
+    function setCustomStatsRange(){
+      state.statsStart = document.getElementById('stats-start').value;
+      state.statsEnd = document.getElementById('stats-end').value;
+      if(state.statsStart && state.statsEnd){
+        state.statsPeriod = 'custom';
+      }
+      renderStats();
+    }
+
+    function renderStatsSummary(){
+      const items = getStatsItems();
+      const total = items.reduce((sum, item) => sum + item.amount, 0);
+      const employees = new Set(items.map(item => getEmployeeKey(item)));
+      const avg = Math.round(total / Math.max(employees.size, 1));
+      document.getElementById('stats-summary').innerHTML = `
+        <div class="stat"><strong>${total.toLocaleString()}원</strong><span>전체 지출</span></div>
+        <div class="stat"><strong>${items.length}건</strong><span>승인 건수</span></div>
+        <div class="stat"><strong>${avg.toLocaleString()}원</strong><span>1인 평균</span></div>
+        <div class="stat"><strong>${employees.size}명</strong><span>사용 직원</span></div>
+      `;
+    }
+
+    function renderStatsCategoryBars(){
+      const totals = sumBy(getStatsItems(), 'category');
+      const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(...entries.map(([, value]) => value), 1);
+      document.getElementById('stats-category-bars').innerHTML = entries.map(([label, value]) => `
+        <div class="bar-row">
+          <div class="bar-label">${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(value / max * 100)}%"></div></div>
+          <div class="bar-value">${value.toLocaleString()}원</div>
+        </div>
+      `).join('') || '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+    }
+
+    function renderStatsChangeList(){
+      const latest = getLatestStatsReceiptDate();
+      if(!latest){
+        document.getElementById('stats-change-list').innerHTML = '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+        return;
+      }
+      const currentStart = new Date(latest.getFullYear(), latest.getMonth(), 1);
+      const prevStart = new Date(latest.getFullYear(), latest.getMonth() - 1, 1);
+      const prevEnd = new Date(latest.getFullYear(), latest.getMonth(), 0);
+      const receipts = getApprovedReceipts();
+      const current = receipts.filter(item => parseDate(item.date) >= currentStart && parseDate(item.date) <= latest);
+      const previous = receipts.filter(item => parseDate(item.date) >= prevStart && parseDate(item.date) <= prevEnd);
+      const currentTotal = current.reduce((sum, item) => sum + item.amount, 0);
+      const previousTotal = previous.reduce((sum, item) => sum + item.amount, 0);
+      const diff = currentTotal - previousTotal;
+      const percent = previousTotal ? Math.round(diff / previousTotal * 100) : 0;
+      const currentFood = current.filter(item => item.category === '식대').reduce((sum, item) => sum + item.amount, 0);
+      const previousFood = previous.filter(item => item.category === '식대').reduce((sum, item) => sum + item.amount, 0);
+      const foodDiff = currentFood - previousFood;
+      document.getElementById('stats-change-list').innerHTML = `
+        <div class="change-item">
+          <div><div class="change-title">전체 지출</div><div class="change-desc">전월 대비 ${Math.abs(percent)}%</div></div>
+          <div class="change-value ${diff >= 0 ? 'change-up' : 'change-down'}">${diff >= 0 ? '+' : '-'}${Math.abs(diff).toLocaleString()}원</div>
+        </div>
+        <div class="change-item">
+          <div><div class="change-title">식대</div><div class="change-desc">주요 반복 카테고리</div></div>
+          <div class="change-value ${foodDiff >= 0 ? 'change-up' : 'change-down'}">${foodDiff >= 0 ? '+' : '-'}${Math.abs(foodDiff).toLocaleString()}원</div>
+        </div>
+      `;
+    }
+
+    function renderCategoryBars(){
+      const approved = getVisibleReceipts().filter(item => item.status === 'approved');
+      const totals = sumBy(approved, 'category');
+      const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(...entries.map(([, value]) => value), 1);
+      document.getElementById('category-bars').innerHTML = entries.map(([label, value]) => `
+        <div class="bar-row">
+          <div class="bar-label">${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(value / max * 100)}%"></div></div>
+          <div class="bar-value">${value.toLocaleString()}원</div>
+        </div>
+      `).join('');
+    }
+
+    function renderStatusSummary(){
+      const statuses = [
+        { key: 'approved', label: '승인', cls: 'status-approved' },
+        { key: 'pending', label: '검토 대기', cls: 'status-pending' },
+        { key: 'rejected', label: '반려', cls: 'status-rejected' }
+      ];
+      document.getElementById('status-summary').innerHTML = statuses.map(status => {
+        const count = getVisibleReceipts().filter(item => item.status === status.key).length;
+        return `<div class="status-card ${status.cls}"><div class="status-number">${count}</div><div class="status-label">${status.label}</div></div>`;
+      }).join('');
+    }
+
+    function renderEmployeeBars(){
+      const entries = getEmployeeSpendEntries().slice(0, 5);
+      const max = Math.max(...entries.map(([, value]) => value), 1);
+      document.getElementById('employee-bars').innerHTML = entries.map(([key, value]) => `
+        <div class="bar-row">
+          <div class="bar-label">${getEmployeeDisplay(key)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(value / max * 100)}%"></div></div>
+          <div class="bar-value">${value.toLocaleString()}원</div>
+        </div>
+      `).join('') || '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+    }
+
+    function getEmployeeSpendEntries(){
+      const totals = sumByEmployee(getStatsItems());
+      return Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    }
+
+    function renderCardRatio(){
+      const totals = sumBy(getStatsItems(), 'card');
+      const entries = Object.entries(totals);
+      const colors = ['var(--p)', 'var(--g)', 'var(--b)', 'var(--am)'];
+      const total = entries.reduce((sum, [, value]) => sum + value, 0) || 1;
+      if(!entries.length){
+        document.getElementById('card-donut').style.background = 'conic-gradient(#eee 0% 100%)';
+        document.getElementById('card-legend').innerHTML = '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+        return;
+      }
+      let start = 0;
+      const gradient = entries.map(([, value], index) => {
+        const end = start + value / total * 100;
+        const segment = `${colors[index % colors.length]} ${start}% ${end}%`;
+        start = end;
+        return segment;
+      }).join(', ');
+      document.getElementById('card-donut').style.background = `conic-gradient(${gradient})`;
+      document.getElementById('card-legend').innerHTML = entries.map(([label, value], index) => `
+        <div class="legend-item">
+          <span class="legend-dot" style="background:${colors[index % colors.length]}"></span>
+          <span style="flex:1">${label}</span>
+          <span>${Math.round(value / total * 100)}%</span>
+        </div>
+      `).join('');
+    }
+
+    function renderStatsTopMerchants(){
+      const merchants = getStatsItems().reduce((acc, item) => {
+        if(!acc[item.merchant]) acc[item.merchant] = { amount: 0, count: 0 };
+        acc[item.merchant].amount += item.amount;
+        acc[item.merchant].count += 1;
+        return acc;
+      }, {});
+      const entries = Object.entries(merchants).sort((a, b) => b[1].amount - a[1].amount).slice(0, 5);
+      document.getElementById('stats-top-merchants').innerHTML = entries.map(([name, data], index) => `
+        <div class="merchant-item">
+          <div class="merchant-rank">${index + 1}</div>
+          <div>
+            <div class="merchant-name">${name}</div>
+            <div class="merchant-count">${data.count}건</div>
+          </div>
+          <div class="merchant-amount">${data.amount.toLocaleString()}원</div>
+        </div>
+      `).join('') || '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+    }
+
+    function renderEmployeeCategoryMatrix(){
+      const { employeeKeys, categories, matrix } = getEmployeeCategoryData();
+      const previewEmployees = employeeKeys.slice(0, 5);
+      if(!employeeKeys.length || !categories.length){
+        document.getElementById('employee-category-matrix').innerHTML = '<tr><td class="empty">선택한 기간의 데이터가 없습니다.</td></tr>';
+        return;
+      }
+      document.getElementById('employee-category-matrix').innerHTML = `
+        <thead><tr><th>직원</th>${categories.map(category => `<th>${category}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${previewEmployees.map(employeeKey => `
+            <tr>
+              <td><strong>${getEmployeeDisplay(employeeKey)}</strong></td>
+              ${categories.map(category => `<td>${matrix[employeeKey]?.[category] ? Math.round(matrix[employeeKey][category] / 1000) + 'k' : '-'}</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function getEmployeeCategoryData(){
+      const items = getStatsItems();
+      const employeeKeys = [...new Set(items.map(item => getEmployeeKey(item)))];
+      const categories = [...new Set(items.map(item => item.category))];
+      const matrix = {};
+      items.forEach(item => {
+        const employeeKey = getEmployeeKey(item);
+        matrix[employeeKey] = matrix[employeeKey] || {};
+        matrix[employeeKey][item.category] = (matrix[employeeKey][item.category] || 0) + item.amount;
+      });
+      return { employeeKeys, categories, matrix };
+    }
+
+    function showStatsModal(type){
+      state.statsModalType = type;
+      state.statsModalSearch = '';
+      state.statsSearchComposing = false;
+      if(type === 'employeeSpend'){
+        showEmployeeSpendModal();
+      }else if(type === 'employeeCategory'){
+        showEmployeeCategoryModal();
+      }
+      document.getElementById('stats-modal').classList.add('show');
+    }
+
+    function showEmployeeSpendModal(){
+      document.getElementById('stats-modal-title').textContent = '직원별 지출 전체보기';
+      document.getElementById('stats-modal-sub').textContent = `${getStatsPeriodLabel()} 기준 전체 직원 지출입니다.`;
+      document.getElementById('stats-modal-body').innerHTML = `
+        <div class="modal-search">
+          <input id="stats-employee-search" value="${escapeHtml(state.statsModalSearch)}" placeholder="이름, 직급, 전화번호 뒤 4자리로 검색" oncompositionstart="startStatsSearchComposition()" oncompositionend="endStatsSearchComposition(this.value)" oninput="filterStatsModal(this.value)" autofocus>
+        </div>
+        <div id="stats-modal-results"></div>
+      `;
+      renderEmployeeSpendModalResults();
+    }
+
+    function showEmployeeCategoryModal(){
+      const { employeeKeys, categories } = getEmployeeCategoryData();
+      document.getElementById('stats-modal-title').textContent = '직원별 카테고리 전체보기';
+      document.getElementById('stats-modal-sub').textContent = `${getStatsPeriodLabel()} 기준 직원별 카테고리 지출입니다.`;
+      if(!employeeKeys.length || !categories.length){
+        document.getElementById('stats-modal-body').innerHTML = '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+        return;
+      }
+      document.getElementById('stats-modal-body').innerHTML = `
+        <div class="modal-search">
+          <input id="stats-employee-search" value="${escapeHtml(state.statsModalSearch)}" placeholder="이름, 직급, 전화번호 뒤 4자리로 검색" oncompositionstart="startStatsSearchComposition()" oncompositionend="endStatsSearchComposition(this.value)" oninput="filterStatsModal(this.value)" autofocus>
+        </div>
+        <div id="stats-modal-results"></div>
+      `;
+      renderEmployeeCategoryModalResults();
+    }
+
+    function renderEmployeeSpendModalResults(){
+      const entries = getEmployeeSpendEntries().filter(([key]) => matchesEmployeeKeySearch(key));
+      const max = Math.max(...entries.map(([, value]) => value), 1);
+      document.getElementById('stats-modal-results').innerHTML = `
+        <div class="chart-list">
+          ${entries.map(([key, value]) => `
+            <div class="bar-row">
+              <div class="bar-label">${getEmployeeDisplay(key)}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round(value / max * 100)}%"></div></div>
+              <div class="bar-value">${value.toLocaleString()}원</div>
+            </div>
+          `).join('') || `<div class="empty">${state.statsModalSearch ? '검색 결과가 없습니다.' : '선택한 기간의 데이터가 없습니다.'}</div>`}
+        </div>
+      `;
+    }
+
+    function renderEmployeeCategoryModalResults(){
+      const { employeeKeys, categories, matrix } = getEmployeeCategoryData();
+      const filteredEmployees = employeeKeys.filter(employeeKey => matchesEmployeeKeySearch(employeeKey));
+      document.getElementById('stats-modal-results').innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>직원</th>${categories.map(category => `<th>${category}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${filteredEmployees.map(employeeKey => `
+                <tr>
+                  <td><strong>${getEmployeeDisplay(employeeKey)}</strong></td>
+                  ${categories.map(category => `<td>${matrix[employeeKey]?.[category] ? matrix[employeeKey][category].toLocaleString() + '원' : '-'}</td>`).join('')}
+                </tr>
+              `).join('') || `<tr><td class="empty" colspan="${categories.length + 1}">검색 결과가 없습니다.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function filterStatsModal(value){
+      state.statsModalSearch = value;
+      if(state.statsSearchComposing) return;
+      if(state.statsModalType === 'employeeSpend'){
+        renderEmployeeSpendModalResults();
+      }else if(state.statsModalType === 'employeeCategory'){
+        renderEmployeeCategoryModalResults();
+      }
+    }
+
+    function startStatsSearchComposition(){
+      state.statsSearchComposing = true;
+    }
+
+    function endStatsSearchComposition(value){
+      state.statsSearchComposing = false;
+      filterStatsModal(value);
+    }
+
+    function hideStatsModal(){
+      state.statsSearchComposing = false;
+      document.getElementById('stats-modal').classList.remove('show');
+    }
+
+    function closeStatsModal(event){
+      if(event.target.id === 'stats-modal') hideStatsModal();
+    }
+
+    function renderTopMerchants(){
+      const merchants = getVisibleReceipts().reduce((acc, item) => {
+        if(!acc[item.merchant]) acc[item.merchant] = { amount: 0, count: 0 };
+        acc[item.merchant].amount += item.amount;
+        acc[item.merchant].count += 1;
+        return acc;
+      }, {});
+      const entries = Object.entries(merchants)
+        .sort((a, b) => b[1].amount - a[1].amount)
+        .slice(0, 5);
+      document.getElementById('top-merchants').innerHTML = entries.map(([name, data], index) => `
+        <div class="merchant-item">
+          <div class="merchant-rank">${index + 1}</div>
+          <div>
+            <div class="merchant-name">${name}</div>
+            <div class="merchant-count">${data.count}건</div>
+          </div>
+          <div class="merchant-amount">${data.amount.toLocaleString()}원</div>
+        </div>
+      `).join('');
+    }
+
+    function renderTrendBars(){
+      const latest = getLatestStatsReceiptDate();
+      if(!latest){
+        document.getElementById('trend-bars').innerHTML = '<div class="empty">선택한 기간의 데이터가 없습니다.</div>';
+        return;
+      }
+      const approved = getApprovedReceipts();
+      const months = Array.from({ length: 6 }, (_, index) => {
+        const monthDate = new Date(latest.getFullYear(), latest.getMonth() - (5 - index), 1);
+        const year = monthDate.getFullYear();
+        const month = monthDate.getMonth();
+        const value = approved
+          .filter(item => {
+            const date = parseDate(item.date);
+            return date.getFullYear() === year && date.getMonth() === month;
+          })
+          .reduce((sum, item) => sum + item.amount, 0);
+        return { label: `${month + 1}월`, value };
+      });
+      const max = Math.max(...months.map(month => month.value), 1);
+      document.getElementById('trend-bars').innerHTML = months.map(month => `
+        <div class="trend-col">
+          <div class="trend-value">${Math.round(month.value / 10000)}만</div>
+          <div class="trend-bar" style="height:${Math.max(18, Math.round(month.value / max * 140))}px"></div>
+          <div class="trend-label">${month.label}</div>
+        </div>
+      `).join('');
     }
 
     function renderPending(){
-      const pending = state.receipts.filter(item => item.status === 'pending');
+      const pending = getVisibleReceiptEntries().filter(entry => entry.item.status === 'pending');
       const target = document.getElementById('pending-list');
+      if(!target)return;
       if(!pending.length){
         target.innerHTML = '<div class="empty">검토 대기 중인 영수증이 없습니다.</div>';
         return;
       }
-      target.innerHTML = pending.map(item => receiptRow(item)).join('');
+      target.innerHTML = pending.map(({ item, index }) => receiptRow(item, index)).join('');
     }
 
     function renderReviews(){
-      document.getElementById('review-list').innerHTML = state.receipts.map((item, index) => `
+      const entries = getVisibleReceiptEntries();
+      if(!entries.length){
+        document.getElementById('review-list').innerHTML = '<div class="empty">표시할 영수증이 없습니다.</div>';
+        return;
+      }
+      document.getElementById('review-list').innerHTML = entries.map(({ item, index }) => `
         <div class="receipt-card">
-          <div>
+          <div class="receipt-main">
+            <div>
             <div class="receipt-name">${item.merchant}</div>
-            <div class="receipt-meta">${item.employee} · ${item.category} · ${item.date}</div>
+            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}<br>${item.purpose || '-'}</div>
+            </div>
+            <button class="review-btn detail-btn" onclick="showReceiptDetail(${index})">영수증 확인</button>
           </div>
-          <div>
-            <div class="amount">${item.amount.toLocaleString()}원</div>
-            <div style="margin-top:7px;text-align:right">${statusBadge(item.status)}</div>
+          <div class="receipt-status">${statusBadge(item.status)}</div>
+          <div class="amount">${item.amount.toLocaleString()}원</div>
+          <div class="receipt-side">
             ${item.status === 'pending' ? `
-              <div style="display:flex;gap:6px;margin-top:10px">
-                <button class="btn btn-subtle" style="padding:8px 10px;font-size:12px" onclick="decideReceipt(${index}, 'approved')">승인</button>
-                <button class="btn btn-outline" style="padding:8px 10px;font-size:12px" onclick="decideReceipt(${index}, 'rejected')">반려</button>
+              <div class="review-actions">
+                <button class="review-btn approve-btn" onclick="decideReceipt(${index}, 'approved')">승인</button>
+                <button class="review-btn reject-btn" onclick="decideReceipt(${index}, 'rejected')">반려</button>
               </div>
             ` : ''}
           </div>
@@ -362,35 +1990,427 @@
       `).join('');
     }
 
-    function receiptRow(item){
+    function formatTripDate(value){
+      return value.replace(/-/g, '.');
+    }
+
+    function getTripDuration(item){
+      return `${formatTripDate(item.startDate)} ~ ${formatTripDate(item.endDate)}`;
+    }
+
+    function getTripCompanionKeys(item){
+      return (item.companions || []).map(value => {
+        const account = state.accounts.find(account => account.phone === value || account.name === value);
+        return account ? account.phone : value;
+      });
+    }
+
+    function getTripCompanionDisplay(item){
+      const companions = getTripCompanionKeys(item);
+      if(!companions.length) return '-';
+      return companions.map(key => {
+        const profile = getEmployeeProfile(key);
+        return profile.phone ? `${profile.name} · ${profile.position}` : key;
+      }).join(', ');
+    }
+
+    function getAvailableTripCompanions(trip){
+      return state.accounts.filter(account => account.active !== false && account.phone !== trip.employeePhone);
+    }
+
+    function renderTripCompanionPicker(keyword = ''){
+      const trip = state.trips[state.currentTripIndex];
+      if(!trip) return;
+      const selected = new Set(state.tripCompanionDraft);
+      document.getElementById('edit-trip-companions').innerHTML = state.tripCompanionDraft.map(phone => {
+        const profile = getEmployeeProfile(phone);
+        return `
+          <span class="selected-chip">
+            ${profile.name}
+            <button type="button" onclick="removeTripCompanion('${phone}')" aria-label="${profile.name} 동행인 제외">x</button>
+          </span>
+        `;
+      }).join('') || '<span class="muted">선택된 동행인이 없습니다.</span>';
+
+      const query = keyword.trim().toLowerCase();
+      if(!query){
+        document.getElementById('trip-companion-results').innerHTML = '<div class="empty">사용자 이름을 검색해 동행인을 선택하세요.</div>';
+        return;
+      }
+      const results = getAvailableTripCompanions(trip)
+        .filter(account => !selected.has(account.phone))
+        .filter(account => [account.name, account.position, account.phone, account.phone.slice(-4)].join(' ').toLowerCase().includes(query));
+      document.getElementById('trip-companion-results').innerHTML = results.map(account => `
+        <button type="button" class="search-result" onclick="selectTripCompanion('${account.phone}')">
+          ${account.name}
+          <span class="choice-meta">${account.position} · ${account.phone.slice(-4)}</span>
+        </button>
+      `).join('') || '<div class="empty">검색 결과가 없습니다.</div>';
+    }
+
+    function renderTripCompanionSearch(value){
+      renderTripCompanionPicker(value);
+    }
+
+    function selectTripCompanion(phone){
+      if(!state.tripCompanionDraft.includes(phone)){
+        state.tripCompanionDraft.push(phone);
+      }
+      document.getElementById('edit-trip-companion-search').value = '';
+      renderTripCompanionPicker();
+    }
+
+    function removeTripCompanion(phone){
+      state.tripCompanionDraft = state.tripCompanionDraft.filter(value => value !== phone);
+      renderTripCompanionPicker(document.getElementById('edit-trip-companion-search').value);
+    }
+
+    function getTodayIsoDate(){
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function isOngoingTrip(item){
+      const today = getTodayIsoDate();
+      return item.startDate <= today && today <= item.endDate;
+    }
+
+    function renderTrips(){
+      const entries = getVisibleTripEntries();
+      const currentEntries = entries.filter(entry => isOngoingTrip(entry.item));
+      document.getElementById('current-trip-count').textContent = `(${currentEntries.length}건)`;
+      document.getElementById('trip-count').textContent = `(${entries.length}건)`;
+      document.getElementById('current-trip-table').innerHTML = renderTripRows(currentEntries, '현재 진행 중인 출장이 없습니다.');
+      document.getElementById('trip-table').innerHTML = renderTripRows(entries, '등록된 출장이 없습니다.');
+    }
+
+    function renderTripRows(entries, emptyMessage){
+      return entries.map(({ item, index }) => `
+        <tr>
+          <td>
+            <strong>${item.title}</strong>
+            <div class="muted">${item.id} · ${item.purpose || '-'}</div>
+          </td>
+          <td>
+            <div class="person">
+              <div class="avatar">${getEmployeeProfile(item.employeePhone).name.slice(0, 1)}</div>
+              <div>
+                <strong>${getEmployeeDisplay(item.employeePhone)}</strong>
+              </div>
+            </div>
+          </td>
+          <td>${getTripDuration(item)}</td>
+          <td>${getTripCompanionDisplay(item)}</td>
+          <td>
+            <button class="review-btn detail-btn" onclick="showTripEdit(${index})">수정</button>
+          </td>
+        </tr>
+      `).join('') || `<tr><td class="empty" colspan="5">${emptyMessage}</td></tr>`;
+    }
+
+    function showTripEdit(index){
+      const trip = state.trips[index];
+      if(!trip) return;
+      state.currentTripIndex = index;
+      document.getElementById('trip-edit-id').textContent = trip.id;
+      document.getElementById('edit-trip-title').value = trip.title;
+      document.getElementById('edit-trip-purpose').value = trip.purpose || '';
+      document.getElementById('edit-trip-start').value = trip.startDate;
+      document.getElementById('edit-trip-end').value = trip.endDate;
+      state.tripCompanionDraft = getTripCompanionKeys(trip);
+      document.getElementById('edit-trip-companion-search').value = '';
+      renderTripCompanionPicker();
+      document.getElementById('trip-form').classList.add('show');
+      document.getElementById('edit-trip-title').focus();
+    }
+
+    function hideTripEdit(){
+      state.currentTripIndex = null;
+      state.tripCompanionDraft = [];
+      document.getElementById('trip-form').classList.remove('show');
+    }
+
+    function saveTripEdit(){
+      const trip = state.trips[state.currentTripIndex];
+      if(!trip) return;
+      const title = document.getElementById('edit-trip-title').value.trim();
+      const purpose = document.getElementById('edit-trip-purpose').value.trim();
+      const startDate = document.getElementById('edit-trip-start').value;
+      const endDate = document.getElementById('edit-trip-end').value;
+      const companions = [...state.tripCompanionDraft];
+      if(!title || !purpose || !startDate || !endDate){
+        alert('출장명, 목적, 시작일, 종료일은 필수입니다.');
+        return;
+      }
+      if(startDate > endDate){
+        alert('출장 종료일은 시작일보다 빠를 수 없습니다.');
+        return;
+      }
+      trip.title = title;
+      trip.purpose = purpose;
+      trip.startDate = startDate;
+      trip.endDate = endDate;
+      trip.companions = companions;
+      hideTripEdit();
+      renderTrips();
+    }
+
+    function renderPatterns(){
+      const receipts = getVisibleReceipts();
+      const repeatedMerchant = receipts.filter(item => item.merchant === '스타벅스 강남점');
+      const nearLimit = receipts.filter(item => item.category === '식대' && item.amount >= 28000 && item.amount <= 30000);
+      const rejected = receipts.filter(item => item.status === 'rejected');
+      const employeeTotals = sumByEmployee(receipts.filter(item => item.status === 'approved'));
+      const topEmployee = Object.entries(employeeTotals).sort((a, b) => b[1] - a[1])[0];
+      const patterns = [
+        {
+          level: 'high',
+          title: '동일 가맹점 반복',
+          desc: `스타벅스 강남점 결제가 ${repeatedMerchant.length}건 감지되었습니다. 같은 목적의 반복 결제인지 확인이 필요합니다.`,
+          tags: ['반복 결제', '가맹점']
+        },
+        {
+          level: '',
+          title: '한도 근접 결제',
+          desc: `식대 한도에 근접한 결제가 ${nearLimit.length}건 있습니다. 자동 승인 전후 기준을 점검해보세요.`,
+          tags: ['식대', '한도 근접']
+        },
+        {
+          level: 'high',
+          title: '반려 이력 확인',
+          desc: `${rejected.map(item => getReceiptEmployeeDisplay(item)).join(', ') || '대상 없음'} 항목에서 반려 건이 있습니다. 금지 항목이나 목적 누락 여부를 확인하세요.`,
+          tags: ['반려', '규정 확인']
+        },
+        {
+          level: 'low',
+          title: '직원별 지출 쏠림',
+          desc: topEmployee ? `${getEmployeeDisplay(topEmployee[0])}님의 승인 지출이 ${topEmployee[1].toLocaleString()}원으로 가장 높습니다.` : '승인 지출 데이터가 아직 충분하지 않습니다.',
+          tags: ['직원별', '승인 지출']
+        }
+      ];
+      document.getElementById('pattern-list').innerHTML = patterns.map(pattern => `
+        <div class="pattern-card ${pattern.level}">
+          <div class="pattern-title">${pattern.title}</div>
+          <div class="pattern-desc">${pattern.desc}</div>
+          <div class="pattern-meta">${pattern.tags.map(tag => `<span class="badge ${pattern.level === 'high' ? 'ba' : 'bb'}">${tag}</span>`).join('')}</div>
+        </div>
+      `).join('');
+    }
+
+    function receiptRow(item, index){
       return `
         <div class="receipt-card">
-          <div>
+          <div class="receipt-main">
+            <div>
             <div class="receipt-name">${item.merchant}</div>
-            <div class="receipt-meta">${item.employee} · ${item.category} · ${item.date}</div>
+            <div class="receipt-meta">${getReceiptEmployeeDisplay(item)} · ${item.category} · ${item.date}<br>${item.purpose || '-'}</div>
+            </div>
+            <button class="review-btn detail-btn" onclick="showReceiptDetail(${index})">영수증 확인</button>
           </div>
-          <div>
-            <div class="amount">${item.amount.toLocaleString()}원</div>
-            <div style="margin-top:7px;text-align:right">${statusBadge(item.status)}</div>
-          </div>
+          <div class="receipt-status">${statusBadge(item.status)}</div>
+          <div class="amount">${item.amount.toLocaleString()}원</div>
+          <div class="receipt-side"></div>
         </div>
       `;
     }
 
+    function renderReceiptImage(item){
+      const lines = (item.items || []).map(name => `<div class="receipt-line"><span>${name}</span><span></span></div>`).join('');
+      return `
+        <div class="receipt-image-title">${item.merchant}</div>
+        <div class="receipt-line"><span>일자</span><span>${item.date}</span></div>
+        <div class="receipt-line"><span>카드</span><span>${item.card || '-'}</span></div>
+        ${lines}
+        <div class="receipt-total"><span>합계</span><span>${item.amount.toLocaleString()}원</span></div>
+      `;
+    }
+
+    function showReceiptDetail(index){
+      const item = state.receipts[index];
+      state.currentReceiptIndex = index;
+      document.getElementById('receipt-image').innerHTML = renderReceiptImage(item);
+      document.getElementById('detail-status').innerHTML = statusBadge(item.status);
+      setReceiptEditMode(false);
+      renderReceiptInfo(item, false);
+      document.getElementById('receipt-modal').classList.add('show');
+    }
+
+    function renderReceiptInfo(item, editMode){
+      document.getElementById('receipt-info').innerHTML = editMode ? `
+        <div class="info-row"><div class="info-key">제출자</div><div class="info-val">${getReceiptEmployeeDisplay(item)}</div></div>
+        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val"><input class="edit-field" id="edit-merchant" value="${item.merchant}"></div></div>
+        <div class="info-row"><div class="info-key">금액</div><div class="info-val"><input class="edit-field" id="edit-amount" type="number" value="${item.amount}"></div></div>
+        <div class="info-row"><div class="info-key">카테고리</div><div class="info-val"><input class="edit-field" id="edit-category" value="${item.category}"></div></div>
+        <div class="info-row"><div class="info-key">결제일</div><div class="info-val"><input class="edit-field" id="edit-date" value="${item.date}"></div></div>
+        <div class="info-row"><div class="info-key">카드</div><div class="info-val"><input class="edit-field" id="edit-card" value="${item.card || ''}"></div></div>
+        <div class="info-row"><div class="info-key">목적</div><div class="info-val"><input class="edit-field" id="edit-purpose" value="${item.purpose || ''}"></div></div>
+      ` : `
+        <div class="info-row"><div class="info-key">제출자</div><div class="info-val">${getReceiptEmployeeDisplay(item)}</div></div>
+        <div class="info-row"><div class="info-key">가맹점</div><div class="info-val">${item.merchant}</div></div>
+        <div class="info-row"><div class="info-key">금액</div><div class="info-val">${item.amount.toLocaleString()}원</div></div>
+        <div class="info-row"><div class="info-key">카테고리</div><div class="info-val">${item.category}</div></div>
+        <div class="info-row"><div class="info-key">결제일</div><div class="info-val">${item.date}</div></div>
+        <div class="info-row"><div class="info-key">카드</div><div class="info-val">${item.card || '-'}</div></div>
+        <div class="info-row"><div class="info-key">목적</div><div class="info-val">${item.purpose || '-'}</div></div>
+      `;
+    }
+
+    function setReceiptEditMode(isEditing){
+      document.getElementById('receipt-edit-btn').classList.toggle('hidden', isEditing);
+      document.getElementById('receipt-save-btn').classList.toggle('hidden', !isEditing);
+      document.getElementById('receipt-cancel-btn').classList.toggle('hidden', !isEditing);
+    }
+
+    function editReceiptDetail(){
+      const item = state.receipts[state.currentReceiptIndex];
+      if(!item)return;
+      setReceiptEditMode(true);
+      renderReceiptInfo(item, true);
+    }
+
+    function cancelReceiptEdit(){
+      const item = state.receipts[state.currentReceiptIndex];
+      if(!item)return;
+      setReceiptEditMode(false);
+      renderReceiptInfo(item, false);
+    }
+
+    function saveReceiptDetail(){
+      const item = state.receipts[state.currentReceiptIndex];
+      if(!item)return;
+      const merchant = document.getElementById('edit-merchant').value.trim();
+      const amount = Number(document.getElementById('edit-amount').value);
+      const category = document.getElementById('edit-category').value.trim();
+      const date = document.getElementById('edit-date').value.trim();
+      if(!merchant || !amount || !category || !date){
+        alert('가맹점, 금액, 카테고리, 결제일은 필수입니다.');
+        return;
+      }
+      item.merchant = merchant;
+      item.amount = amount;
+      item.category = category;
+      item.date = date;
+      item.card = document.getElementById('edit-card').value.trim();
+      item.purpose = document.getElementById('edit-purpose').value.trim();
+      document.getElementById('receipt-image').innerHTML = renderReceiptImage(item);
+      setReceiptEditMode(false);
+      renderReceiptInfo(item, false);
+      renderDashboard();
+      renderStats();
+      renderReviews();
+      renderPatterns();
+    }
+
+    function hideReceiptDetail(){
+      document.getElementById('receipt-modal').classList.remove('show');
+    }
+
+    function closeReceiptDetail(event){
+      if(event.target.id === 'receipt-modal') hideReceiptDetail();
+    }
+
     function statusBadge(status){
       const map = {
-        approved: '<span class="badge bg">승인</span>',
-        pending: '<span class="badge ba">검토 대기</span>',
-        rejected: '<span class="badge bp">반려</span>'
+        approved: '<span class="status-pill status-approved">승인</span>',
+        pending: '<span class="status-pill status-pending">검토 대기</span>',
+        rejected: '<span class="status-pill status-rejected">반려</span>'
       };
-      return map[status] || '<span class="badge bb">확인 필요</span>';
+      return map[status] || '<span class="status-pill status-pending">확인 필요</span>';
     }
 
     function decideReceipt(index, status){
       state.receipts[index].status = status;
-      renderSummary();
-      renderPending();
+      renderDashboard();
+      renderStats();
       renderReviews();
+      renderPatterns();
+    }
+
+    function showAddCard(){
+      clearCardForm();
+      document.getElementById('card-form').classList.add('show');
+      document.getElementById('new-card-name').focus();
+    }
+
+    function hideAddCard(){
+      document.getElementById('card-form').classList.remove('show');
+      clearCardForm();
+    }
+
+    function clearCardForm(){
+      document.getElementById('new-card-name').value = '';
+      document.getElementById('new-card-type').value = 'corporate';
+      document.getElementById('new-card-issuer').value = '';
+      document.getElementById('new-card-last4').value = '';
+      document.getElementById('new-card-memo').value = '';
+    }
+
+    function getCardTypeLabel(type){
+      return type === 'government' ? '정부지원카드' : '법인카드';
+    }
+
+    function generateCardId(){
+      const nextNumber = state.cards.length + 1;
+      return `C${String(nextNumber).padStart(3, '0')}`;
+    }
+
+    function addCard(){
+      const name = document.getElementById('new-card-name').value.trim();
+      const type = document.getElementById('new-card-type').value;
+      const issuer = document.getElementById('new-card-issuer').value.trim();
+      const last4 = document.getElementById('new-card-last4').value.replace(/\D/g, '');
+      const memo = document.getElementById('new-card-memo').value.trim();
+      if(!name || !issuer || !last4){
+        alert('카드명, 발급처, 카드번호 끝 4자리를 입력해주세요.');
+        return;
+      }
+      if(last4.length !== 4){
+        alert('카드번호 끝 4자리는 숫자 4자리로 입력해주세요.');
+        return;
+      }
+      if(state.cards.some(card => card.name === name || (card.issuer === issuer && card.last4 === last4))){
+        alert('이미 등록된 카드와 이름 또는 발급처/끝 4자리가 겹칩니다.');
+        return;
+      }
+      state.cards.push({ id: generateCardId(), name, type, issuer, last4, memo, active: true });
+      hideAddCard();
+      renderCards();
+      alert(`${name} 카드가 등록되었습니다.`);
+    }
+
+    function renderCards(){
+      const activeCards = state.cards.filter(card => card.active !== false);
+      const inactiveCards = state.cards.filter(card => card.active === false);
+      document.getElementById('active-card-count').textContent = `(${activeCards.length}장)`;
+      document.getElementById('inactive-card-count').textContent = `(${inactiveCards.length}장)`;
+      document.getElementById('active-card-table').innerHTML = renderCardRows(activeCards, '활성 카드가 없습니다.');
+      document.getElementById('inactive-card-table').innerHTML = renderCardRows(inactiveCards, '비활성 카드가 없습니다.');
+    }
+
+    function renderCardRows(cards, emptyMessage){
+      return cards.map(card => `
+        <tr>
+          <td>
+            <strong>${card.name}</strong>
+            <div class="muted">${card.id}</div>
+          </td>
+          <td><span class="badge ${card.type === 'government' ? 'bb' : 'bp'}">${getCardTypeLabel(card.type)}</span></td>
+          <td>${card.issuer}</td>
+          <td><code>**** ${card.last4}</code></td>
+          <td>${card.memo || '-'}</td>
+          <td><button class="account-status-btn ${card.active === false ? 'inactive' : 'active'}" onclick="toggleCardStatus('${card.id}')">${card.active === false ? '비활성' : '활성'}</button></td>
+        </tr>
+      `).join('') || `<tr><td class="empty" colspan="6">${emptyMessage}</td></tr>`;
+    }
+
+    function toggleCardStatus(id){
+      const card = state.cards.find(item => item.id === id);
+      if(!card) return;
+      card.active = card.active === false;
+      renderCards();
     }
 
     function showAddAccount(){
@@ -467,29 +2487,48 @@
       state.accounts.push({ phone, name, position, password, active: true });
       hideAddAccount();
       renderAccounts();
-      renderSummary();
+      renderDashboard();
+      renderStats();
+      renderTrips();
       alert(`${name}님 계정이 등록되었습니다.`);
     }
 
     function renderAccounts(){
-      document.getElementById('account-count').textContent = `(${state.accounts.length}명)`;
-      document.getElementById('account-table').innerHTML = state.accounts.map(account => `
+      const activeAccounts = state.accounts.filter(account => account.active !== false);
+      const inactiveAccounts = state.accounts.filter(account => account.active === false);
+      document.getElementById('account-count').textContent = `(${activeAccounts.length}명)`;
+      document.getElementById('inactive-account-count').textContent = `(${inactiveAccounts.length}명)`;
+      document.getElementById('account-table').innerHTML = renderAccountRows(activeAccounts, '등록된 활성 사용자가 없습니다.');
+      document.getElementById('inactive-account-table').innerHTML = renderAccountRows(inactiveAccounts, '비활성 사용자가 없습니다.');
+    }
+
+    function renderAccountRows(accounts, emptyMessage){
+      return accounts.map(account => `
         <tr>
           <td>
             <div class="person">
               <div class="avatar">${account.name.charAt(0)}</div>
-              <div>
-                <div>${account.name}</div>
-                <div class="muted">전화번호 로그인</div>
-              </div>
+              <div>${account.name}</div>
             </div>
           </td>
           <td>${account.phone}</td>
           <td>${account.position}</td>
           <td><code>${account.password}</code></td>
-          <td><span class="badge bg">활성</span></td>
+          <td><button class="account-status-btn ${account.active === false ? 'inactive' : 'active'}" onclick="toggleAccountStatus('${account.phone}')">${account.active === false ? '비활성' : '활성'}</button></td>
         </tr>
-      `).join('');
+      `).join('') || `<tr><td class="empty" colspan="5">${emptyMessage}</td></tr>`;
+    }
+
+    function toggleAccountStatus(phone){
+      const account = state.accounts.find(item => item.phone === phone);
+      if(!account) return;
+      account.active = account.active === false;
+      renderAccounts();
+      renderDashboard();
+      renderStats();
+      renderReviews();
+      renderTrips();
+      renderPatterns();
     }
 
     renderAll();
