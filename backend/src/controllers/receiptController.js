@@ -12,6 +12,7 @@ async function callAI(filePath, filename, cardType, companyId) {
   form.append('image', fs.createReadStream(filePath), filename);
   form.append('card_type', cardType);
   form.append('company_id', String(companyId));
+  form.append('position', req.user.position ?? '');
 
   const res = await fetch(`${AI_URL}/ai/analyze`, {
     method: 'POST', body: form, headers: form.getHeaders(),

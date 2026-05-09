@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../services/api_service.dart';
+import '../main.dart';
 import 'receipt_result_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -13,25 +13,30 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   final ImagePicker _picker = ImagePicker();
-  final ApiService _api    = ApiService();
   final List<File> _selectedImages = [];
-  String _cardType = '회사카드';
-  bool _isLoading  = false;
+  String _cardType  = '회사카드';
+  int    _headcount = 1;        // ← 인원수
+  bool   _isLoading = false;
 
-  // 갤러리에서 여러 장 선택
   Future<void> _pickImages() async {
-    final images = await _picker.pickMultiImage(imageQuality: 80);
-    if (images.isEmpty) return;
-    setState(() {
-      for (final img in images) {
-        if (_selectedImages.length < 10) {
-          _selectedImages.add(File(img.path));
+    try {
+      final images = await _picker.pickMultiImage(imageQuality: 80);
+      if (images.isEmpty) return;
+      setState(() {
+        for (final img in images) {
+          if (_selectedImages.length < 10) {
+            _selectedImages.add(File(img.path));
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('갤러리 오류: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
-  // 카메라로 촬영
   Future<void> _takePhoto() async {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
@@ -41,20 +46,21 @@ class _GalleryScreenState extends State<GalleryScreen> {
     setState(() => _selectedImages.add(File(image.path)));
   }
 
-  // 선택된 이미지 제거
   void _removeImage(int index) {
     setState(() => _selectedImages.removeAt(index));
   }
 
-  // 일괄 분석 시작
   Future<void> _analyzeAll() async {
     if (_selectedImages.isEmpty) return;
     setState(() => _isLoading = true);
 
     try {
-      final result = await _api.batchUpload(_selectedImages, _cardType);
+      final result = await apiService.batchUpload(
+        _selectedImages,
+        _cardType,
+        _headcount,   // ← 인원수 전달
+      );
       if (!mounted) return;
-
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -62,7 +68,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ),
       );
       setState(() => _selectedImages.clear());
-
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +103,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
           Expanded(
             child: _selectedImages.isEmpty
               ? const Center(
-                  child: Text('사진을 선택해주세요\n최대 10장까지 가능합니다',
+                  child: Text(
+                    '사진을 선택해주세요\n최대 10장까지 가능합니다',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -114,10 +120,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   itemBuilder: (ctx, i) => Stack(
                     children: [
                       Positioned.fill(
-                        child: Image.file(
-                          _selectedImages[i],
-                          fit: BoxFit.cover,
-                        ),
+                        child: Image.file(_selectedImages[i], fit: BoxFit.cover),
                       ),
                       Positioned(
                         top: 2, right: 2,
@@ -135,7 +138,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
           ),
 
-          // 하단 버튼 영역
+          // 하단 영역
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -143,6 +146,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 Text('${_selectedImages.length}/10장 선택됨',
                   style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 8),
+
+                // 인원수 선택
+                Row(
+                  children: [
+                    const Text('인원수:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      onPressed: _headcount > 1
+                        ? () => setState(() => _headcount--)
+                        : null,
+                      icon: const Icon(Icons.remove_circle_outline),
+                    ),
+                    Text(
+                      '$_headcount명',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      onPressed: _headcount < 20
+                        ? () => setState(() => _headcount++)
+                        : null,
+                      icon: const Icon(Icons.add_circle_outline),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // 갤러리 / 카메라 버튼
                 Row(
                   children: [
                     Expanded(
@@ -163,6 +193,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
+
+                // 분석 시작 버튼
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(

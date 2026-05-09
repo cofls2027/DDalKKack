@@ -11,3 +11,6 @@
 # --- OS/Tools ---
 .DS_Store
 .idea/
+
+/backend/ai/.env
+/backend/.env
