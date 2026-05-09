@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'screens/gallery_screen.dart';
+import 'services/api_service.dart';
 
-void main() {
+final apiService = ApiService();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await apiService.init();  // 토큰 자동 발급
   runApp(const MyApp());
 }
 

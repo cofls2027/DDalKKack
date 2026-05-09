@@ -1,66 +1,78 @@
-import google.generativeai as genai
-import os, json, re
-from services.rag_service import retrieve_relevant_rules
+import json, re
+from google import genai
+from supabase import create_client
+from config import GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY
+from datetime import datetime
+print("######## VALIDATOR FILE RUNNING ########")
+client    = genai.Client(api_key=GEMINI_API_KEY)
+MODEL     = "gemini-2.5-flash"
+_supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
-
-# 카드 타입별 폴백 규정
-FALLBACK = {
-    "정부지원카드": {"banned": ["담배","주류","술","맥주","소주","와인"]},
-    "회사카드":     {"banned": ["담배"]},
-    "개인카드":     {"banned": ["담배"]},
+# OCR 카테고리 → DB 카테고리 매핑
+CATEGORY_MAP = {
+    "식비":  "식비",
+    "교통":  "교통비",
+    "숙박":  "숙박",
+    "기타":  "기타",
+    "용품":  "용품",
 }
 
-async def validate_receipt(ocr_data: dict, card_type: str, company_id: int) -> dict:
-    """RAG 기반 검증 판정"""
-    fb = FALLBACK.get(card_type, FALLBACK["회사카드"])
+async def validate_receipt(ocr_data: dict, card_type: str, company_id: int, position: str = None, headcount: int = 1) -> dict:
+    """DB rules_2 테이블 기반 검증 판정"""
 
-    # 1) 빠른 금지어 체크
-    target = " ".join([ocr_data.get("rawText", "")] + ocr_data.get("items", []))
-    for word in fb["banned"]:
-        if word in target:
-            return {"status": "rejected", "reason": f"[{card_type}] 금지 품목: '{word}'"}
-
-    # 2) 금액 인식 실패
+    # 1) 금액 인식 실패
     if not ocr_data.get("amount") or ocr_data["amount"] <= 0:
         return {"status": "pending", "reason": "금액 인식 실패 - 수동 확인 필요"}
 
-    # 3) RAG 검색
-    rule_context = await retrieve_relevant_rules(ocr_data, card_type, company_id)
+    amount   = ocr_data.get("amount", 0)
+    category = ocr_data.get("category", "기타")
+    db_category = CATEGORY_MAP.get(category, category)
 
-    # RAG 결과 없으면 한도 체크 폴백
-    if not rule_context:
-        if ocr_data["amount"] > fb["limit"]:
-            return {"status": "pending", "reason": f"한도 초과: {ocr_data['amount']:,}원"}
-        return {"status": "approved", "reason": None}
+    # 2) DB에서 해당 회사 + 카테고리 규정 조회
+    response = _supabase.table("rules_2") \
+        .select("*") \
+        .eq("company_id", company_id) \
+        .execute()
 
-    # 4) Gemini 판정
-    prompt = f"""
-당신은 기업 지출 심사 AI입니다.
-아래 [회사 규정]을 참고해서 [영수증 정보]의 승인 여부를 판단하세요.
+    rules = response.data or []
+    print(f"[검증] 전체 규정 수: {len(rules)}")
 
-[회사 규정]
-{rule_context}
+    # 3) 카테고리 매칭되는 규정 찾기
+    applicable_rule = None
+    for rule in rules:
+        policy = rule.get("policy_data", {})
+        if policy.get("category") == db_category:
+            applicable_rule = rule
+            break
 
-[영수증 정보]
-- 카드 종류: {card_type}
-- 가맹점: {ocr_data.get('merchant')}
-- 결제 금액: {ocr_data.get('amount')}원
-- 카테고리: {ocr_data.get('category')}
-- 품목: {', '.join(ocr_data.get('items', []))}
+    print(f"[검증] 적용 규정: {applicable_rule}")
 
-반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트 금지.
-{{
-  "status": "approved" | "pending" | "rejected",
-  "reason": "한 문장 이유 (approved면 null)"
-}}
-"""
+    # 4) 규정 없으면 보류
+    if not applicable_rule:
+        print("######## NO RULE -> PENDING ########")
+        return {"status": "pending", "reason": "해당 카테고리 규정 없음 - 수동 확인 필요"}
 
-    response = model.generate_content(prompt)
-    cleaned  = re.sub(r'```json\n?|```\n?', '', response.text).strip()
+    policy     = applicable_rule.get("policy_data", {})
+    max_amount = policy.get("max_amount")
+    approval_required = policy.get("approval_required", False)
 
-    try:
-        return json.loads(cleaned)
-    except:
-        return {"status": "pending", "reason": "AI 판정 실패 - 수동 확인 필요"}
+    # 5) 1인당 금액 계산
+    per_person = amount / headcount
+    print(f"[검증] 총액: {amount:,}원 / {headcount}명 = 1인당 {per_person:,.0f}원 / 한도: {max_amount:,}원")
+
+    # 6) 한도 초과 검사
+    if max_amount and per_person > max_amount:
+        return {
+            "status": "rejected",
+            "reason": f"1인당 {per_person:,.0f}원 (한도: {max_amount:,}원, {headcount}명 기준)"
+        }
+
+    # 7) 관리자 승인 필요 항목
+    if approval_required:
+        return {
+            "status": "pending",
+            "reason": f"관리자 승인 필요 항목: {applicable_rule.get('rule_name')}"
+        }
+
+    # 8) 통과
+    return {"status": "approved", "reason": None}

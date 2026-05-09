@@ -1,18 +1,18 @@
-import google.generativeai as genai
-import os, json, re
+import json, re, os
+from google import genai
+from google.genai import types
 from PIL import Image
+from config import GEMINI_API_KEY
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
+MODEL  = "gemini-2.5-flash"
 
 async def analyze_receipt(image_path: str) -> dict:
     """영수증 이미지 → OCR 데이터 추출"""
     image = Image.open(image_path)
 
     prompt = """
-아래 영수증 이미지를 분석해서 반드시 JSON 형식으로만 응답해.
-다른 텍스트는 절대 포함하지 마.
-
+영수증 이미지를 분석해서 반드시 JSON만 반환해. 다른 텍스트 금지.
 {
   "merchant": "가맹점명",
   "amount": 숫자만(원화),
@@ -23,20 +23,18 @@ async def analyze_receipt(image_path: str) -> dict:
 }
 """
 
-    response = model.generate_content([image, prompt])
-    text = response.text
-
-    # ```json 블록 제거
-    cleaned = re.sub(r'```json\n?|```\n?', '', text).strip()
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=[image, prompt],
+    )
+    cleaned = re.sub(r'```json\n?|```\n?', '', response.text).strip()
+    print(f"Gemini OCR 응답: {cleaned[:200]}")
 
     try:
         return json.loads(cleaned)
-    except json.JSONDecodeError:
+    except:
         return {
-            "merchant": "인식 실패",
-            "amount":   0,
-            "date":     "",
-            "category": "기타",
-            "items":    [],
-            "rawText":  text,
+            "merchant": "인식 실패", "amount": 0,
+            "date": "", "category": "기타",
+            "items": [], "rawText": response.text,
         }
