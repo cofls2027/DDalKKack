@@ -1,6 +1,5 @@
 import json, re, os
 from google import genai
-from google.genai import types
 from PIL import Image
 from config import GEMINI_API_KEY
 
@@ -17,10 +16,12 @@ async def analyze_receipt(image_path: str) -> dict:
   "merchant": "가맹점명",
   "amount": 숫자만(원화),
   "date": "YYYY-MM-DD",
+  "time": "HH:MM",
   "category": "식비|교통|숙박|기타",
   "items": ["품목1", "품목2"],
   "rawText": "OCR로 읽은 전체 텍스트"
 }
+시간이 없으면 time은 null로 반환해.
 """
 
     response = client.models.generate_content(
@@ -35,6 +36,7 @@ async def analyze_receipt(image_path: str) -> dict:
     except:
         return {
             "merchant": "인식 실패", "amount": 0,
-            "date": "", "category": "기타",
+            "date": "", "time": None,
+            "category": "기타",
             "items": [], "rawText": response.text,
         }

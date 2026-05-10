@@ -21,8 +21,19 @@ async def analyze(
         tmp_path = tmp.name
     try:
         ocr_data = await analyze_receipt(tmp_path)
-        result = await validate_receipt(ocr_data, card_type, company_id, position, headcount)
-        return {"ocr": ocr_data, "status": result["status"], "reason": result["reason"]}
+        result   = await validate_receipt(ocr_data, card_type, company_id, position, headcount)
+        return {
+            "ocr":      ocr_data,
+            "merchant": ocr_data.get("merchant"),
+            "amount":   ocr_data.get("amount"),
+            "date":     ocr_data.get("date"),
+            "time":     ocr_data.get("time"),      # ← 추가
+            "category": ocr_data.get("category"),
+            "cardType": card_type,                 # ← 추가
+            "warnings": result.get("reason"),      # ← reason → warnings
+            "status":   result["status"],
+            "reason":   result["reason"],
+        }
     finally:
         os.unlink(tmp_path)
 
@@ -31,6 +42,8 @@ async def batch_analyze(
     images:     list[UploadFile] = File(...),
     card_type:  str              = Form("회사카드"),
     company_id: int              = Form(...),
+    position:   str              = Form(None),
+    headcount:  int              = Form(1),
 ):
     if len(images) > 10:
         raise HTTPException(status_code=400, detail="최대 10장까지 가능합니다")
@@ -43,10 +56,19 @@ async def batch_analyze(
             tmp_path = tmp.name
         try:
             ocr_data = await analyze_receipt(tmp_path)
-            result   = await validate_receipt(ocr_data, card_type, company_id)
+            result   = await validate_receipt(ocr_data, card_type, company_id, position, headcount)
             results.append({
                 "filename": image.filename, "success": True,
-                "ocr": ocr_data, "status": result["status"], "reason": result["reason"],
+                "merchant": ocr_data.get("merchant"),
+                "amount":   ocr_data.get("amount"),
+                "date":     ocr_data.get("date"),
+                "time":     ocr_data.get("time"),      # ← 추가
+                "category": ocr_data.get("category"),
+                "cardType": card_type,                 # ← 추가
+                "warnings": result.get("reason"),      # ← 추가
+                "status":   result["status"],
+                "reason":   result["reason"],
+                "ocr":      ocr_data,
             })
         except Exception as e:
             results.append({"filename": image.filename, "success": False, "error": str(e)})
