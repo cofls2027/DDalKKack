@@ -1,106 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'receipt_detail_screen.dart';
-import 'receipt_submit_screen.dart'; // 💡 방금 만든 영수증 제출 화면 불러오기
 
-// 💡 방금 만든 영수증 제출 화면 불러오기
-// 💡 상세 화면 불러오기
-// 💡 하단 탭바에서 이동할 출장 화면 불러오기
-
-// 🖥️ 메인 지출 내역 화면 (코틀린의 MainActivity + activity_history.xml 합체 버전)
+// 🖥️ 메인 지출 내역 화면
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
-// 💡 1. 필터 상태를 저장할 변수들 (기존 receipts 변수 근처에 추가)
-  List<dynamic> _allReceipts = []; // DB에서 가져온 진짜 전체 원본 데이터
-  List<dynamic> _filteredReceipts = []; // 화면에 보여줄 필터링된 데이터
-  
-  String _selectedMonth = '전체 월';
-  String _selectedCategory = '전체 카테고리';
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  // 💡 2. 필터 버튼을 누를 때마다 데이터를 걸러주는 요술 함수 (클래스 안에 추가)
-  void _applyFilters() {
-  setState(() {
-    _filteredReceipts = _allReceipts.where((item) {
-      // 1. 카테고리 필터 (데이터가 없거나 '전체'면 통과!)
-      bool matchCategory = _selectedCategory == '전체 카테고리' || 
-                           item['category'] == null || // 💡 데이터가 NULL이어도 통과되게 수정
-                           item['category'] == _selectedCategory;
-
-      // 2. 월 필터
-      bool matchMonth = _selectedMonth == '전체 월';
-      if (!matchMonth && item['payment_date'] != null) {
-        try {
-          DateTime date = DateTime.parse(item['payment_date']);
-          String monthStr = '${date.month}월';
-          matchMonth = monthStr == _selectedMonth;
-        } catch (e) {
-          // 날짜 형식이 잘못되었을 경우 일단 포함시킴
-          matchMonth = true; 
-        }
-      } else if (item['payment_date'] == null) {
-        // 💡 날짜가 비어있는 옛날 데이터도 '전체 월'일 때는 보여주게 수정
-        matchMonth = (_selectedMonth == '전체 월');
-      }
-
-      return matchCategory && matchMonth;
-    }).toList();
-  });
-}
-  // 💡 1. 더미 데이터 대신 DB에서 가져올 빈 바구니 준비
-  List<dynamic> _receipts = [];
+  // 💡 1. 모든 변수는 반드시 클래스 '안쪽'에 있어야 합니다!
+  List<dynamic> _receipts = [];         // 서버에서 가져온 원본 데이터를 담을 창고
+  List<dynamic> _filteredReceipts = []; // 화면에 실제로 보여줄 진열대 (필터링 완료된 데이터)
+  
   bool _isLoading = true;
+  String _selectedMonth = '전체 월';
   String _selectedCategory = '전체 카테고리';
 
   @override
   void initState() {
     super.initState();
-    _fetchReceipts(); // 화면이 켜지자마자 데이터 가져오기!
+    _fetchReceipts(); // 화면 켜지자마자 데이터 가져오기!
   }
 
-  // 🚀 2. DB에서 진짜 데이터 꺼내오기 (null 방어막 추가!)
-  // 기존 _fetchReceipts() 함수 내부를 이렇게 바꿔주세요!
-  Future<void> _fetchReceipts() async {
-    try {
-      final data = await Supabase.instance.client
-          .from('receipts')
-          .select()
-          .order('payment_date', ascending: false);
+  // 🚀 DB에서 진짜 데이터 꺼내오기
+  Future<void> _fetchReceipts() async { 
+    setState(() { _isLoading = true; });
 
-      setState(() {
-        _allReceipts = data;
-        print('가져온 데이터 개수: ${data.length}'); // 💡 디버그 콘솔에 숫자가 찍히는지 확인!
-        _applyFilters();     
-        _isLoading = false; // 💡 데이터를 다 가져오면 로딩을 멈추도록 추가
-      });
-    } catch (e) {
-      debugPrint('데이터 불러오기 오류: $e');
-      if (mounted) {
+    try {
+      // 웹 브라우저용 로컬 주소
+      final url = Uri.parse('http://localhost:3000/api/expenses');
+      
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        
         setState(() {
-          _isLoading = false; // 💡 에러가 발생했을 때도 무한 로딩에 빠지지 않도록 처리
+          _receipts = data; // 1. 원본 창고에 데이터 꽉꽉 채우기
+          _isLoading = false;
         });
+        
+        // 🚨 핵심 포인트: 데이터를 가져오자마자 필터를 한번 돌려서 진열대(_filteredReceipts)를 채워줍니다!
+        _applyFilters(); 
+        
+      } else {
+        throw Exception('서버 응답 에러');
       }
+    } catch (e) {
+      debugPrint('내역 조회 에러: $e');
+      setState(() { _isLoading = false; });
     }
   }
 
-  // 💡 4. 필터링 로직 (DB에서 가져온 진짜 데이터 기준)
-  List<dynamic> get filteredData {
-    if (_selectedCategory == '전체 카테고리') return _receipts;
-    
-    return _receipts.where((item) {
-      final category = item['category'] ?? '';
-      final storeName = item['merchant_name'] ?? '';
-      
-      if (_selectedCategory == '식대') return category.contains('식대') || storeName.contains('식대');
-      if (_selectedCategory == '교통비') return category.contains('교통비') || storeName.contains('택시') || storeName.contains('KTX');
-      if (_selectedCategory == '회식비') return category.contains('회식');
-      
-      return false;
-    }).toList();
+  // 💡 콤보박스를 누를 때마다 진열대를 새로 세팅해 주는 요술 함수
+  // 💡 콤보박스를 누를 때마다 진열대를 새로 세팅해 주는 요술 함수
+  // 💡 콤보박스를 누를 때마다 진열대를 새로 세팅해 주는 요술 함수
+  void _applyFilters() {
+    setState(() {
+      _filteredReceipts = _receipts.where((item) {
+        // 1. 🌟 정교한 카테고리 필터
+        bool matchCategory = _selectedCategory == '전체 카테고리' || item['category'] == null;
+        
+        if (!matchCategory && item['category'] != null) {
+          String dbCategory = item['category'].toString();
+          
+          if (_selectedCategory == '식대') {
+            // '회식'이라는 단어가 안 들어간 진짜 '식대'나 '식비'만 인정! (분리)
+            matchCategory = (dbCategory.contains('식대') || dbCategory.contains('식비')) && !dbCategory.contains('회식');
+          } else if (_selectedCategory == '회식비') {
+            matchCategory = dbCategory.contains('회식');
+          } else if (_selectedCategory == '교통비') {
+            matchCategory = dbCategory.contains('교통');
+          } else if (_selectedCategory == '숙박비') {
+            matchCategory = dbCategory.contains('숙박');
+          } else if (_selectedCategory == '비품비') {
+            matchCategory = dbCategory.contains('비품') || dbCategory.contains('소모품');
+          } else if (_selectedCategory == '복리후생비') {
+            matchCategory = dbCategory.contains('복리후생'); // '비' 글자 빼고 매칭!
+          } else if (_selectedCategory == '접대비') {
+            matchCategory = dbCategory.contains('접대');
+          } else if (_selectedCategory == '행사비') {
+            matchCategory = dbCategory.contains('행사');
+          } else {
+            matchCategory = (dbCategory == _selectedCategory);
+          }
+        }
+
+        // 2. 월 필터 (이전과 동일)
+        bool matchMonth = _selectedMonth == '전체 월';
+        if (!matchMonth && item['payment_date'] != null) {
+          try {
+            DateTime date = DateTime.parse(item['payment_date']);
+            String monthStr = '${date.month}월';
+            matchMonth = monthStr == _selectedMonth;
+          } catch (e) {
+            matchMonth = true; 
+          }
+        } else if (item['payment_date'] == null) {
+          matchMonth = (_selectedMonth == '전체 월');
+        }
+
+        return matchCategory && matchMonth;
+      }).toList();
+    });
   }
 
   @override
@@ -116,13 +123,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
       
       body: Column(
         children: [
-          // 🚀 1. 필터 콤보박스 구역
+          // 🚀 필터 콤보박스 구역
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             color: Colors.white,
             child: Row(
               children: [
-                // 🗓️ 1. 월 선택 드롭다운 (12월까지 확장!)
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
@@ -130,7 +136,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     value: _selectedMonth,
-                    // 💡 1월부터 12월까지 꽉 채웠습니다.
                     items: ['전체 월', '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'].map((e) {
                       return DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14)));
                     }).toList(),
@@ -141,8 +146,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
-                // 📂 2. 카테고리 선택 드롭다운 (매뉴얼 기준 세분화!)
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
@@ -150,9 +153,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     value: _selectedCategory,
-                    // 💡 오현님이 정리해주신 8가지 대분류 카테고리를 적용했습니다.
                     items: ['전체 카테고리', '식대', '교통비', '회식비', '접대비', '복리후생비', '숙박비', '비품비', '행사비'].map((e) {
-                      return DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis)); // 글자가 길면 ... 처리
+                      return DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis));
                     }).toList(),
                     onChanged: (val) {
                       setState(() => _selectedCategory = val!);
@@ -164,38 +166,50 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           
-          // 💡 로딩 중이거나 데이터가 없을 때의 화면 처리
+          // 💡 화면 그리기 구역
           Expanded(
             child: _isLoading 
                 ? const Center(child: CircularProgressIndicator(color: Color(0xFF3C3489)))
-                // 🚨 수정 1: 옛날 변수 filteredData 대신 _filteredReceipts 로 교체!
                 : _filteredReceipts.isEmpty 
                     ? const Center(child: Text('해당하는 내역이 없습니다.', style: TextStyle(color: Colors.grey)))
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: _filteredReceipts.length,
                         itemBuilder: (context, index) {
-                          // 🚨 수정 2: 창고(_allReceipts)가 아니라 필터 바구니(_filteredReceipts)에서 꺼내기!
+                          // 데이터 꺼내기
                           final item = _filteredReceipts[index];
                           
-                          // DB 컬럼명을 안전하게 변환해서 UI에 매핑 (없으면 기본값)
+                          // 변수 매핑 (null 안전하게 처리)
                           final storeName = item['merchant_name'] ?? '알 수 없는 사용처';
                           final amount = item['amount']?.toString() ?? '0';
-                          final date = item['payment_date'] ?? '날짜 없음';
+                          
+                          // 날짜 파싱 로직 (예: 2026-05-04T10:33... -> 2026-05-04)
+                          String date = '날짜 없음';
+                          if (item['payment_date'] != null) {
+                             try {
+                               DateTime parsedDate = DateTime.parse(item['payment_date']);
+                               date = "${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}";
+                             } catch(e) {
+                               date = item['payment_date'].toString().split('T')[0];
+                             }
+                          }
+                          
                           final category = item['category'] ?? '분류 없음';
                           final method = item['card_type'] ?? '결제수단 모름';
                           
-                          // 아이콘 간단 매칭 로직
-                          String icon = "🧾";
-                          if (category.contains('식대')) icon = "🍽";
-                          if (category.contains('교통비')) icon = "🚕";
-                          if (category.contains('회식')) icon = "🍻";
+                          String icon = "🧾"; // 기본 아이콘
+                          
+                          if (category.contains('회식')) icon = "🍻"; // 회식을 가장 먼저 확인!
+                          else if (category.contains('식대') || category.contains('식비')) icon = "🍽";
+                          else if (category.contains('교통')) icon = "🚕";
+                          else if (category.contains('숙박')) icon = "🏨";
+                          else if (category.contains('비품') || category.contains('소모품')) icon = "📎";
+                          else if (category.contains('복리후생')) icon = "🎁";
+                          else if (category.contains('접대')) icon = "🤝";
+                          else if (category.contains('행사')) icon = "🎉";
 
                           return InkWell(
                             onTap: () async {
-                              // 💡 1. 클릭한 항목의 데이터를 우리가 만든 Receipt 붕어빵 틀에 예쁘게 담습니다!
-                              // 🚀 기존에 있던 'final selectedReceipt = Receipt(...)' 생성 코드 싹 삭제!
-                              // DB에서 가져온 item을 통째로 바로 넘깁니다.
                               final isDeleted = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -204,7 +218,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               );
 
                               if (isDeleted == true) {
-                                _fetchReceipts(); // 삭제 후 돌아오면 목록 다시 불러오기
+                                _fetchReceipts(); 
                               }
                             },
                             child: Container(
@@ -252,33 +266,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildChip(String label, {String? filterKey}) {
-    final key = filterKey ?? label;
-    final isSelected = _selectedCategory == key;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() { _selectedCategory = key; });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEEEDFE) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF3C3489) : const Color(0xFF666666),
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
       ),
     );
   }

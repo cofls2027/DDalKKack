@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ReceiptSubmitScreen extends StatefulWidget {
   const ReceiptSubmitScreen({super.key});
@@ -19,23 +21,28 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
     _fetchMyTrips(); // 화면 켜지자마자 출장 목록 가져오기!
   }
 
-  // 🚀 2. DB에서 '내 출장' 목록 싹 가져오는 함수
-  Future<void> _fetchMyTrips() async {
-    try {
-      final data = await Supabase.instance.client
-          .from('trips')
-          .select('id, trip_name') // 💡 콤보박스에 쓸 id와 이름만 쏙 빼옵니다
-          .order('created_at', ascending: false);
+  // 🚀 2. DB 대신 Node.js 서버에서 '내 출장' 목록 싹 가져오는 함수
+Future<void> _fetchMyTrips() async {
+  try {
+    // 안드로이드 에뮬레이터 주소 (서버의 /api/trips 호출)
+    final url = Uri.parse('http://10.0.2.2:3000/api/trips');
+    final response = await http.get(url);
 
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      
       if (mounted) {
         setState(() {
           _myTrips = data;
         });
       }
-    } catch (e) {
-      debugPrint('출장 목록 불러오기 실패: $e');
+    } else {
+      throw Exception('서버 응답 에러');
     }
+  } catch (e) {
+    debugPrint('출장 목록 불러오기 실패: $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -112,36 +119,30 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () async {
-                    // 💡 여기에 실제 DB 전송 로직을 넣습니다!
                     try {
-                      await Supabase.instance.client.from('receipts').insert({
-                        // 🚨 주의: 아까 출장 등록할 때 쓰셨던 '진짜 유저 UUID'와 '회사 ID'를 똑같이 넣어주세요!
-                        'user_id': '048def2e-5ff2-480d-a659-c12d18fa7ed8', 
-                        'company_id': 1, 
-                        
-                        // 임시 하드코딩 데이터 (나중에 AI 담당자가 주는 데이터로 교체될 부분)
-                        'merchant_name': '할매국밥', 
-                        'amount': 10000,
-                        'category': '식대', 
+                      final url = Uri.parse('http://localhost:3000/api/expenses');
+                      final submitData = {
+                        'user_id': '630c1279-a2bc-401e-9991-52e88e619f67', // TODO: 로그인 연동 시 교체
+                        'company_id': 1,
+                        'merchant_name': '할매국밥', // TODO: OCR 연동 시 교체
+                        'amount': 10000,          // TODO: OCR 연동 시 교체
+                        'category': '식대',
                         'card_type': '개인카드',
-                        'payment_date': DateTime.now().toIso8601String(), // 오늘 날짜로 임시 세팅
-                        
-                        // ✨ 대망의 출장 매핑 데이터! (선택 안 했으면 null이 들어감)
-                        'trip_id': _selectedTripId, 
-                      });
+                        'payment_date': DateTime.now().toIso8601String(),
+                        'trip_id': _selectedTripId,
+                      };
 
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('🎉 영수증 제출 완벽 성공! (출장 연결됨)')),
-                        );
-                        Navigator.pop(context); // 💡 제출 완료 후 내역 화면으로 자동 복귀!
+                      final response = await http.post(
+                        url,
+                        headers: {'Content-Type': 'application/json'},
+                        body: json.encode(submitData),
+                      );
+
+                      if (response.statusCode == 201 && context.mounted) {
+                        Navigator.pop(context);
                       }
                     } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('🚨 제출 실패: $e')),
-                        );
-                      }
+                      debugPrint('Error: $e');
                     }
                   },
                   child: const Text('제출하기', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class TripDetailScreen extends StatefulWidget {
-  final Map<String, dynamic> trip; // 💡 클릭한 출장 정보를 통째로 받아옵니다.
+  final Map<String, dynamic> trip;
 
   const TripDetailScreen({super.key, required this.trip});
 
@@ -13,7 +14,7 @@ class TripDetailScreen extends StatefulWidget {
 class _TripDetailScreenState extends State<TripDetailScreen> {
   List<dynamic> _receipts = [];
   bool _isLoading = true;
-  int _totalAmount = 0; // 💡 이 출장에서 쓴 총 금액!
+  int _totalAmount = 0; // 💡 여기서 총 지출 금액 변수를 다시 살려냅니다!
 
   @override
   void initState() {
@@ -21,29 +22,32 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     _fetchTripReceipts();
   }
 
-  // 🚀 DB에서 이 출장에 엮인 영수증만 쏙쏙 뽑아옵니다.
   Future<void> _fetchTripReceipts() async {
     try {
-      final data = await Supabase.instance.client
-          .from('receipts')
-          .select()
-          .eq('trip_id', widget.trip['id']) // 🌟 핵심 매핑 조건!
-          .order('payment_date', ascending: false);
+      final url = Uri.parse('http://localhost:3000/api/trips/${widget.trip['id']}/expenses');
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        
+        // 💡 가져온 영수증들의 금액을 싹 다 더해주는 계산 로직 복구!
+        int total = 0;
+        for (var item in data) {
+          total += (item['amount'] as num?)?.toInt() ?? 0;
+        }
 
-      int total = 0;
-      for (var item in data) {
-        total += (item['amount'] as num?)?.toInt() ?? 0; // 총합 계산
-      }
-
-      if (mounted) {
-        setState(() {
-          _receipts = data;
-          _totalAmount = total;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() { 
+            _receipts = data; 
+            _totalAmount = total; // 계산된 총합을 변수에 쏙!
+            _isLoading = false; 
+          });
+        }
+      } else {
+        throw Exception('서버 응답 에러');
       }
     } catch (e) {
-      debugPrint('출장 영수증 불러오기 실패: $e');
+      debugPrint('출장 영수증 에러: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -118,6 +122,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                             final date = item['payment_date'] ?? '날짜 없음';
                             final category = item['category'] ?? '미분류';
 
+                            // 날짜 깔끔하게 자르기 (예: 2026-05-11T... -> 2026-05-11)
+                            String displayDate = date;
+                            if (date.contains('T')) {
+                              displayDate = date.split('T')[0];
+                            }
+
                             return Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.all(16),
@@ -138,7 +148,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                                     children: [
                                       Text('$amount원', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                                       const SizedBox(height: 4),
-                                      Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                      Text(displayDate, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                     ],
                                   )
                                 ],

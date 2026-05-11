@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ReceiptDetailScreen extends StatefulWidget {
   final Map<String, dynamic> receiptData;
-
   const ReceiptDetailScreen({super.key, required this.receiptData});
 
   @override
@@ -12,91 +12,61 @@ class ReceiptDetailScreen extends StatefulWidget {
 }
 
 class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
-  // 💡 DB에서 변경된 데이터를 화면에 바로바로 반영하기 위한 바구니
   late Map<String, dynamic> _currentReceiptData;
-  bool _isModified = false; // 출장이 변경되었는지 체크!
+  bool _isModified = false;
 
   @override
   void initState() {
     super.initState();
-    // 처음 넘어온 데이터를 바구니에 담습니다.
-    _currentReceiptData = Map.from(widget.receiptData); 
+    _currentReceiptData = Map.from(widget.receiptData);
   }
 
-  // 🚀 핵심: 출장 목록을 불러오고 팝업창을 띄우는 함수!
   Future<void> _showTripMappingDialog() async {
     try {
-      // 1. DB에서 내 출장 목록 싹 가져오기
-      final trips = await Supabase.instance.client
-          .from('trips')
-          .select('id, trip_name')
-          .order('created_at', ascending: false);
+      final tripUrl = Uri.parse('http://localhost:3000/api/trips');
+      final tripResponse = await http.get(tripUrl);
+      if (tripResponse.statusCode != 200) throw Exception('출장 목록 실패');
+      final List<dynamic> trips = json.decode(tripResponse.body);
 
       if (!mounted) return;
 
-      // 2. 팝업창(Dialog) 띄우기
       final selectedTripId = await showDialog<dynamic>(
         context: context,
-        builder: (dialogContext) {
-          return AlertDialog(
-            title: const Text('출장 연결 / 변경', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            contentPadding: const EdgeInsets.only(top: 16, bottom: 8),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: trips.length + 1,
-                itemBuilder: (context, index) {
-                  // 첫 번째 칸은 '연결 해제' 옵션
-                  if (index == 0) {
-                    return ListTile(
-                      leading: const Icon(Icons.link_off, color: Colors.grey),
-                      title: const Text('해당 없음 (일반 지출로 변경)', style: TextStyle(color: Colors.grey)),
-                      onTap: () => Navigator.pop(dialogContext, 'unlink'), 
-                    );
-                  }
-                  // 나머지는 내 출장 목록
-                  final trip = trips[index - 1];
-                  return ListTile(
-                    leading: const Icon(Icons.flight_takeoff, color: Color(0xFF3C3489)),
-                    title: Text(trip['trip_name']),
-                    onTap: () => Navigator.pop(dialogContext, trip['id']),
-                  );
-                },
-              ),
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('출장 연결 / 변경'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: trips.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) return ListTile(title: const Text('연결 해제'), onTap: () => Navigator.pop(dialogContext, 'unlink'));
+                final trip = trips[index - 1];
+                return ListTile(title: Text(trip['trip_name']), onTap: () => Navigator.pop(dialogContext, trip['id']));
+              },
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext), // 취소하면 null 반환
-                child: const Text('취소', style: TextStyle(color: Colors.grey)),
-              )
-            ],
-          );
-        },
+          ),
+        ),
       );
 
-      // 3. 사용자가 출장을 선택했다면? -> DB 업데이트!
-      if (selectedTripId != null && mounted) {
-        dynamic newTripId = (selectedTripId == 'unlink') ? null : selectedTripId;
-
-        // DB 진짜로 수정하기
-        await Supabase.instance.client
-            .from('receipts')
-            .update({'trip_id': newTripId})
-            .eq('id', _currentReceiptData['id']);
-
-        // 화면 갱신하기
-        setState(() {
-          _currentReceiptData['trip_id'] = newTripId;
-          _isModified = true; // 변경되었다고 도장 쾅!
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('🎉 출장 정보가 성공적으로 변경되었습니다!')),
+      if (selectedTripId != null) {
+        final newTripId = (selectedTripId == 'unlink') ? null : selectedTripId;
+        final updateUrl = Uri.parse('http://localhost:3000/api/expenses/${_currentReceiptData['id']}');
+        final updateResponse = await http.patch(
+          updateUrl,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'trip_id': newTripId}),
         );
+
+        if (updateResponse.statusCode == 200) {
+          setState(() {
+            _currentReceiptData['trip_id'] = newTripId;
+            _isModified = true;
+          });
+        }
       }
     } catch (e) {
-      debugPrint('출장 변경 실패: $e');
+      debugPrint('Error: $e');
     }
   }
 

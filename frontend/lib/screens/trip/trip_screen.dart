@@ -1,8 +1,8 @@
-// trip_screen.dart 파일 내용
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http; // 💡 http 패키지 추가
 import 'trip_registration_screen.dart'; 
-import 'trip_detail_screen.dart'; // 💡 방금 만든 출장 상세 화면 불러오기
+import 'trip_detail_screen.dart';
 
 class TripScreen extends StatefulWidget {
   const TripScreen({super.key});
@@ -21,23 +21,27 @@ class _TripScreenState extends State<TripScreen> {
     _fetchTrips();
   }
 
+  // 🚀 DB 직접 연결 ❌ -> Node.js 서버에서 가져오기 ⭕
   Future<void> _fetchTrips() async {
     try {
-      final supabase = Supabase.instance.client;
-      final data = await supabase.from('trips').select().order('created_at', ascending: false);
-      
-      if (mounted) {
-        setState(() {
-          _trips = data;
-          _isLoading = false;
-        });
+      final url = Uri.parse('http://localhost:3000/api/trips');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            _trips = data;
+            _isLoading = false;
+          });
+        }
+      } else {
+        throw Exception('서버 응답 에러');
       }
     } catch (e) {
       if (mounted) {
         setState(() { _isLoading = false; });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('🚨 데이터 불러오기 실패: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('🚨 데이터 불러오기 실패: $e')));
       }
     }
   }
@@ -59,9 +63,8 @@ class _TripScreenState extends State<TripScreen> {
                 context,
                 MaterialPageRoute(builder: (context) => TripRegistrationScreen()), 
               );
-              
               setState(() { _isLoading = true; });
-              _fetchTrips();
+              _fetchTrips(); // 등록하고 돌아오면 새로고침!
             },
             child: const Text('+ 등록', style: TextStyle(color: Color(0xFF3C3489), fontSize: 16)),
           ),
@@ -81,15 +84,11 @@ class _TripScreenState extends State<TripScreen> {
                     final startDate = trip['start_date'] ?? '?';
                     final endDate = trip['end_date'] ?? '?';
                     
-                    // 🚀 수정된 부분: 터치하면 넘어갑니다!
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            // 💡 터치한 출장(trip) 정보를 봇짐 싸서 같이 넘겨줍니다!
-                            builder: (context) => TripDetailScreen(trip: trip), 
-                          ),
+                          MaterialPageRoute(builder: (context) => TripDetailScreen(trip: trip)), 
                         );
                       },
                       child: _buildTripCard(title, '$startDate ~ $endDate', '승인 대기'),
@@ -103,17 +102,7 @@ class _TripScreenState extends State<TripScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ]
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -123,10 +112,7 @@ class _TripScreenState extends State<TripScreen> {
               Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEEDFE),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFFEEEDFE), borderRadius: BorderRadius.circular(8)),
                 child: Text(status, style: const TextStyle(fontSize: 12, color: Color(0xFF3C3489), fontWeight: FontWeight.bold)),
               ),
             ],
