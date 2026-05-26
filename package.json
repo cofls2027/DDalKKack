@@ -1,0 +1,14 @@
+{
+  "name": "ddalkkack",
+  "private": true,
+  "description": "Render 등 저장소 루트에서 배포할 때 backend로 위임",
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend run dev",
+    "test": "npm --prefix backend test",
+    "postinstall": "npm install --prefix backend"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

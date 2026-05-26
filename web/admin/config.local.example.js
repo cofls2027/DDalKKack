@@ -1,2 +1,1 @@
-/** 이 파일을 config.local.js 로 복사한 뒤 Supabase publishable(anon) 키를 넣으세요. config.local.js 는 Git에 올리지 마세요. */
-window.SUPABASE_PUBLISHABLE_KEY = '여기에_publishable_또는_anon_키';
+/** 관리자 화면은 이제 Node 백엔드와 같은 origin에서 제공됩니다. 별도 브라우저용 Supabase 키 설정은 필요하지 않습니다. */
