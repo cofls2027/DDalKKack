@@ -16,17 +16,25 @@ const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (supabaseAnonKey.isEmpty) {
-    throw StateError(
-      'SUPABASE_ANON_KEY 가 비어 있습니다. '
-      'frontend/dart_defines.example.json 을 dart_defines.json 으로 복사해 키를 넣거나, '
-      'flutter run --dart-define=SUPABASE_ANON_KEY=<키> 로 실행하세요.',
+    runApp(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text(
+              'SUPABASE_ANON_KEY가 없습니다.\n'
+              'flutter run --dart-define=SUPABASE_ANON_KEY=<키> 로 실행하세요.',
+            ),
+          ),
+        ),
+      ),
     );
-  }
+    return;
+}
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
   );
-  runApp(const DDalKKackApp());
+runApp(const DDalKKackApp());
 }
 
 class DDalKKackApp extends StatelessWidget {
