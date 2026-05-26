@@ -1,0 +1,610 @@
+openapi: 3.0.3
+info:
+  title: DDalKKack Admin API
+  description: |
+    관리자 웹앱용 REST API 명세입니다.
+
+    - **협업**: `backend/openapi.yaml`을 Git으로 수정·리뷰합니다.
+    - **확인**: Swagger UI(`/api/docs`)에서 이 파일을 읽어 표시합니다.
+    - **인증**: 로그인 후 받은 `access_token`을 Authorize에 `Bearer <token>` 형식으로 입력하세요.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: 로컬 개발
+  - url: https://ddalkkack.onrender.com
+    description: Render 배포
+
+tags:
+  - name: Auth
+    description: 로그인·세션
+  - name: Data
+    description: 대시보드 일괄 조회
+  - name: Receipts
+    description: 영수증 승인/반려
+  - name: Cards
+    description: 법인카드 관리
+  - name: Users
+    description: 직원 계정 관리
+
+paths:
+  /api/admin/login:
+    post:
+      tags: [Auth]
+      summary: 관리자 로그인
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/me:
+    get:
+      tags: [Auth]
+      summary: 현재 로그인한 관리자 프로필
+      responses:
+        '200':
+          description: 프로필 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/AdminProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/data:
+    get:
+      tags: [Data]
+      summary: 관리자 대시보드 데이터 일괄 조회
+      description: users, receipts, trips, cards를 한 번에 반환합니다. company_id로 스코프됩니다.
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDataResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/receipts/{id}/decision:
+    patch:
+      tags: [Receipts]
+      summary: 영수증 승인/반려
+      parameters:
+        - $ref: '#/components/parameters/ReceiptId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiptDecisionRequest'
+      responses:
+        '200':
+          description: 상태 저장 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receipt:
+                    $ref: '#/components/schemas/ReceiptDecision'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/cards:
+    post:
+      tags: [Cards]
+      summary: 법인카드 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardRequest'
+      responses:
+        '201':
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  card:
+                    $ref: '#/components/schemas/Card'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/cards/{id}/status:
+    patch:
+      tags: [Cards]
+      summary: 카드 활성/비활성 변경
+      parameters:
+        - $ref: '#/components/parameters/CardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiveStatusRequest'
+      responses:
+        '200':
+          description: 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  card:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      is_active:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/users:
+    post:
+      tags: [Users]
+      summary: 직원 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/users/{id}:
+    patch:
+      tags: [Users]
+      summary: 직원 정보 수정
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/users/{id}/status:
+    patch:
+      tags: [Users]
+      summary: 직원 활성/비활성 변경
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiveStatusRequest'
+      responses:
+        '200':
+          description: 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      is_active:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: POST /api/admin/login 응답의 access_token
+
+  parameters:
+    ReceiptId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    CardId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: 잘못된 요청
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 로그인 필요 또는 토큰 무효
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 관리자 권한 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Supabase 연결 불가
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 서버 오류
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@example.com
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_at:
+          type: integer
+          description: Unix timestamp (seconds)
+        profile:
+          $ref: '#/components/schemas/AdminProfile'
+
+    AdminProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        role:
+          type: string
+          enum: [admin]
+        email:
+          type: string
+          format: email
+        is_active:
+          type: boolean
+
+    AdminDataResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Receipt'
+        trips:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trip'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        role:
+          type: string
+          enum: [admin, employee, manager]
+        email:
+          type: string
+        is_active:
+          type: boolean
+        staff_initial_password:
+          type: string
+          nullable: true
+        staff_current_password:
+          type: string
+          nullable: true
+
+    Receipt:
+      type: object
+      description: receipts 테이블 row (필드는 DB 스키마에 따름)
+      additionalProperties: true
+
+    Trip:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: string
+        company_id:
+          type: integer
+        trip_name:
+          type: string
+        trip_purpose:
+          type: string
+        trip_companions:
+          type: array
+          items:
+            type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+      additionalProperties: true
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+        company_id:
+          type: integer
+        card_type:
+          type: string
+          enum: [corporate, government]
+        card_company:
+          type: string
+        card_number:
+          type: string
+        card_description:
+          type: string
+        is_active:
+          type: boolean
+        user_id:
+          type: string
+          nullable: true
+
+    ReceiptDecisionRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+        reject_reason:
+          type: string
+          nullable: true
+          description: status가 rejected일 때 사용
+
+    ReceiptDecision:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum: [approved, rejected]
+        reject_reason:
+          type: string
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+
+    CreateCardRequest:
+      type: object
+      required: [card_description, card_type, card_company, card_number]
+      properties:
+        card_description:
+          type: string
+        card_type:
+          type: string
+          enum: [corporate, government]
+        card_company:
+          type: string
+        card_number:
+          type: string
+          description: 숫자 12~19자리
+
+    CreateUserRequest:
+      type: object
+      required: [email, phone, name, position, password]
+      properties:
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        name:
+          type: string
+        position:
+          type: string
+        password:
+          type: string
+          minLength: 1
+
+    UpdateUserRequest:
+      type: object
+      required: [email, phone, name, position]
+      properties:
+        email:
+          type: string
+        phone:
+          type: string
+        name:
+          type: string
+        position:
+          type: string
+        staff_initial_password:
+          type: string
+          nullable: true
+        password:
+          type: string
+          minLength: 6
+          description: 입력 시 Supabase Auth 비밀번호도 변경
+
+    ActiveStatusRequest:
+      type: object
+      required: [is_active]
+      properties:
+        is_active:
+          type: boolean
+
+security:
+  - bearerAuth: []
