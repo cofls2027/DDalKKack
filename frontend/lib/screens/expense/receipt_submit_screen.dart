@@ -73,7 +73,7 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
                   filled: true,
                   fillColor: Colors.white,
                 ),
-                value: _selectedTripId,
+                initialValue: _selectedTripId,
                 hint: const Text('관련 출장을 선택하세요'),
                 items: [
                   // 1번 옵션: 일반 지출일 경우
