@@ -26,6 +26,10 @@ tags:
     description: 법인카드 관리
   - name: Users
     description: 직원 계정 관리
+  - name: Rules
+    description: 지출 규칙 조회
+  - name: Stats
+    description: 통계 조회
 
 paths:
   /api/admin/login:
@@ -297,6 +301,92 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/cards:
+    get:
+      tags: [Cards]
+      summary: 카드 목록 조회
+      parameters:
+        - name: company_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/rules:
+    get:
+      tags: [Rules]
+      summary: 지출 규칙 목록 조회
+      parameters:
+        - name: company_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/stats/my:
+    get:
+      tags: [Stats]
+      summary: 내 통계 조회
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: company_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyStatsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -605,6 +695,58 @@ components:
       properties:
         is_active:
           type: boolean
+
+    Rule:
+      type: object
+      properties:
+        id:
+          type: integer
+        company_id:
+          type: integer
+        category_code:
+          type: string
+        position:
+          type: string
+        max_amount:
+          type: integer
+        allowed_time_from:
+          type: string
+          description: "HH:MM 형식"
+        allowed_time_to:
+          type: string
+          description: "HH:MM 형식"
+        created_at:
+          type: string
+          format: date-time
+        category_name:
+          type: string
+          description: categories 테이블에서 조인된 카테고리명
+
+    MyStatsResponse:
+      type: object
+      properties:
+        total_amount:
+          type: integer
+          description: 해당 월 총 지출액
+        category_stats:
+          type: object
+          additionalProperties:
+            type: integer
+          description: "카테고리별 금액 합계 (예: {\"식비\": 50000})"
+        card_type_stats:
+          type: object
+          additionalProperties:
+            type: integer
+          description: "카드 유형별 건수 (예: {\"corporate\": 3})"
+        status_stats:
+          type: object
+          properties:
+            approved:
+              type: integer
+            pending:
+              type: integer
+            rejected:
+              type: integer
 
 security:
   - bearerAuth: []
