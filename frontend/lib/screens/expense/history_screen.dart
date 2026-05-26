@@ -1,5 +1,6 @@
-import '../../services/api_client.dart';
 import 'package:flutter/material.dart';
+
+import '../../services/api_client.dart';
 import 'receipt_detail_screen.dart';
 import 'receipt_submit_screen.dart';
 
@@ -18,6 +19,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _selectedMonth = '전체 월';
   String _selectedCategory = '전체 카테고리';
 
+  final List<String> _months = const [
+    '전체 월',
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
+  ];
+
+  final List<String> _categories = const [
+    '전체 카테고리',
+    '식대',
+    '교통비',
+    '회식비',
+    '접대비',
+    '복리후생비',
+    '숙박비',
+    '비품비',
+    '행사비',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +54,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _fetchReceipts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final data = await apiClient.getList('/api/receipts');
 
@@ -37,11 +70,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       _applyFilters();
     } catch (e) {
-      debugPrint('데이터 불러오기 오류: $e');
+      debugPrint('내역 불러오기 오류: $e');
 
       if (!mounted) return;
 
       setState(() {
+        _allReceipts = [];
+        _filteredReceipts = [];
         _isLoading = false;
       });
 
@@ -76,6 +111,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
+  String _formatAmount(dynamic value) {
+    final amount = int.tryParse(value?.toString() ?? '0') ?? 0;
+    return '${amount.toString().replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+          (match) => '${match[1]},',
+        )}원';
+  }
+
+  String _formatDate(dynamic value) {
+    final raw = value?.toString();
+
+    if (raw == null || raw.isEmpty) {
+      return '날짜 없음';
+    }
+
+    try {
+      final date = DateTime.parse(raw);
+      return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  String _iconForCategory(String category) {
+    if (category.contains('식대')) return '🍽';
+    if (category.contains('교통')) return '🚕';
+    if (category.contains('회식')) return '🍻';
+    if (category.contains('숙박')) return '🏨';
+    if (category.contains('접대')) return '🤝';
+    return '🧾';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +150,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leadingWidth: 80,
         title: const Text(
           '내역 조회',
           style: TextStyle(
@@ -102,6 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               );
 
+              if (!mounted) return;
               _fetchReceipts();
             },
             child: const Text(
@@ -120,6 +187,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
+                    initialValue: _selectedMonth,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -129,30 +197,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    value: _selectedMonth,
-                    items: [
-                      '전체 월',
-                      '1월',
-                      '2월',
-                      '3월',
-                      '4월',
-                      '5월',
-                      '6월',
-                      '7월',
-                      '8월',
-                      '9월',
-                      '10월',
-                      '11월',
-                      '12월',
-                    ].map((e) {
+                    items: _months.map((month) {
                       return DropdownMenuItem(
-                        value: e,
-                        child: Text(e, style: const TextStyle(fontSize: 14)),
+                        value: month,
+                        child: Text(
+                          month,
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       );
                     }).toList(),
-                    onChanged: (val) {
-                      if (val == null) return;
-                      _selectedMonth = val;
+                    onChanged: (value) {
+                      if (value == null) return;
+
+                      _selectedMonth = value;
                       _applyFilters();
                     },
                   ),
@@ -160,6 +217,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
+                    initialValue: _selectedCategory,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -169,30 +227,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    value: _selectedCategory,
-                    items: [
-                      '전체 카테고리',
-                      '식대',
-                      '교통비',
-                      '회식비',
-                      '접대비',
-                      '복리후생비',
-                      '숙박비',
-                      '비품비',
-                      '행사비',
-                    ].map((e) {
+                    items: _categories.map((category) {
                       return DropdownMenuItem(
-                        value: e,
+                        value: category,
                         child: Text(
-                          e,
+                          category,
                           style: const TextStyle(fontSize: 14),
                           overflow: TextOverflow.ellipsis,
                         ),
                       );
                     }).toList(),
-                    onChanged: (val) {
-                      if (val == null) return;
-                      _selectedCategory = val;
+                    onChanged: (value) {
+                      if (value == null) return;
+
+                      _selectedCategory = value;
                       _applyFilters();
                     },
                   ),
@@ -214,71 +262,106 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           style: TextStyle(color: Colors.grey),
                         ),
                       )
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: _filteredReceipts.length,
-                        itemBuilder: (context, index) {
-                          final item = _filteredReceipts[index];
+                    : RefreshIndicator(
+                        onRefresh: _fetchReceipts,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _filteredReceipts.length,
+                          itemBuilder: (context, index) {
+                            final item = _filteredReceipts[index];
 
-                          final storeName =
-                              item['merchant_name']?.toString() ?? '알 수 없는 사용처';
-                          final amount = item['amount']?.toString() ?? '0';
-                          final date =
-                              item['payment_date']?.toString() ?? '날짜 없음';
-                          final category =
-                              item['category']?.toString() ?? '분류 없음';
-                          final method =
-                              item['card_type']?.toString() ?? '결제수단 모름';
+                            final storeName =
+                                item['merchant_name']?.toString() ??
+                                    item['merchant']?.toString() ??
+                                    '알 수 없는 사용처';
 
-                          var icon = '🧾';
-                          if (category.contains('식대')) icon = '🍽';
-                          if (category.contains('교통비')) icon = '🚕';
-                          if (category.contains('회식')) icon = '🍻';
+                            final amount = _formatAmount(item['amount']);
+                            final date = _formatDate(item['payment_date']);
+                            final category =
+                                item['category']?.toString() ?? '분류 없음';
+                            final method =
+                                item['card_type']?.toString() ?? '결제수단 모름';
+                            final status =
+                                item['status']?.toString() ?? 'pending';
 
-                          return InkWell(
-                            onTap: () async {
-                              final isModified = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      ReceiptDetailScreen(receiptData: item),
-                                ),
-                              );
+                            final icon = _iconForCategory(category);
 
-                              if (isModified == true) {
-                                _fetchReceipts();
-                              }
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEEEDFE),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      icon,
-                                      style: const TextStyle(fontSize: 18),
+                            return InkWell(
+                              onTap: () async {
+                                final isModified = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ReceiptDetailScreen(
+                                      receiptData: item,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
+                                );
+
+                                if (isModified == true) {
+                                  _fetchReceipts();
+                                }
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 42,
+                                      height: 42,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEEEDFE),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        icon,
+                                        style: const TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            storeName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '$category · $method',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            status,
+                                            style: const TextStyle(
+                                              color: Color(0xFF3C3489),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
-                                          storeName,
+                                          amount,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14,
@@ -286,7 +369,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '$category · $method',
+                                          date,
                                           style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 12,
@@ -294,32 +377,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '$amount원',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        date,
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
           ),
         ],
