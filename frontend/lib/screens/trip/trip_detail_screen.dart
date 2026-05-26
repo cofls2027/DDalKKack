@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/api_client.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final Map<String, dynamic> trip; // 💡 클릭한 출장 정보를 통째로 받아옵니다.
@@ -24,15 +24,13 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   // 🚀 DB에서 이 출장에 엮인 영수증만 쏙쏙 뽑아옵니다.
   Future<void> _fetchTripReceipts() async {
     try {
-      final data = await Supabase.instance.client
-          .from('receipts')
-          .select()
-          .eq('trip_id', widget.trip['id']) // 🌟 핵심 매핑 조건!
-          .order('payment_date', ascending: false);
+      final data = await apiClient.getList(
+        '/api/trips/${widget.trip['id']}/receipts',
+      );
 
-      int total = 0;
-      for (var item in data) {
-        total += (item['amount'] as num?)?.toInt() ?? 0; // 총합 계산
+      var total = 0;
+      for (final item in data) {
+        total += (item['amount'] as num?)?.toInt() ?? 0;
       }
 
       if (mounted) {
@@ -44,7 +42,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
       }
     } catch (e) {
       debugPrint('출장 영수증 불러오기 실패: $e');
-      if (mounted) setState(() => _isLoading = false);
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
