@@ -1,6 +1,6 @@
 // trip_registration_screen.dart 파일 내용
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/api_client.dart';
 
 class TripRegistrationScreen extends StatefulWidget {
   const TripRegistrationScreen({super.key});
@@ -106,18 +106,16 @@ class _TripRegistrationScreenState extends State<TripRegistrationScreen> {
                     }
 
                     try {
-                      final supabase = Supabase.instance.client;
-                      
-                      await supabase.from('trips').insert({
-                        'user_id': '048def2e-5ff2-480d-a659-c12d18fa7ed8', 
-                        'company_id': 1,
-
-                        'trip_name': _tripNameController.text,
-                        'trip_purpose': _purposeController.text,
-                        'trip_companions': _companionsController.text,
-                        'start_date': _startDateController.text,
-                        'end_date': _endDateController.text,
-                      });
+                      await apiClient.postJson(
+                        '/api/trips',
+                        {
+                          'trip_name': _tripNameController.text.trim(),
+                          'trip_purpose': _purposeController.text.trim(),
+                          'trip_companions': _companionsController.text.trim(),
+                          'start_date': _startDateController.text.trim(),
+                          'end_date': _endDateController.text.trim(),
+                        },
+                      );
 
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(

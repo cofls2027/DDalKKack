@@ -1,39 +1,13 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/expense/history_screen.dart';
 import 'screens/trip/trip_screen.dart';
-
-const supabaseUrl = 'https://hczripxpbmtvqwbouexo.supabase.co';
-
-/// 빌드/실행 시 `--dart-define=SUPABASE_ANON_KEY=...` 또는
-/// `flutter run --dart-define-from-file=dart_defines.json` (gitignore) 로 전달하세요.
-const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+import 'services/api_client.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (supabaseAnonKey.isEmpty) {
-    runApp(
-      const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text(
-              'SUPABASE_ANON_KEY가 없습니다.\n'
-              'flutter run --dart-define=SUPABASE_ANON_KEY=<키> 로 실행하세요.',
-            ),
-          ),
-        ),
-      ),
-    );
-    return;
-}
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
 runApp(const DDalKKackApp());
 }
 
@@ -248,10 +222,6 @@ class AppRoot extends StatefulWidget {
 
 class _AppRootState extends State<AppRoot> {
   bool isLoggedIn = false;
-  bool isCheckingSession = true;
-  StreamSubscription<AuthState>? authSubscription;
-
-  SupabaseClient get supabase => Supabase.instance.client;
 
   final List<QuickReceipt> quickReceipts = [];
   final List<ReceiptSummary> receipts = [
@@ -307,74 +277,38 @@ class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();
-    restoreSession();
-    authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (!mounted) return;
-      setState(() {
-        isLoggedIn = data.session != null;
-      });
-    });
   }
 
   @override
   void dispose() {
-    authSubscription?.cancel();
     super.dispose();
-  }
-
-  Future<void> restoreSession() async {
-    final session = supabase.auth.currentSession;
-    if (session == null) {
-      setState(() {
-        isLoggedIn = false;
-        isCheckingSession = false;
-      });
-      return;
-    }
-    final isActive = await isCurrentUserActive();
-    if (!isActive) {
-      await supabase.auth.signOut();
-    }
-    if (!mounted) return;
-    setState(() {
-      isLoggedIn = isActive;
-      isCheckingSession = false;
-    });
-  }
-
-  Future<bool> isCurrentUserActive() async {
-    final userId = supabase.auth.currentUser?.id;
-    if (userId == null) return false;
-    final profile = await supabase
-        .from('users')
-        .select('id, is_active')
-        .eq('id', userId)
-        .maybeSingle();
-    return profile != null && profile['is_active'] == true;
   }
 
   Future<String?> signIn(String email, String password) async {
     try {
-      final response = await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
+      final result = await apiClient.postJson(
+        '/api/auth/login',
+        {
+          'email': email,
+          'password': password,
+        },
       );
-      if (response.user == null) {
-        return '로그인에 실패했습니다.';
+
+      final token = result['accessToken'] ?? result['access_token'];
+
+      if (token == null || token.toString().isEmpty) {
+        return '로그인 응답에 accessToken이 없습니다.';
       }
-      final isActive = await isCurrentUserActive();
-      if (!isActive) {
-        await supabase.auth.signOut();
-        return '비활성화된 계정입니다. 관리자에게 문의하세요.';
-      }
+
+      apiClient.setAccessToken(token.toString());
+
       setState(() {
         isLoggedIn = true;
       });
+
       return null;
-    } on AuthException catch (error) {
-      return error.message;
-    } catch (_) {
-      return '로그인 중 오류가 발생했습니다.';
+    } catch (e) {
+      return '로그인 실패: $e';
     }
   }
 
@@ -404,12 +338,6 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   Widget build(BuildContext context) {
-    if (isCheckingSession) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     if (!isLoggedIn) {
       return LoginScreen(
         onLogin: signIn,
@@ -426,7 +354,7 @@ class _AppRootState extends State<AppRoot> {
       onAddQuickReceipts: addQuickReceipts,
       onRemoveSelectedQuickReceipts: removeSelectedQuickReceipts,
       onLogout: () {
-        supabase.auth.signOut();
+        apiClient.clearAccessToken();
         setState(() {
           isLoggedIn = false;
         });
