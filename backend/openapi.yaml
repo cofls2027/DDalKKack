@@ -61,6 +61,40 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Flutter 앱 사용자 로그인
+      description: |
+        Flutter 앱에서 사용하는 일반 사용자 로그인 API입니다.
+        관리자 전용 API(`/api/admin/login`)와 달리 `role=admin` 조건을 요구하지 않고,
+        Supabase Auth 인증 후 `users.is_active` 상태를 확인합니다.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/admin/me:
     get:
       tags: [Auth]
@@ -396,7 +430,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: POST /api/admin/login 응답의 access_token
+      description: POST /api/admin/login 또는 POST /api/auth/login 응답의 access token
 
   parameters:
     ReceiptId:
@@ -487,6 +521,46 @@ components:
           description: Unix timestamp (seconds)
         profile:
           $ref: '#/components/schemas/AdminProfile'
+
+
+    UserLoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: Flutter 앱에서 Authorization Bearer 토큰으로 사용할 access token
+        refreshToken:
+          type: string
+          nullable: true
+        profile:
+          $ref: '#/components/schemas/AppUserProfile'
+      required: [accessToken, profile]
+
+    AppUserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        role:
+          type: string
+          enum: [admin, employee, manager, user]
+        email:
+          type: string
+          format: email
+          nullable: true
+        is_active:
+          type: boolean
+      required: [id, role, is_active]
 
     AdminProfile:
       type: object
