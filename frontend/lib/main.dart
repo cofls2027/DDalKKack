@@ -201,18 +201,6 @@ class AnalyzeReceiptResult {
   }
 }
 
-class PolicyValidationResult {
-  final ExpenseStatus status;
-  final List<String> warnings;
-  final List<String> rejectionReasons;
-
-  PolicyValidationResult({
-    required this.status,
-    required this.warnings,
-    required this.rejectionReasons,
-  });
-}
-
 class AppRoot extends StatefulWidget {
   const AppRoot({super.key});
 
@@ -224,55 +212,9 @@ class _AppRootState extends State<AppRoot> {
   bool isLoggedIn = false;
 
   final List<QuickReceipt> quickReceipts = [];
-  final List<ReceiptSummary> receipts = [
-    ReceiptSummary(
-      id: 'sample_1',
-      merchant: '스타벅스 광운대점',
-      amount: 15000,
-      category: '회의비',
-      status: ExpenseStatus.pending,
-      date: '2026.05.01',
-      time: '14:30',
-      cardType: '회사카드',
-      warnings: ['회의비 목적 입력 필요', '참여자 정보 누락'],
-    ),
-    ReceiptSummary(
-      id: 'sample_2',
-      merchant: 'KTX',
-      amount: 59800,
-      category: '교통비',
-      status: ExpenseStatus.approved,
-      date: '2026.05.02',
-      time: '09:10',
-      cardType: '회사카드',
-    ),
-  ];
-
-  final List<TripSummary> trips = [
-    TripSummary(
-      id: 1,
-      tripName: '부산 고객사 방문',
-      tripPurpose: '계약 협의 및 현장 점검',
-      tripCompanions: '백다인, 원의재',
-      startDate: '2026.05.10',
-      endDate: '2026.05.12',
-    ),
-  ];
-
-  final List<RegisteredCard> cards = [
-    RegisteredCard(
-      id: 1,
-      cardType: '회사카드',
-      cardCompany: '신한',
-      cardNumber: '5234 ****',
-    ),
-    RegisteredCard(
-      id: 2,
-      cardType: '정부지원카드',
-      cardCompany: 'BC',
-      cardNumber: '9876 ****',
-    ),
-  ];
+  final List<ReceiptSummary> receipts = [];
+  final List<TripSummary> trips = [];
+  final List<RegisteredCard> cards = [];
 
   @override
   void initState() {
@@ -697,7 +639,25 @@ class ReceiptRegisterScreen extends StatelessWidget {
     if (file == null || !context.mounted) return;
 
     final savedPath = await savePickedFile(file);
-    final initialResult = createDummyAnalysisResult(savedPath);
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('영수증을 분석 중입니다...')),
+    );
+
+    late final AnalyzeReceiptResult initialResult;
+
+    try {
+      initialResult = await analyzeReceiptImage(savedPath);
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('분석 실패: $e')),
+      );
+      return;
+    }
 
     if (!context.mounted) return;
 
@@ -772,20 +732,28 @@ class QuickRegisterScreen extends StatefulWidget {
 class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
   final picker = ImagePicker();
 
+  String _fileNameFromPath(String path) {
+    return path.split(Platform.pathSeparator).last;
+  }
+
   Future<void> pickOne(ImageSource source) async {
     final file = await picker.pickImage(source: source);
     if (file == null) return;
 
     final savedPath = await savePickedFile(file);
+
     final receipt = QuickReceipt(
       id: 'quick_${DateTime.now().millisecondsSinceEpoch}',
       imagePath: savedPath,
-      fileName: savedPath.split(Platform.pathSeparator).last,
+      fileName: _fileNameFromPath(savedPath),
       createdAt: DateTime.now(),
     );
 
     widget.onAddQuickReceipt(receipt);
-    setState(() {});
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> pickMultiple() async {
@@ -796,18 +764,22 @@ class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
 
     for (final file in files) {
       final savedPath = await savePickedFile(file);
+
       items.add(
         QuickReceipt(
           id: 'quick_${DateTime.now().millisecondsSinceEpoch}_${items.length}',
           imagePath: savedPath,
-          fileName: savedPath.split(Platform.pathSeparator).last,
+          fileName: _fileNameFromPath(savedPath),
           createdAt: DateTime.now(),
         ),
       );
     }
 
     widget.onAddQuickReceipts(items);
-    setState(() {});
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> analyzeSelected() async {
@@ -820,9 +792,27 @@ class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
       return;
     }
 
-    final generated = selected
-        .map((quick) => createDummyAnalysisResult(quick.imagePath).toReceiptSummary())
-        .toList();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('선택한 영수증을 분석 중입니다...')),
+    );
+
+    final generated = <ReceiptSummary>[];
+
+    try {
+      for (final quick in selected) {
+        final result = await analyzeReceiptImage(quick.imagePath);
+        generated.add(result.toReceiptSummary());
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('분석 실패: $e')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
 
     final shouldSave = await Navigator.push<bool>(
       context,
@@ -835,7 +825,9 @@ class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
       for (final receipt in generated) {
         widget.onAddReceipt(receipt);
       }
+
       widget.onRemoveSelected();
+
       if (!mounted) return;
       Navigator.pop(context);
     }
@@ -889,9 +881,9 @@ class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
                           onPressed: selectedCount == 0
                               ? null
                               : () {
-                            widget.onRemoveSelected();
-                            setState(() {});
-                          },
+                                  widget.onRemoveSelected();
+                                  setState(() {});
+                                },
                           child: const Text('선택 삭제'),
                         ),
                       ),
@@ -922,7 +914,7 @@ class _QuickRegisterScreenState extends State<QuickRegisterScreen> {
             )
           else
             ...widget.quickReceipts.map(
-                  (receipt) => Card(
+              (receipt) => Card(
                 child: CheckboxListTile(
                   value: receipt.selected,
                   onChanged: (value) {
@@ -992,15 +984,6 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
   }
 
   AnalyzeReceiptResult buildResult() {
-    final policy = validateReceiptPolicy(
-      category: categoryController.text,
-      amount: int.tryParse(amountController.text) ?? 0,
-      cardType: cardTypeController.text,
-      purpose: purposeController.text,
-      participants: participantsController.text,
-      time: timeController.text,
-    );
-
     return widget.initialResult.copyWith(
       merchant: merchantController.text,
       amount: int.tryParse(amountController.text) ?? 0,
@@ -1010,9 +993,6 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> {
       cardType: cardTypeController.text,
       purpose: purposeController.text,
       participants: participantsController.text,
-      status: policy.status,
-      warnings: policy.warnings,
-      rejectionReasons: policy.rejectionReasons,
     );
   }
 
@@ -1070,7 +1050,7 @@ class BatchAnalysisScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppPage(
       title: 'AI 일괄 분석',
-      subtitle: '선택된 영수증 이미지를 AI 분석 모듈로 전달하는 더미 화면입니다.',
+      subtitle: '선택된 영수증 이미지의 AI 분석 결과를 확인합니다.',
       showBack: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1082,7 +1062,7 @@ class BatchAnalysisScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            '더미 분석 결과',
+            '분석 결과',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -1755,78 +1735,123 @@ class MenuTile extends StatelessWidget {
   }
 }
 
-PolicyValidationResult validateReceiptPolicy({
-  required String category,
-  required int amount,
-  required String cardType,
-  required String purpose,
-  required String participants,
-  required String time,
-}) {
-  final warnings = <String>[];
-  final rejections = <String>[];
+Future<AnalyzeReceiptResult> analyzeReceiptImage(String imagePath) async {
+  final json = await apiClient.postJson(
+    '/api/receipts/analyze',
+    {
+      'imagePath': imagePath,
+    },
+  );
 
-  if (cardType.contains('회사') && category.contains('식') && amount > 15000) {
-    warnings.add('회사카드 일반 식대는 1인 1식 기준 15,000원을 초과할 수 있습니다.');
-  }
+  return analyzeReceiptResultFromApi(json, imagePath);
+}
 
-  if ((category.contains('회의') || category.contains('접대')) && purpose.trim().isEmpty) {
-    warnings.add('회의비/접대비로 처리하려면 사용 목적 입력이 필요합니다.');
-  }
+AnalyzeReceiptResult analyzeReceiptResultFromApi(
+  Map<String, dynamic> json,
+  String imagePath,
+) {
+  final ocr = _asMap(json['ocr']);
 
-  if ((category.contains('회의') || category.contains('접대')) && participants.trim().isEmpty) {
-    warnings.add('회의비/접대비로 처리하려면 참여자 정보 입력이 필요합니다.');
-  }
+  final status = _parseExpenseStatus(json['status']);
+  final warnings = _asStringList(json['warnings']);
+  final reasons = _asStringList(json['reason']);
 
-  if (cardType.contains('정부') && purpose.trim().isEmpty) {
-    warnings.add('정부지원카드는 과제 관련 사용 목적을 반드시 입력해야 합니다.');
-  }
-
-  if (cardType.contains('정부') && (category.contains('접대') || category.contains('회식'))) {
-    rejections.add('정부지원카드는 접대비 또는 회식비로 사용할 수 없습니다.');
-  }
-
-  if (category.contains('주류') || category.contains('담배') || category.contains('유흥')) {
-    rejections.add('주류, 담배, 유흥업소 관련 지출은 비용 처리할 수 없습니다.');
-  }
-
-  final status = rejections.isNotEmpty
-      ? ExpenseStatus.rejected
-      : warnings.isNotEmpty
-      ? ExpenseStatus.pending
-      : ExpenseStatus.approved;
-
-  return PolicyValidationResult(
+  return AnalyzeReceiptResult(
+    merchant: _asString(json['merchant'] ?? ocr['merchant']),
+    amount: _asInt(json['amount'] ?? ocr['amount']),
+    date: _asString(json['date'] ?? ocr['date']),
+    time: _asString(json['time'] ?? ocr['time']),
+    category: _asString(json['category'] ?? ocr['category']),
+    cardType: _asString(
+      json['cardType'] ??
+          json['card_type'] ??
+          ocr['cardType'] ??
+          ocr['card_type'],
+    ),
+    purpose: '',
+    participants: '',
     status: status,
     warnings: warnings,
-    rejectionReasons: rejections,
+    rejectionReasons: status == ExpenseStatus.rejected ? reasons : const [],
+    imagePath: imagePath,
   );
 }
 
-AnalyzeReceiptResult createDummyAnalysisResult(String imagePath) {
-  final policy = validateReceiptPolicy(
-    category: '회의비',
-    amount: 15000,
-    cardType: '회사카드',
-    purpose: '',
-    participants: '',
-    time: '14:30',
-  );
+Map<String, dynamic> _asMap(dynamic value) {
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
 
-  return AnalyzeReceiptResult(
-    merchant: '스타벅스 광운대점',
-    amount: 15000,
-    date: '2026.05.01',
-    time: '14:30',
-    category: '회의비',
-    cardType: '회사카드',
-    purpose: '',
-    participants: '',
-    status: policy.status,
-    warnings: policy.warnings,
-    rejectionReasons: policy.rejectionReasons,
-    imagePath: imagePath,
-  );
+  if (value is Map) {
+    return value.map(
+      (key, item) => MapEntry(key.toString(), item),
+    );
+  }
+
+  return {};
+}
+
+String _asString(dynamic value) {
+  if (value == null) {
+    return '';
+  }
+
+  return value.toString();
+}
+
+int _asInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+
+  if (value is double) {
+    return value.round();
+  }
+
+  if (value is String) {
+    return int.tryParse(value.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+  }
+
+  return 0;
+}
+
+List<String> _asStringList(dynamic value) {
+  if (value == null) {
+    return const [];
+  }
+
+  if (value is List) {
+    return value
+        .where((item) => item != null)
+        .map((item) => item.toString())
+        .where((item) => item.trim().isNotEmpty)
+        .toList();
+  }
+
+  final text = value.toString().trim();
+
+  if (text.isEmpty) {
+    return const [];
+  }
+
+  return [text];
+}
+
+ExpenseStatus _parseExpenseStatus(dynamic value) {
+  final status = value?.toString().toLowerCase().trim();
+
+  switch (status) {
+    case 'approved':
+    case 'approve':
+      return ExpenseStatus.approved;
+    case 'rejected':
+    case 'reject':
+      return ExpenseStatus.rejected;
+    case 'pending':
+    case 'reviewing':
+    default:
+      return ExpenseStatus.pending;
+  }
 }
 
 Future<String> savePickedFile(XFile file) async {
