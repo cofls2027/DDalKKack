@@ -1,10 +1,21 @@
 import 'dart:io';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'expense/history_screen.dart' as real_expense;
+import 'trip/trip_screen.dart' as real_trip;// 💡 추가!
 
-void main() {
+void main() async {
+  // 플러터 엔진 초기화 보장
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 🚀 Supabase 초기화 (앱 켜질 때 한 번만 실행)
+  await Supabase.initialize(
+    url: '', // 💡 실제 Supabase URL로 변경하세요!
+    anonKey: '',                     // 💡 실제 Anon Key로 변경하세요!
+  );
+
   runApp(const DDalKKackApp());
 }
 
@@ -508,8 +519,8 @@ class _MainShellState extends State<MainShell> {
           );
         },
       ),
-      HistoryScreen(receipts: widget.receipts),
-      TripsScreen(trips: widget.trips),
+      const real_expense.HistoryScreen(),
+      const real_trip.TripScreen(),
       StatsScreen(receipts: widget.receipts),
       MenuScreen(
         cards: widget.cards,
