@@ -26,10 +26,13 @@ tags:
     description: 법인카드 관리
   - name: Users
     description: 직원 계정 관리
+<<<<<<< HEAD
   - name: Rules
     description: 지출 규칙 조회
   - name: Stats
     description: 통계 조회
+=======
+>>>>>>> origin/dochi
 
 paths:
   /api/admin/login:
@@ -61,6 +64,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+<<<<<<< HEAD
 
   /api/auth/login:
     post:
@@ -95,6 +99,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+=======
+>>>>>>> origin/dochi
   /api/admin/me:
     get:
       tags: [Auth]
@@ -338,6 +344,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+<<<<<<< HEAD
   /api/cards:
     get:
       tags: [Cards]
@@ -814,13 +821,19 @@ paths:
         '200': 
           description: 서버 정상 동작
 
+=======
+>>>>>>> origin/dochi
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+<<<<<<< HEAD
       description: POST /api/admin/login 또는 POST /api/auth/login 응답의 access token
+=======
+      description: POST /api/admin/login 응답의 access_token
+>>>>>>> origin/dochi
 
   parameters:
     ReceiptId:
@@ -912,6 +925,7 @@ components:
         profile:
           $ref: '#/components/schemas/AdminProfile'
 
+<<<<<<< HEAD
 
     UserLoginResponse:
       type: object
@@ -952,6 +966,8 @@ components:
           type: boolean
       required: [id, role, is_active]
 
+=======
+>>>>>>> origin/dochi
     AdminProfile:
       type: object
       properties:
@@ -1160,6 +1176,7 @@ components:
         is_active:
           type: boolean
 
+<<<<<<< HEAD
     Rule:
       type: object
       properties:
@@ -1284,5 +1301,7 @@ components:
           items: 
             type: string
 
+=======
+>>>>>>> origin/dochi
 security:
   - bearerAuth: []
