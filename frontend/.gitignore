@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Miscellaneous
 *.class
 *.log
@@ -43,3 +44,39 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+=======
+﻿# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android / Gradle
+*.iml
+.gradle/
+/local.properties
+local.properties
+.externalNativeBuild
+.cxx
+/captures
+
+# Android Studio / IntelliJ
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup
+_as_backup/
+frontend_kotlin_backup/
+>>>>>>> origin/dochi
