@@ -30,13 +30,10 @@ tags:
     description: 지출 규칙 조회
   - name: Stats
     description: 통계 조회
-<<<<<<< Updated upstream
-=======
   - name: Expense
     description: 지출 및 영수증 관리
   - name: Trip
     description: 출장 등록 및 관리
->>>>>>> Stashed changes
 
 paths:
   /api/admin/login:
@@ -101,8 +98,7 @@ paths:
           $ref: '#/components/responses/ServiceUnavailable'
         '500':
           $ref: '#/components/responses/InternalError'
-<<<<<<< Updated upstream
-=======
+
   /api/expenses:
     get:
       tags: [Expense]
@@ -226,7 +222,6 @@ paths:
       responses:
         '200':
           description: 해당 출장의 영수증 목록 반환
->>>>>>> Stashed changes
 
   /api/admin/me:
     get:
