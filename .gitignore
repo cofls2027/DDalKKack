@@ -12,5 +12,10 @@
 .DS_Store
 .idea/
 
+<<<<<<< HEAD
+/backend/ai/.env
+/backend/.env
+=======
 # --- Local secrets (copy from *.example.*) ---
 /frontend/dart_defines.json
+>>>>>>> origin/dochi

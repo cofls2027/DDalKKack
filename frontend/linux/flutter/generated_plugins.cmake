@@ -4,12 +4,18 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
+<<<<<<< HEAD
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+=======
   gtk
   url_launcher_linux
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   jni
+>>>>>>> origin/dochi
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)
