@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+=======
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,11 +23,23 @@ runApp(const DDalKKackApp());
 
 class DDalKKackApp extends StatelessWidget {
   const DDalKKackApp({super.key});
+>>>>>>> origin/dochi
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DDalKKack',
+<<<<<<< HEAD
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: const Scaffold(
+        body: Center(child: Text('DDalKKack')),
+      ),
+    );
+  }
+=======
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -1884,4 +1906,5 @@ Color statusColor(ExpenseStatus status) {
     case ExpenseStatus.rejected:
       return const Color(0xFFD93025);
   }
+>>>>>>> origin/dochi
 }

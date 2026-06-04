@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+# frontend_flutter
+=======
 # frontend
+>>>>>>> origin/dochi
 
 A new Flutter project.
 

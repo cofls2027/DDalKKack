@@ -3,6 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+<<<<<<< HEAD
+  file_selector_windows
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+=======
   app_links
   file_selector_windows
   url_launcher_windows
@@ -10,6 +16,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   jni
+>>>>>>> origin/dochi
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)
