@@ -829,11 +829,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-<<<<<<< HEAD
-      description: POST /api/admin/login 또는 POST /api/auth/login 응답의 access token
-=======
       description: POST /api/admin/login 응답의 access_token
->>>>>>> origin/dochi
 
   parameters:
     ReceiptId:
@@ -925,49 +921,6 @@ components:
         profile:
           $ref: '#/components/schemas/AdminProfile'
 
-<<<<<<< HEAD
-
-    UserLoginResponse:
-      type: object
-      properties:
-        accessToken:
-          type: string
-          description: Flutter 앱에서 Authorization Bearer 토큰으로 사용할 access token
-        refreshToken:
-          type: string
-          nullable: true
-        profile:
-          $ref: '#/components/schemas/AppUserProfile'
-      required: [accessToken, profile]
-
-    AppUserProfile:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        company_id:
-          type: integer
-          nullable: true
-        name:
-          type: string
-        phone:
-          type: string
-        position:
-          type: string
-        role:
-          type: string
-          enum: [admin, employee, manager, user]
-        email:
-          type: string
-          format: email
-          nullable: true
-        is_active:
-          type: boolean
-      required: [id, role, is_active]
-
-=======
->>>>>>> origin/dochi
     AdminProfile:
       type: object
       properties:
@@ -1176,132 +1129,5 @@ components:
         is_active:
           type: boolean
 
-<<<<<<< HEAD
-    Rule:
-      type: object
-      properties:
-        id:
-          type: integer
-        company_id:
-          type: integer
-        category_code:
-          type: string
-        position:
-          type: string
-        max_amount:
-          type: integer
-        allowed_time_from:
-          type: string
-          description: "HH:MM 형식"
-        allowed_time_to:
-          type: string
-          description: "HH:MM 형식"
-        created_at:
-          type: string
-          format: date-time
-        category_name:
-          type: string
-          description: categories 테이블에서 조인된 카테고리명
-
-    MyStatsResponse:
-      type: object
-      properties:
-        total_amount:
-          type: integer
-          description: 해당 월 총 지출액
-        category_stats:
-          type: object
-          additionalProperties:
-            type: integer
-          description: "카테고리별 금액 합계 (예: {\"식비\": 50000})"
-        card_type_stats:
-          type: object
-          additionalProperties:
-            type: integer
-          description: "카드 유형별 건수 (예: {\"corporate\": 3})"
-        status_stats:
-          type: object
-          properties:
-            approved:
-              type: integer
-            pending:
-              type: integer
-            rejected:
-              type: integer
-    Receipt: 
-      type: object 
-      properties: 
-        id: 
-          type: integer 
-        
-        merchant_name: 
-          type: string 
-        
-        amount: 
-          type: integer 
-        
-        payment_date: 
-          type: string 
-        
-        category: 
-          type: string 
-        
-        status: 
-          type: string 
-          enum: 
-            - approved 
-            - pending 
-            - rejected 
-        
-        reject_reason: 
-          type: string 
-          nullable: true 
-        
-        image_url: 
-          type: string 
-        
-        headcount: 
-          type: integer 
-    AIAnalyzeResponse: 
-      type: object 
-      properties: 
-        merchant: 
-          type: string 
-        
-        amount: 
-          type: integer 
-        
-        date: 
-          type: string 
-            
-        time: 
-          type: string 
-          nullable: true 
-        
-        category: 
-          type: string 
-        
-        cardType: 
-          type: string 
-        
-        status: 
-          type: string 
-          enum: 
-            - approved 
-            - pending 
-            - rejected 
-        
-        warnings: 
-          type: array 
-          items: 
-            type: string 
-        
-        rejectionReasons: 
-          type: array 
-          items: 
-            type: string
-
-=======
->>>>>>> origin/dochi
 security:
   - bearerAuth: []
