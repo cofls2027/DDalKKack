@@ -1,45 +1,23 @@
 {
-  "name": "ddalkkack-admin-backend",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "DDalKKack 관리자 API 및 정적 웹 서버",
-  "main": "web/index.js",
+  "description": "DDalKKack 법인카드 영수증 관리 백엔드",
+  "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
-    "dev": "node --watch server.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-=======
-    "start": "node web/index.js",
-    "dev": "node --watch web/index.js",
-    "test": "node --check web/index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "engines": {
-    "node": ">=18"
->>>>>>> origin/dochi
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-<<<<<<< HEAD
-  "type": "module",
-  "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@supabase/supabase-js": "^2.105.1",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^4.18.2",
-    "form-data": "^4.0.5",
-    "jsonwebtoken": "^9.0.3",
-    "multer": "^2.1.1",
-    "node-fetch": "^3.3.2"
-=======
-  "type": "commonjs",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.105.4",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "swagger-ui-express": "^5.0.1"
->>>>>>> origin/dochi
-  }
+  "type": "commonjs"
 }
