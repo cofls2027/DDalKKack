@@ -1,6 +1,6 @@
 // trip_screen.dart 파일 내용
+import '../../services/api_client.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'trip_registration_screen.dart'; 
 import 'trip_detail_screen.dart'; // 💡 방금 만든 출장 상세 화면 불러오기
 
@@ -23,9 +23,8 @@ class _TripScreenState extends State<TripScreen> {
 
   Future<void> _fetchTrips() async {
     try {
-      final supabase = Supabase.instance.client;
-      final data = await supabase.from('trips').select().order('created_at', ascending: false);
-      
+      final data = await apiClient.getList('/api/trips');
+
       if (mounted) {
         setState(() {
           _trips = data;
@@ -34,7 +33,9 @@ class _TripScreenState extends State<TripScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() { _isLoading = false; });
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('🚨 데이터 불러오기 실패: $e')),
         );
@@ -108,7 +109,7 @@ class _TripScreenState extends State<TripScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import '../../services/api_client.dart';
 
 class ReceiptDetailScreen extends StatefulWidget {
   final Map<String, dynamic> receiptData;
@@ -27,10 +27,7 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
   Future<void> _showTripMappingDialog() async {
     try {
       // 1. DB에서 내 출장 목록 싹 가져오기
-      final trips = await Supabase.instance.client
-          .from('trips')
-          .select('id, trip_name')
-          .order('created_at', ascending: false);
+      final trips = await apiClient.getList('/api/trips');
 
       if (!mounted) return;
 
@@ -79,11 +76,18 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
       if (selectedTripId != null && mounted) {
         dynamic newTripId = (selectedTripId == 'unlink') ? null : selectedTripId;
 
-        // DB 진짜로 수정하기
-        await Supabase.instance.client
-            .from('receipts')
-            .update({'trip_id': newTripId})
-            .eq('id', _currentReceiptData['id']);
+        await apiClient.patchJson(
+          '/api/receipts/${_currentReceiptData['id']}',
+          {
+            'trip_id': newTripId,
+          },
+        );
+
+if (!mounted) return;
+
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(content: Text('출장 연결이 변경되었습니다.')),
+);
 
         // 화면 갱신하기
         setState(() {
@@ -102,12 +106,10 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final int targetId = _currentReceiptData['id'];
     final String storeName = _currentReceiptData['merchant_name'] ?? '알 수 없는 가맹점';
     final String category = _currentReceiptData['category'] ?? '미분류';
     final String cardType = _currentReceiptData['card_type'] ?? '결제수단 모름';
     final String purpose = _currentReceiptData['purpose'] ?? '메모 없음';
-    final String participants = _currentReceiptData['participants'] ?? '참여자 없음';
     final String status = _currentReceiptData['status'] ?? '대기';
     
     final bool isTripLinked = _currentReceiptData['trip_id'] != null;
@@ -132,7 +134,7 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
     // 뒤로가기 처리를 위한 팝스코프 (안드로이드 물리 뒤로가기 버튼 대응)
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         Navigator.pop(context, _isModified); // 변경사항이 있으면 true를 들고 돌아감
       },

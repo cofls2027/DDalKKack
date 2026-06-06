@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/api_client.dart';
 
 class ReceiptSubmitScreen extends StatefulWidget {
   const ReceiptSubmitScreen({super.key});
@@ -19,13 +19,9 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
     _fetchMyTrips(); // 화면 켜지자마자 출장 목록 가져오기!
   }
 
-  // 🚀 2. DB에서 '내 출장' 목록 싹 가져오는 함수
   Future<void> _fetchMyTrips() async {
     try {
-      final data = await Supabase.instance.client
-          .from('trips')
-          .select('id, trip_name') // 💡 콤보박스에 쓸 id와 이름만 쏙 빼옵니다
-          .order('created_at', ascending: false);
+      final data = await apiClient.getList('/api/trips');
 
       if (mounted) {
         setState(() {
@@ -77,7 +73,7 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
                   filled: true,
                   fillColor: Colors.white,
                 ),
-                value: _selectedTripId,
+                initialValue: _selectedTripId,
                 hint: const Text('관련 출장을 선택하세요'),
                 items: [
                   // 1번 옵션: 일반 지출일 경우
@@ -89,9 +85,9 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
                   ..._myTrips.map((trip) {
                     return DropdownMenuItem(
                       value: trip['id'].toString(), // DB의 고유 id
-                      child: Text(trip['trip_name'] ?? '이름 없는 출장'), // 화면에 보이는 글자
+                      child: Text(trip['trip_name']), // 화면에 보이는 글자
                     );
-                  }).toList(),
+                  }),
                 ],
                 onChanged: (val) {
                   setState(() {
@@ -114,21 +110,19 @@ class _ReceiptSubmitScreenState extends State<ReceiptSubmitScreen> {
                   onPressed: () async {
                     // 💡 여기에 실제 DB 전송 로직을 넣습니다!
                     try {
-                      await Supabase.instance.client.from('receipts').insert({
-                        // 🚨 주의: 아까 출장 등록할 때 쓰셨던 '진짜 유저 UUID'와 '회사 ID'를 똑같이 넣어주세요!
-                        'user_id': '048def2e-5ff2-480d-a659-c12d18fa7ed8', 
-                        'company_id': 1, 
-                        
-                        // 임시 하드코딩 데이터 (나중에 AI 담당자가 주는 데이터로 교체될 부분)
-                        'merchant_name': '할매국밥', 
-                        'amount': 10000,
-                        'category': '식대', 
-                        'card_type': '개인카드',
-                        'payment_date': DateTime.now().toIso8601String(), // 오늘 날짜로 임시 세팅
-                        
-                        // ✨ 대망의 출장 매핑 데이터! (선택 안 했으면 null이 들어감)
-                        'trip_id': _selectedTripId, 
-                      });
+                      await apiClient.postJson(
+                        '/api/receipts',
+                        {
+                          'merchant_name': '할매국밥',
+                          'amount': 10000,
+                          'category': '식대',
+                          'card_type': '개인카드',
+                          'payment_date': DateTime.now().toIso8601String(),
+                          'trip_id': _selectedTripId == null
+                              ? null
+                              : int.tryParse(_selectedTripId!),
+                        },
+                      );
 
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
