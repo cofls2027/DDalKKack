@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 
 const AI_URL = 'http://localhost:9000';
 
+
 async function callAI(filePath, filename, cardType, companyId, position) {
   const form = new FormData();
   form.append('image', fs.createReadStream(filePath), filename);
@@ -34,6 +35,7 @@ export async function uploadReceipt(req, res, next) {
     const ai = await callAI(
       req.file.path, req.file.filename, card_type, companyId, req.user.position
     );
+    console.log('AI 응답:', JSON.stringify(ai).slice(0, 200));
 
     const { data, error } = await supabase
       .from('receipts')
@@ -45,6 +47,7 @@ export async function uploadReceipt(req, res, next) {
         merchant_name: ai.ocr.merchant,
         amount:        ai.ocr.amount,
         payment_date:  ai.ocr.date,
+        payment_time:  ai.ocr.time,
         category:      ai.ocr.category,
         card_type,
         items:         ai.ocr.items,

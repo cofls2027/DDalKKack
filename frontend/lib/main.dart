@@ -1743,12 +1743,12 @@ Future<AnalyzeReceiptResult> analyzeReceiptImage(String imagePath) async {
   final uri = apiClient.buildUri('/api/receipts/analyze');
   final request = http.MultipartRequest('POST', uri);
   print('imagePath: $imagePath');
-
   apiClient.addAuthHeader(request.headers);
   request.files.add(await http.MultipartFile.fromPath(
-    'image', 
+    'image',
     imagePath,
-    contentType: MediaType('image', 'jpeg'),));
+    contentType: MediaType('image', 'jpeg'),
+  ));
   request.fields['card_type'] = '회사카드';
   request.fields['company_id'] = '1';
 
@@ -1760,7 +1760,8 @@ Future<AnalyzeReceiptResult> analyzeReceiptImage(String imagePath) async {
   }
 
   final json = jsonDecode(response.body);
-  return analyzeReceiptResultFromApi(json, imagePath);
+  final ai = json['ai'] as Map<String, dynamic>;
+  return analyzeReceiptResultFromApi(ai, imagePath);
 }
 
 AnalyzeReceiptResult analyzeReceiptResultFromApi(
