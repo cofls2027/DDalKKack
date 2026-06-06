@@ -73,7 +73,10 @@ async def batch_analyze(
         except Exception as e:
             results.append({"filename": image.filename, "success": False, "error": str(e)})
         finally:
-            os.unlink(tmp_path)
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
 
     succeeded = sum(1 for r in results if r["success"])
     return {"total": len(images), "succeeded": succeeded, "results": results}

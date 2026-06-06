@@ -1,14 +1,12 @@
-import { supabase }  from '../lib/supabase.js';
+import { supabase } from '../lib/supabase.js';
 import { uploadToStorage, getPublicUrl, deleteFromStorage } from '../services/storageService.js';
-import FormData      from 'form-data';
-import fs            from 'fs';
-import fetch         from 'node-fetch';
+import FormData from 'form-data';
+import fs from 'fs';
+import fetch from 'node-fetch';
 
+const AI_URL = 'http://localhost:9000';
 
-const AI_URL = 'http://localhost:8000';  // FastAPI 주소
-
-/** FastAPI에 이미지 + 메타 전송 → OCR + 검증 결과 받기 */
-async function callAI(filePath, filename, cardType, companyId) {
+async function callAI(filePath, filename, cardType, companyId, position) {
   const form = new FormData();
   form.append('image', fs.createReadStream(filePath), filename);
   form.append('card_type', cardType);
@@ -22,7 +20,6 @@ async function callAI(filePath, filename, cardType, companyId) {
   return res.json();
 }
 
-/** POST /api/receipts/upload */
 export async function uploadReceipt(req, res, next) {
   try {
     if (!req.file) return res.status(400).json({ error: '파일이 없습니다' });
@@ -30,17 +27,14 @@ export async function uploadReceipt(req, res, next) {
     const { card_type = '회사카드' } = req.body;
     const companyId = req.user.company_id;
 
-    // 1) Storage 업로드
     const storagePath = await uploadToStorage(
       req.file.path, req.user.id, req.file.filename
     );
 
-    // 2) FastAPI 호출 (OCR + 검증)
     const ai = await callAI(
-      req.file.path, req.file.filename, card_type, companyId
+      req.file.path, req.file.filename, card_type, companyId, req.user.position
     );
 
-    // 3) DB 저장
     const { data, error } = await supabase
       .from('receipts')
       .insert({
@@ -65,7 +59,6 @@ export async function uploadReceipt(req, res, next) {
   } catch (err) { next(err); }
 }
 
-/** GET /api/receipts */
 export async function getReceipts(req, res, next) {
   try {
     const { status, page = 1, limit = 20 } = req.query;
@@ -78,26 +71,10 @@ export async function getReceipts(req, res, next) {
     if (status) q = q.eq('status', status);
     const { data, error, count } = await q;
     if (error) throw error;
-    res.json({ receipts: data, total: count, page: +page, limit: +limit });
+    res.json({ data, total: count, page: +page, limit: +limit });
   } catch (err) { next(err); }
 }
 
-export const analyzeReceipt = async (req, res) => {
-  try {
-    const file = req.file;
-    if (!file) return res.status(400).json({ message: '이미지가 없습니다.' });
-
-    const ai = await callAI(
-      file.path, file.filename, 'analyze', null, null
-    );
-
-    res.json({ success: true, data: ai });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-/** GET /api/receipts/:id */
 export async function getReceiptById(req, res, next) {
   try {
     const { data, error } = await supabase.from('receipts')
@@ -107,7 +84,6 @@ export async function getReceiptById(req, res, next) {
   } catch (err) { next(err); }
 }
 
-/** DELETE /api/receipts/:id */
 export async function deleteReceipt(req, res, next) {
   try {
     const { data: receipt, error } = await supabase.from('receipts')
