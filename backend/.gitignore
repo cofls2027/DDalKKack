@@ -1,18 +1,55 @@
-# --- Android (frontend) ---
-/frontend/build/
-/frontend/app/build/
-/frontend/.gradle/
-/frontend/local.properties
 
 # --- Backend (Node.js) ---
 /backend/node_modules/
 /backend/.env
 
-# --- OS/Tools ---
-.DS_Store
-.idea/
 
 /backend/ai/.env
 /backend/.env
-# --- Local secrets (copy from *.example.*) ---
-/frontend/dart_defines.json
+﻿# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android / Gradle
+*.iml
+.gradle/
+/local.properties
+local.properties
+.externalNativeBuild
+.cxx
+/captures
+
+# Android Studio / IntelliJ
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup
+_as_backup/
+frontend_kotlin_backup/
+
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+build/
