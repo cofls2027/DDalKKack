@@ -1,8 +1,9 @@
 import { supabase }  from '../lib/supabase.js';
-import { uploadToStorage, getPublicUrl } from '../services/storageService.js';
+import { uploadToStorage, getPublicUrl, deleteFromStorage } from '../services/storageService.js';
 import FormData      from 'form-data';
 import fs            from 'fs';
 import fetch         from 'node-fetch';
+
 
 const AI_URL = 'http://localhost:8000';  // FastAPI 주소
 
@@ -12,7 +13,7 @@ async function callAI(filePath, filename, cardType, companyId) {
   form.append('image', fs.createReadStream(filePath), filename);
   form.append('card_type', cardType);
   form.append('company_id', String(companyId));
-  form.append('position', req.user.position ?? '');
+  form.append('position', position ?? '');
 
   const res = await fetch(`${AI_URL}/ai/analyze`, {
     method: 'POST', body: form, headers: form.getHeaders(),
@@ -80,6 +81,21 @@ export async function getReceipts(req, res, next) {
     res.json({ receipts: data, total: count, page: +page, limit: +limit });
   } catch (err) { next(err); }
 }
+
+export const analyzeReceipt = async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: '이미지가 없습니다.' });
+
+    const ai = await callAI(
+      file.path, file.filename, 'analyze', null, null
+    );
+
+    res.json({ success: true, data: ai });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 /** GET /api/receipts/:id */
 export async function getReceiptById(req, res, next) {

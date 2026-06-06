@@ -18,6 +18,14 @@ app.use('/api/validation', validationRouter);
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use(errorHandler);
 
-app.listen(4000, () => {
+app.listen(3000, () => {
   console.log('Server running on port 4000');
+});
+
+app._router.stack.forEach(r => {
+  if (r.handle?.stack) {
+    r.handle.stack.forEach(s => {
+      if (s.route) console.log(s.route.path, Object.keys(s.route.methods));
+    });
+  }
 });

@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-=======
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +5,10 @@ import 'package:path_provider/path_provider.dart';
 import 'screens/expense/history_screen.dart';
 import 'screens/trip/trip_screen.dart';
 import 'services/api_client.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,23 +17,11 @@ runApp(const DDalKKackApp());
 
 class DDalKKackApp extends StatelessWidget {
   const DDalKKackApp({super.key});
->>>>>>> origin/dochi
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DDalKKack',
-<<<<<<< HEAD
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(child: Text('DDalKKack')),
-      ),
-    );
-  }
-=======
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -1758,13 +1740,26 @@ class MenuTile extends StatelessWidget {
 }
 
 Future<AnalyzeReceiptResult> analyzeReceiptImage(String imagePath) async {
-  final json = await apiClient.postJson(
-    '/api/receipts/analyze',
-    {
-      'imagePath': imagePath,
-    },
-  );
+  final uri = apiClient.buildUri('/api/receipts/analyze');
+  final request = http.MultipartRequest('POST', uri);
+  print('imagePath: $imagePath');
 
+  apiClient.addAuthHeader(request.headers);
+  request.files.add(await http.MultipartFile.fromPath(
+    'image', 
+    imagePath,
+    contentType: MediaType('image', 'jpeg'),));
+  request.fields['card_type'] = '회사카드';
+  request.fields['company_id'] = '1';
+
+  final streamed = await request.send();
+  final response = await http.Response.fromStream(streamed);
+
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    throw Exception('API 오류 ${response.statusCode}: ${response.body}');
+  }
+
+  final json = jsonDecode(response.body);
   return analyzeReceiptResultFromApi(json, imagePath);
 }
 
@@ -1906,5 +1901,4 @@ Color statusColor(ExpenseStatus status) {
     case ExpenseStatus.rejected:
       return const Color(0xFFD93025);
   }
->>>>>>> origin/dochi
 }

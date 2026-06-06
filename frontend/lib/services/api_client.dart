@@ -15,6 +15,13 @@ class ApiClient {
     _accessToken = null;
   }
 
+  Uri buildUri(String path) => _uri(path);
+
+  void addAuthHeader(Map<String, String> headers) {
+    if (_accessToken != null) {
+      headers['Authorization'] = 'Bearer $_accessToken';
+    }
+  }
   Map<String, String> get _headers {
     return {
       'Content-Type': 'application/json',
