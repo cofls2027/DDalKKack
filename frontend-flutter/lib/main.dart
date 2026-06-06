@@ -41,9 +41,24 @@ class DDalKKackApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: '딸깍',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2563EB)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF3D3B6E),
+          primary: const Color(0xFF3D3B6E),
+        ),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          foregroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       routerConfig: router,
     );

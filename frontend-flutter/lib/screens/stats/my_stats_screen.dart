@@ -15,14 +15,19 @@ class MyStatsScreen extends ConsumerWidget {
     final title = '${now.year}년 ${now.month}월 내 통계';
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _ErrorView(message: e.toString(), onRetry: () => ref.invalidate(myStatsProvider)),
-        data: (stats) => _StatsBody(stats: stats),
+        data: (stats) => _StatsBody(stats: stats, title: title),
       ),
     );
   }
@@ -30,13 +35,31 @@ class MyStatsScreen extends ConsumerWidget {
 
 class _StatsBody extends StatelessWidget {
   final StatsModel stats;
-  const _StatsBody({required this.stats});
+  final String title;
+  const _StatsBody({required this.stats, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('DDalKKack',
+                  style: TextStyle(fontSize: 11, color: Colors.grey)),
+              const SizedBox(height: 4),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 3),
+              const Text('카테고리별 지출 및 승인 현황을 확인하세요.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
+        ),
         _TotalAmountCard(amount: stats.totalAmount),
         const SizedBox(height: 16),
         _SectionCard(
@@ -263,7 +286,16 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: 16),
-          FilledButton(onPressed: onRetry, child: const Text('다시 시도')),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3D3B6E),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('다시 시도'),
+          ),
         ],
       ),
     );

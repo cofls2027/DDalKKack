@@ -12,9 +12,14 @@ class RulesViewerScreen extends ConsumerWidget {
     final rulesAsync = ref.watch(myRulesProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('규정 확인'),
-        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: rulesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -37,12 +42,36 @@ class _RulesTable extends StatelessWidget {
     final formatter = NumberFormat('#,###', 'ko_KR');
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Card(
-        child: Column(
-          children: [
-            _TableHeader(),
-            const Divider(height: 1),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(4, 0, 4, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('DDalKKack',
+                    style: TextStyle(fontSize: 11, color: Colors.grey)),
+                SizedBox(height: 4),
+                Text('규정 확인',
+                    style: TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold)),
+                SizedBox(height: 3),
+                Text('회사 경비 처리 규정 및 한도를 확인하세요.',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+              ],
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade200),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _TableHeader(),
+                const Divider(height: 1),
             if (rules.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
@@ -60,6 +89,8 @@ class _RulesTable extends StatelessWidget {
               ),
           ],
         ),
+          ),
+        ],
       ),
     );
   }
@@ -143,7 +174,16 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: 16),
-          FilledButton(onPressed: onRetry, child: const Text('다시 시도')),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3D3B6E),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('다시 시도'),
+          ),
         ],
       ),
     );

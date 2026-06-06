@@ -11,9 +11,14 @@ class MyCardsScreen extends ConsumerWidget {
     final cardsAsync = ref.watch(myCardsProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('카드 조회'),
-        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: cardsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -21,14 +26,50 @@ class MyCardsScreen extends ConsumerWidget {
           message: e.toString(),
           onRetry: () => ref.invalidate(myCardsProvider),
         ),
-        data: (cards) => cards.isEmpty
-            ? const Center(child: Text('등록된 카드가 없습니다.', style: TextStyle(color: Colors.grey)))
-            : ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: cards.length,
-                separatorBuilder: (ctx, idx) => const SizedBox(height: 12),
-                itemBuilder: (_, i) => _CardItem(card: cards[i]),
+        data: (cards) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('DDalKKack',
+                        style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    SizedBox(height: 4),
+                    Text('카드 조회',
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 3),
+                    Text('회사에 등록된 카드 목록을 확인하세요.',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    SizedBox(height: 4),
+                  ],
+                ),
               ),
+            ),
+            if (cards.isEmpty)
+              const SliverFillRemaining(
+                child: Center(
+                  child: Text('등록된 카드가 없습니다.',
+                      style: TextStyle(color: Colors.grey)),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _CardItem(card: cards[i]),
+                    ),
+                    childCount: cards.length,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -40,24 +81,26 @@ class _CardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompany = card.cardType == '법인카드';
-    final typeColor = isCompany
-        ? Theme.of(context).colorScheme.primary
-        : const Color(0xFF059669);
+    final typeColor = Theme.of(context).colorScheme.primary;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: typeColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.credit_card, color: typeColor),
+              child: Icon(Icons.credit_card, color: typeColor, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -126,7 +169,16 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: 16),
-          FilledButton(onPressed: onRetry, child: const Text('다시 시도')),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3D3B6E),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('다시 시도'),
+          ),
         ],
       ),
     );
