@@ -1,2 +1,18 @@
-.env
-node_modules/
+# --- Android (frontend) ---
+/frontend/build/
+/frontend/app/build/
+/frontend/.gradle/
+/frontend/local.properties
+
+# --- Backend (Node.js) ---
+/backend/node_modules/
+/backend/.env
+
+# --- OS/Tools ---
+.DS_Store
+.idea/
+
+/backend/ai/.env
+/backend/.env
+# --- Local secrets (copy from *.example.*) ---
+/frontend/dart_defines.json
