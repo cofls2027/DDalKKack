@@ -5,7 +5,6 @@ import '../screens/home/home_screen.dart';
 import '../screens/stats/my_stats_screen.dart';
 import '../screens/cards/my_cards_screen.dart';
 import '../screens/rules/rules_viewer_screen.dart';
-
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
