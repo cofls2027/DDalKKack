@@ -25,3 +25,16 @@
 # --- Local secrets (copy from *.example.*) ---
 /frontend/dart_defines.json
 >>>>>>> origin/dochi
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+venv/
+.venv/
+
+# Environment
+.env
+*.env
