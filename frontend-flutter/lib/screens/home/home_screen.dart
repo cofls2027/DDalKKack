@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
             title: '내 통계',
             subtitle: '이번 달 지출 현황 및 카테고리별 분석',
             color: const Color(0xFF3D3B6E),
-            onTap: () => context.push('/stats'),
+            onTap: () => context.go('/stats'),
           ),
           const SizedBox(height: 12),
           _NavCard(
@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
             title: '카드 조회',
             subtitle: '회사에 등록된 카드 목록 확인',
             color: const Color(0xFF3D3B6E),
-            onTap: () => context.push('/cards'),
+            onTap: () => context.push('/cards'), 
           ),
           const SizedBox(height: 12),
           _NavCard(
@@ -70,7 +70,27 @@ class HomeScreen extends StatelessWidget {
             title: '규정 확인',
             subtitle: '회사 경비 처리 규정 및 한도 확인',
             color: const Color(0xFF3D3B6E),
-            onTap: () => context.push('/rules'),
+            onTap: () => context.go('/rules'),
+          ),
+          const SizedBox(height: 12),
+          
+          // 🌟 추가된 버튼: 영수증 내역
+          _NavCard(
+            icon: Icons.receipt_long,
+            title: '영수증 내역',
+            subtitle: '제출한 영수증 목록 및 승인 상태 확인',
+            color: const Color(0xFF3366FF),
+            onTap: () => context.go('/history'),
+          ),
+          const SizedBox(height: 12),
+          
+          // 🌟 추가된 버튼: 출장 관리
+          _NavCard(
+            icon: Icons.luggage,
+            title: '출장 관리',
+            subtitle: '출장 등록 및 관련 경비 정산 관리',
+            color: const Color(0xFF3366FF),
+            onTap: () => context.go('/trip'),
           ),
         ],
       ),
