@@ -53,3 +53,5 @@ __pycache__/
 .flutter-plugins-dependencies
 .dart_tool/
 build/
+
+tmp/receipts/
